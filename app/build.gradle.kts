@@ -44,7 +44,7 @@ android {
 
             BuildConfigFieldFactory(
                 fields = listOf(
-                    Field.Environment("prod"),
+                    Field.Environment("prod.restricted"),
                     Field.TestActionEnabled(false),
                     Field.LogEnabled(false),
                 ),
@@ -55,7 +55,7 @@ android {
         debug {
             isDebuggable = true
             isMinifyEnabled = false
-            applicationIdSuffix = ".dev"
+            applicationIdSuffix = ".dev.restricted"
 
             configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
                 // disable mapping file uploads (default=true if minifying)
@@ -75,7 +75,7 @@ android {
         create("debug_beta") {
             initWith(getByName("release"))
             versionNameSuffix = "-beta"
-            applicationIdSuffix = ".debug"
+            applicationIdSuffix = ".debug.restricted"
             signingConfig = signingConfigs.getByName("debug")
         }
     }

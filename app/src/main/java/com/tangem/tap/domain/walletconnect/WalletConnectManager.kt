@@ -5,6 +5,7 @@ import com.tangem.common.card.EllipticCurve
 import com.tangem.common.extensions.guard
 import com.tangem.core.analytics.Analytics
 import com.tangem.domain.common.ScanResponse
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.tap.common.analytics.events.WalletConnect
 import com.tangem.tap.common.extensions.dispatchOnMain
 import com.tangem.tap.common.redux.global.GlobalAction
@@ -140,7 +141,7 @@ class WalletConnectManager {
     }
 
     fun restoreSessions(scanResponse: ScanResponse) {
-        val walletPublicKey = scanResponse.card.wallets.firstOrNull { it.curve == EllipticCurve.Secp256k1 }?.publicKey
+        val walletPublicKey = scanResponse.card.wallets.selectWalletForRestrictedApp(EllipticCurve.Secp256k1)?.publicKey
             ?: return
         if (scanResponse.card.backupStatus?.isActive != true) cardId = scanResponse.card.cardId
         val sessions = walletConnectRepository.loadSavedSessions()

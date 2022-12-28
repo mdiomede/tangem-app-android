@@ -1,12 +1,15 @@
 package com.tangem.tap.domain.extensions
 
 import com.tangem.common.card.FirmwareVersion
+import com.tangem.common.extensions.calculateSha256
 import com.tangem.common.extensions.toHexString
 import com.tangem.common.services.Result
 import com.tangem.domain.common.CardDTO
 import com.tangem.domain.common.TapWorkarounds.isSaltPay
 import com.tangem.domain.common.TwinCardNumber
+import com.tangem.domain.common.extensions.calculateHmacSha256
 import com.tangem.domain.common.getTwinCardNumber
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.operations.attestation.CardVerifyAndGetInfo
 import com.tangem.operations.attestation.OnlineCardVerifier
 import com.tangem.tap.features.wallet.redux.Artwork
@@ -56,7 +59,6 @@ suspend fun CardDTO.getOrLoadCardArtworkUrl(cardInfo: Result<CardVerifyAndGetInf
                 OnlineCardVerifier.getUrlForArtwork(cardId, cardPublicKey.toHexString(), artworkId)
             }
         }
-
         is Result.Failure -> ifAnyError()
     }
 }
@@ -66,9 +68,23 @@ fun CardDTO.getArtworkUrl(artworkId: String?): String? {
         artworkId != null -> {
             OnlineCardVerifier.getUrlForArtwork(cardId, cardPublicKey.toHexString(), artworkId)
         }
-
         cardId.startsWith(Artwork.SERGIO_CARD_ID) -> Artwork.SERGIO_CARD_URL
         cardId.startsWith(Artwork.MARTA_CARD_ID) -> Artwork.MARTA_CARD_URL
         else -> null
+    }
+}
+
+fun CardDTO.getUserWalletId(): String {
+    val walletPublicKey = wallets.selectWalletForRestrictedApp()?.publicKey ?: return ""
+    return UserWalletId(walletPublicKey).stringValue
+}
+
+class UserWalletId(val walletPublicKey: ByteArray) {
+    val stringValue: String = calculateUserId(walletPublicKey)
+
+    private fun calculateUserId(walletPublicKey: ByteArray): String {
+        val message = "UserWalletID".toByteArray()
+        val keyHash = walletPublicKey.calculateSha256()
+        return message.calculateHmacSha256(keyHash).toHexString()
     }
 }

@@ -63,6 +63,16 @@ private fun handleHomeAction(action: Action) {
             store.dispatch(GlobalAction.FetchUserCountry)
         }
         is HomeAction.ReadCard -> {
+            // if (RestrictedAppWorkaround.appIsExpired()) {
+            //     store.dispatchDialogShow(
+            //         AppDialog.SimpleOkDialog(
+            //             header = "Warning",
+            //             message = "Application time expired",
+            //             onOk = {},
+            //         ),
+            //     )
+            //     return
+            // }
             readCard(action.analyticsEvent)
         }
         is HomeAction.GoToShop -> {
