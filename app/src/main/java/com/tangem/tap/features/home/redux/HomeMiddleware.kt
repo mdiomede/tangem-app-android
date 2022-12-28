@@ -79,10 +79,9 @@ private fun readCard() = scope.launch {
         onProgressStateChange = { showProgress ->
             if (showProgress) {
                 changeButtonState(ButtonState.PROGRESS)
+            } else {
+                changeButtonState(ButtonState.ENABLED)
             }
-            // else { //todo hide this because
-            //     changeButtonState(ButtonState.ENABLED)
-            // }
         },
         onScanStateChange = { scanInProgress ->
             store.dispatch(HomeAction.ScanInProgress(scanInProgress))
