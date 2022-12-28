@@ -81,9 +81,9 @@ data class ScanResponse(
     }
 
     fun hasDerivation(curve: EllipticCurve, derivationPath: DerivationPath): Boolean {
-        val foundWallet = card.wallets.firstOrNull { it.curve == curve }
-            ?: return false
+        val foundWallet = card.wallets.selectWalletForRestrictedApp(curve) ?: return false
         val extendedPublicKeysMap = derivedKeys[foundWallet.publicKey.toMapKey()] ?: return false
+
         val extendedPublicKey = extendedPublicKeysMap[derivationPath]
         return extendedPublicKey != null
     }

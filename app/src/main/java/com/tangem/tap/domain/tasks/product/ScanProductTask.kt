@@ -14,6 +14,7 @@ import com.tangem.common.extensions.toHexString
 import com.tangem.common.extensions.toMapKey
 import com.tangem.common.hdWallet.DerivationPath
 import com.tangem.domain.common.ProductType
+import com.tangem.domain.common.RestrictedAppWorkaround
 import com.tangem.domain.common.ScanResponse
 import com.tangem.domain.common.TapWorkarounds.isExcluded
 import com.tangem.domain.common.TapWorkarounds.isNotSupportedInThatRelease
@@ -22,6 +23,7 @@ import com.tangem.domain.common.TapWorkarounds.isTangemNote
 import com.tangem.domain.common.TapWorkarounds.isTangemTwins
 import com.tangem.domain.common.TapWorkarounds.useOldStyleDerivation
 import com.tangem.domain.common.TwinsHelper
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.operations.PreflightReadMode
 import com.tangem.operations.PreflightReadTask
 import com.tangem.operations.ScanTask
@@ -88,6 +90,8 @@ class ScanProductTask(
     private fun getErrorIfExcludedCard(card: Card): TangemError? {
         if (card.isExcluded) return TapSdkError.CardForDifferentApp
         if (card.isNotSupportedInThatRelease) return TapSdkError.CardNotSupportedByRelease
+        if (!RestrictedAppWorkaround.getSupportedCardIds().contains(card.cardId)) return TapSdkError.CardNotSupportedByRelease
+
         return null
     }
 }
@@ -263,7 +267,7 @@ private class ScanWalletProcessor(
 
         blockchains.forEach { blockchain ->
             val curve = blockchain.blockchain.getPrimaryCurve()
-            val wallet = card.wallets.firstOrNull { it.curve == curve } ?: return@forEach
+            val wallet = card.wallets.selectWalletForRestrictedApp(curve) ?: return@forEach
             if (wallet.chainCode == null) return@forEach
 
             val key = wallet.publicKey.toMapKey()

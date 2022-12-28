@@ -18,6 +18,7 @@ import com.tangem.domain.common.SaltPayWorkaround
 import com.tangem.domain.common.ScanResponse
 import com.tangem.domain.common.TapWorkarounds.isTestCard
 import com.tangem.domain.common.TapWorkarounds.useOldStyleDerivation
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.tap.domain.tokens.models.BlockchainNetwork
 import com.tangem.tap.features.wallet.models.Currency
 
@@ -31,7 +32,7 @@ fun WalletManagerFactory.makeWalletManagerForApp(
     val supportedCurves = blockchain.getSupportedCurves()
 
     val wallets = card.wallets.filter { wallet -> supportedCurves.contains(wallet.curve) }
-    val wallet = selectWallet(wallets) ?: return null
+    val wallet = wallets.selectWalletForRestrictedApp() ?: return null
 
     val environmentBlockchain =
         if (card.isTestCard) blockchain.getTestnetVersion()!! else blockchain

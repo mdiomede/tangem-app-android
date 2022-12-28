@@ -14,6 +14,7 @@ import com.tangem.domain.common.ScanResponse
 import com.tangem.domain.common.TapWorkarounds.derivationStyle
 import com.tangem.domain.common.TapWorkarounds.isTestCard
 import com.tangem.domain.common.extensions.supportedBlockchains
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.domain.features.addCustomToken.CustomCurrency
 import com.tangem.domain.features.addCustomToken.redux.AddCustomTokenAction
 import com.tangem.domain.redux.domainStore
@@ -232,7 +233,7 @@ class TokensMiddleware {
         scanResponse: ScanResponse,
         currencyList: List<Currency>,
     ): DerivationData? {
-        val wallet = scanResponse.card.wallets.firstOrNull { it.curve == curve } ?: return null
+        val wallet = scanResponse.card.wallets.selectWalletForRestrictedApp(curve) ?: return null
 
         val manageTokensCandidates = currencyList.map { it.blockchain }.distinct().filter {
             it.getSupportedCurves().contains(curve)

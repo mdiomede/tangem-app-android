@@ -14,6 +14,7 @@ import com.tangem.domain.common.TwinCardNumber
 import com.tangem.domain.common.extensions.calculateHmacSha256
 import com.tangem.domain.common.getTwinCardNumber
 import com.tangem.domain.common.isTangemTwin
+import com.tangem.domain.common.selectWalletForRestrictedApp
 import com.tangem.operations.attestation.CardVerifyAndGetInfo
 import com.tangem.operations.attestation.OnlineCardVerifier
 import com.tangem.tap.features.wallet.redux.Artwork
@@ -93,7 +94,7 @@ fun Card.getArtworkUrl(artworkId: String?): String? {
 }
 
 fun Card.getUserWalletId(): String {
-    val walletPublicKey = this.wallets.firstOrNull()?.publicKey ?: return ""
+    val walletPublicKey = wallets.selectWalletForRestrictedApp()?.publicKey ?: return ""
     return UserWalletId(walletPublicKey).stringValue
 }
 

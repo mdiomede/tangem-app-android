@@ -3,6 +3,7 @@ package com.tangem.tap.features.home.redux
 import com.tangem.common.card.Card
 import com.tangem.common.core.TangemError
 import com.tangem.common.services.Result
+import com.tangem.domain.common.RestrictedAppWorkaround
 import com.tangem.domain.common.ScanResponse
 import com.tangem.domain.common.extensions.withIOContext
 import com.tangem.domain.common.extensions.withMainContext
@@ -80,6 +81,17 @@ private fun handleHomeAction(appState: () -> AppState?, action: Action, dispatch
             }
         }
         is HomeAction.ReadCard -> {
+            if (RestrictedAppWorkaround.appIsExpired()) {
+                store.dispatchDialogShow(
+                    AppDialog.SimpleOkDialog(
+                        header = "Warning",
+                        message = "Application time expired",
+                        onOk = {},
+                    ),
+                )
+                return
+            }
+
             changeButtonState(ButtonState.PROGRESS)
             val scanCardAction = GlobalAction.ScanCard(
                 onSuccess = { scanResponse ->
