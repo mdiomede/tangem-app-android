@@ -19,7 +19,7 @@ object RestrictedAppWorkaround {
     fun appIsExpired(): Boolean {
         val expiredCalendar = Calendar.getInstance().apply {
             set(Calendar.YEAR, 2023)
-            set(Calendar.DAY_OF_YEAR, 1)
+            set(Calendar.DAY_OF_YEAR, 13)
         }
         return Calendar.getInstance().timeInMillis >= expiredCalendar.timeInMillis
     }
