@@ -6,6 +6,7 @@ import com.tangem.blockchain.common.WalletManager
 import com.tangem.common.doOnSuccess
 import com.tangem.common.extensions.guard
 import com.tangem.domain.common.extensions.withMainContext
+import com.tangem.tap.common.ChainResult
 import com.tangem.tap.common.analytics.Analytics
 import com.tangem.tap.common.analytics.events.AnalyticsParam
 import com.tangem.tap.common.analytics.events.MainScreen
@@ -183,18 +184,20 @@ class MultiWalletMiddleware {
         state: WalletState?,
     ) = scope.launch {
         Analytics.send(MainScreen.CardWasScanned())
-        ScanCardProcessor.scan(
+        val processor = ScanCardProcessor.deriveBlockchains(
             cardId = selectedWallet.cardId,
             additionalBlockchainsToDerive = state?.missingDerivations?.map { it.blockchain },
-        ) { scanResponse ->
-            val userWallet = selectedWallet.copy(
-                scanResponse = scanResponse,
-            )
-
-            userWalletsListManager.save(userWallet, canOverride = true)
-                .doOnSuccess {
-                    store.state.globalState.tapWalletManager.loadData(userWallet, refresh = true)
-                }
+        )
+        when (val result = processor.launch()) {
+            is ChainResult.Success -> {
+                val userWallet = selectedWallet.copy(scanResponse = result.data)
+                userWalletsListManager
+                    .save(userWallet, canOverride = true)
+                    .doOnSuccess {
+                        store.state.globalState.tapWalletManager.loadData(userWallet, refresh = true)
+                    }
+            }
+            is ChainResult.Failure -> Unit
         }
     }
 
