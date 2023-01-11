@@ -25,12 +25,17 @@ class ConfigValueModel(
     val blockchairAuthorizationToken: String?,
     val blockcypherTokens: Set<String>?,
     val infuraProjectId: String?,
-    val appsFlyerDevKey: String,
+    val appsFlyer: AppsFlyer,
     val shopifyShop: ShopifyShop?,
     val zendesk: ZendeskConfig?,
     val saltPay: SaltPayConfig,
     val tronGridApiKey: String,
     val amplitudeApiKey: String,
+)
+
+data class AppsFlyer(
+    val appsFlyerDevKey: String,
+    val appsFlyerAppID: String,
 )
 
 class ConfigModel(

@@ -90,7 +90,7 @@ class ConfigManager {
                 infuraProjectId = values.infuraProjectId,
                 tronGridApiKey = values.tronGridApiKey
             ),
-            appsFlyerDevKey = values.appsFlyerDevKey,
+            appsFlyerDevKey = values.appsFlyer.appsFlyerDevKey,
             amplitudeApiKey = values.amplitudeApiKey,
             shopify = values.shopifyShop,
             zendesk = values.zendesk,
@@ -108,7 +108,7 @@ class ConfigManager {
                 blockcypherTokens = values.blockcypherTokens,
                 infuraProjectId = values.infuraProjectId
             ),
-            appsFlyerDevKey = values.appsFlyerDevKey,
+            appsFlyerDevKey = values.appsFlyer.appsFlyerDevKey,
             amplitudeApiKey = values.amplitudeApiKey,
             shopify = values.shopifyShop,
             zendesk = values.zendesk,
