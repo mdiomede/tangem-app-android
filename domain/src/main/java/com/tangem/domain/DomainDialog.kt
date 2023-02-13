@@ -1,7 +1,7 @@
 package com.tangem.domain
 
 import com.tangem.common.extensions.VoidCallback
-import com.tangem.datasource.api.tangemTech.CoinsResponse
+import com.tangem.datasource.api.tangemTech.models.CoinsResponse
 
 /**
  * Created by Anton Zhilenkov on 10/04/2022.
@@ -14,6 +14,6 @@ sealed interface DomainDialog {
         val items: List<CoinsResponse.Coin.Network>,
         val networkIdConverter: (String) -> String,
         val onSelect: (CoinsResponse.Coin.Network) -> Unit,
-        val onClose: VoidCallback = {}
+        val onClose: VoidCallback = {},
     ) : DomainDialog
 }

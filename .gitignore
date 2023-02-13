@@ -20,6 +20,9 @@ app/google-services.json
 # LayoutInspector files
 /captures
 
+# bundler
+/vendor
+
 # OS-specific files
 .DS_Store
 .DS_Store?
