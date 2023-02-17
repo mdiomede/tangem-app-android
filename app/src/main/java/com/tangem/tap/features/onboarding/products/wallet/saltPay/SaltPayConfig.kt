@@ -1,20 +1,19 @@
 package com.tangem.tap.features.onboarding.products.wallet.saltPay
 
-import com.tangem.tap.common.zendesk.ZendeskConfig
 import org.spongycastle.util.encoders.Base64.toBase64String
 
 /**
  * Created by Anton Zhilenkov on 13.10.2022.
  */
 data class SaltPayConfig(
-    val zendesk: ZendeskConfig,
+    val sprinklrAppID: String,
     val kycProvider: KYCProvider,
     val credentials: Credentials,
 ) {
     companion object {
         fun stub(): SaltPayConfig {
             return SaltPayConfig(
-                zendesk = ZendeskConfig("", "", "", "", ""),
+                sprinklrAppID = "",
                 kycProvider = KYCProvider("", "", "", ""),
                 credentials = Credentials("", ""),
             )
