@@ -1,12 +1,13 @@
 package com.tangem.tap.features.onboarding.products.wallet.saltPay
 
+import com.tangem.tap.common.chat.SprinklrConfig
 import org.spongycastle.util.encoders.Base64.toBase64String
 
 /**
  * Created by Anton Zhilenkov on 13.10.2022.
  */
 data class SaltPayConfig(
-    val sprinklrAppID: String,
+    val sprinklr: SprinklrConfig,
     val kycProvider: KYCProvider,
     val credentials: Credentials,
     val blockscoutCredentials: Credentials,
@@ -14,7 +15,7 @@ data class SaltPayConfig(
     companion object {
         fun stub(): SaltPayConfig {
             return SaltPayConfig(
-                sprinklrAppID = "",
+                sprinklr = SprinklrConfig("", ""),
                 kycProvider = KYCProvider("", "", "", ""),
                 credentials = Credentials("", ""),
                 blockscoutCredentials = Credentials("", ""),
