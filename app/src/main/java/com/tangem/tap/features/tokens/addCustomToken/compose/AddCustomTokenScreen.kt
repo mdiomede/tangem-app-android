@@ -60,7 +60,8 @@ import kotlinx.coroutines.launch
 /**
  * Created by Anton Zhilenkov on 23/03/2022.
  */
-private class AddCustomTokenScreen  // for simple search
+@Suppress("UnusedPrivateClass")
+private class AddCustomTokenScreen // for simple search
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
