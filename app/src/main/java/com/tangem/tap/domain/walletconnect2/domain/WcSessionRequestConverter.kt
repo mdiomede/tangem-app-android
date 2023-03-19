@@ -76,6 +76,7 @@ class WcSessionRequestConverter(
                     preparedRequestData = data,
                     topic = sessionRequest.topic,
                     requestId = sessionRequest.id,
+                    type = request.data.type,
                     derivationPath = derivationPath,
                 )
             }

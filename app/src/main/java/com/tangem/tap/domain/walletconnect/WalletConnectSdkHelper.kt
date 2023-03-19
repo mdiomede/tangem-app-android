@@ -128,20 +128,6 @@ class WalletConnectSdkHelper {
         return store.state.walletState.getWalletManager(blockchainNetwork)
     }
 
-    // private fun getWalletManager(session: WalletConnectSession): WalletManager? {
-    //     val factory = store.state.globalState.tapWalletManager.walletManagerFactory
-    //     val publicKey = Wallet.PublicKey(
-    //         session.wallet.walletPublicKey ?: return null,
-    //         session.wallet.derivedPublicKey,
-    //         session.wallet.derivationPath,
-    //     )
-    //     val blockchain = session.wallet.getBlockchainForSession()
-    //     return factory.makeWalletManager(
-    //         blockchain = blockchain,
-    //         publicKey = publicKey,
-    //     )
-    // }
-
     suspend fun completeTransaction(data: WcTransactionData, cardId: String?): String? {
         return when (data.type) {
             WcEthTransactionType.EthSendTransaction -> sendTransaction(data, cardId)
@@ -261,6 +247,7 @@ class WalletConnectSdkHelper {
             topic = topic,
             id = id,
             dialogData = dialogData,
+            type = message.type,
         )
     }
 

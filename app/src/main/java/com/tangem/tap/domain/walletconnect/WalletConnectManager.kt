@@ -349,6 +349,7 @@ class WalletConnectManager {
                             preparedRequestData = data,
                             topic = session.session.topic,
                             requestId = id,
+                            type = data.type,
                             derivationPath = session.wallet.derivationPath?.rawPath,
                         ),
                     ),
