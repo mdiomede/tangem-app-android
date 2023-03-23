@@ -33,6 +33,7 @@ import com.tangem.tap.network.NetworkConnectivity
 import com.tangem.tap.persistence.PreferencesStorage
 import com.tangem.wallet.BuildConfig
 import com.zendesk.logger.Logger
+import okhttp3.logging.HttpLoggingInterceptor
 import org.rekotlin.Store
 import timber.log.Timber
 import zendesk.chat.Chat
@@ -72,7 +73,11 @@ class TapApplication : Application(), ImageLoaderFactory {
         initConfigManager(configLoader, ::initWithConfigDependency)
         initWarningMessagesManager()
 
-        BlockchainSdkRetrofitBuilder.enableNetworkLogging = LogConfig.network.blockchainSdkNetwork
+        if (LogConfig.network.blockchainSdkNetwork) {
+            BlockchainSdkRetrofitBuilder.interceptors = listOf(
+                HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY },
+            )
+        }
 
         userTokensRepository = UserTokensRepository.init(
             context = this,

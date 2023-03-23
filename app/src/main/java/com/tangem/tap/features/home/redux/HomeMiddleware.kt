@@ -90,10 +90,10 @@ private fun handleHomeAction(appState: () -> AppState?, action: Action, dispatch
                     ),
                 )
             } else {
-                val daysLeft = RestrictedAppWorkaround.appIsExpired()
-                AppDialog.SimpleOkDialog(
+                val daysLeft = RestrictedAppWorkaround.daysLeft()
+                val dialog = AppDialog.SimpleOkDialog(
                     header = "Warning",
-                    message = "Application time expired after $daysLeft days",
+                    message = "Application time expires after $daysLeft day(s)",
                     onOk = {
                         changeButtonState(ButtonState.PROGRESS)
                         val scanCardAction = GlobalAction.ScanCard(
@@ -116,6 +116,7 @@ private fun handleHomeAction(appState: () -> AppState?, action: Action, dispatch
                         postUiDelayBg(300) { store.dispatch(scanCardAction) }
                     },
                 )
+                store.dispatchDialogShow(dialog)
             }
         }
         is HomeAction.GoToShop -> {

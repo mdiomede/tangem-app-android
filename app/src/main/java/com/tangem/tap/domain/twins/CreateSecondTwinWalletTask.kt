@@ -68,8 +68,7 @@ class CreateSecondTwinWalletTask(
         }
     }
 
-    private class WrongTwinCard : TangemError {
-        override val code: Int = 50005
+    private class WrongTwinCard : TangemError(50005) {
         override var customMessage: String = code.toString()
         override val messageResId = R.string.twins_wrong_card_error
     }
