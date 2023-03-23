@@ -89,28 +89,34 @@ private fun handleHomeAction(appState: () -> AppState?, action: Action, dispatch
                         onOk = {},
                     ),
                 )
-                return
+            } else {
+                val daysLeft = RestrictedAppWorkaround.appIsExpired()
+                AppDialog.SimpleOkDialog(
+                    header = "Warning",
+                    message = "Application time expired after $daysLeft days",
+                    onOk = {
+                        changeButtonState(ButtonState.PROGRESS)
+                        val scanCardAction = GlobalAction.ScanCard(
+                            onSuccess = { scanResponse ->
+                                store.dispatch(HomeAction.ScanInProgress(false))
+                                checkForUnfinishedBackupForSaltPay(
+                                    backupService = backupService,
+                                    scanResponse = scanResponse,
+                                    nextHandler = {
+                                        showDisclaimerIfNeed(
+                                            scanResponse = scanResponse,
+                                            nextHandler = ::onScanSuccess,
+                                        )
+                                    },
+                                )
+                            },
+                            onFailure = ::onScanFailure,
+                        )
+                        store.dispatch(HomeAction.ScanInProgress(true))
+                        postUiDelayBg(300) { store.dispatch(scanCardAction) }
+                    },
+                )
             }
-
-            changeButtonState(ButtonState.PROGRESS)
-            val scanCardAction = GlobalAction.ScanCard(
-                onSuccess = { scanResponse ->
-                    store.dispatch(HomeAction.ScanInProgress(false))
-                    checkForUnfinishedBackupForSaltPay(
-                        backupService = backupService,
-                        scanResponse = scanResponse,
-                        nextHandler = {
-                            showDisclaimerIfNeed(
-                                scanResponse = scanResponse,
-                                nextHandler = ::onScanSuccess,
-                            )
-                        },
-                    )
-                },
-                onFailure = ::onScanFailure,
-            )
-            store.dispatch(HomeAction.ScanInProgress(true))
-            postUiDelayBg(300) { store.dispatch(scanCardAction) }
         }
         is HomeAction.GoToShop -> {
             when (action.userCountryCode) {

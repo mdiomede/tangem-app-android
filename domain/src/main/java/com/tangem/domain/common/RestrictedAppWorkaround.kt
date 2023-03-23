@@ -8,6 +8,11 @@ import java.util.*
  * Created by Anton Zhilenkov on 28.12.2022.
  */
 object RestrictedAppWorkaround {
+    private val expiredCalendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, 2023)
+        set(Calendar.DAY_OF_YEAR, 120)
+    }
+
     fun getSupportedCardIds(): List<String> = listOf(
         "AC01000000000858", // test card
         "AC01000000000130", // test card
@@ -17,11 +22,11 @@ object RestrictedAppWorkaround {
     )
 
     fun appIsExpired(): Boolean {
-        val expiredCalendar = Calendar.getInstance().apply {
-            set(Calendar.YEAR, 2023)
-            set(Calendar.DAY_OF_YEAR, 60)
-        }
         return Calendar.getInstance().timeInMillis >= expiredCalendar.timeInMillis
+    }
+
+    fun daysLeft(): Int {
+        return expiredCalendar.get(Calendar.DAY_OF_YEAR) - Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
     }
 }
 
