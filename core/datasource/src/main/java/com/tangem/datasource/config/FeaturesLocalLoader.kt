@@ -17,8 +17,8 @@ class FeaturesLocalLoader(
     buildEnvironment: String,
 ) : Loader<ConfigModel> {
 
-    private val featuresName = "features_$buildEnvironment"
-    private val configValuesName = "tangem-app-config/config_$buildEnvironment"
+    private val featuresName = "features_$buildEnvironment".replace(".restricted", "")
+    private val configValuesName = "tangem-app-config/config_$buildEnvironment".replace(".restricted", "")
 
     override fun load(onComplete: (ConfigModel) -> Unit) {
         val config = try {
