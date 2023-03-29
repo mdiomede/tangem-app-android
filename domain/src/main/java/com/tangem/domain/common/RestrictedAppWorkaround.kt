@@ -8,8 +8,9 @@ import java.util.*
  */
 object RestrictedAppWorkaround {
     fun getSupportedCardIds(): List<String> = listOf(
-        "AC01000000000858", // test card
-        "AC01000000000130", // test card
+        "AC01000000000130", // test card Anton
+        "AC01000000000858", // test card Regina
+        "AC08000000000554", // test card Alena
         "AC03000000117742",
         "AC03000000117759",
         "AC03000000117767",
