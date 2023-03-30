@@ -2,10 +2,10 @@ name: Tests
 
 on:
   pull_request:
-    branches: 
-    - 'releases/**'
-    - 'develop'
-    - 'master'
+    branches:
+      - 'releases/**'
+      - 'develop'
+      - 'master'
     types:
       - opened
       - reopened
@@ -23,27 +23,35 @@ jobs:
     runs-on: self-hosted
     if: github.event.pull_request.draft == false
     steps:
+
+    - name: 'Cleanup build folder'
+      run: |
+        ls -la ./
+        rm -rf ./* || true
+        rm -rf ./.??* || true
+        ls -la ./
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
-       
+
     - name: Bundle install
       run: |
         bundle config path vendor/bundle
         bundle install --jobs 4 --retry 3
-      
+
     - name: Tests
       run: bundle exec fastlane test
-      
+
     - name: Build notification
       if: failure()
       uses: adamkdean/simple-slack-notify@master
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DVELOPMENT_ANDROID }}
       with:
-        channel: '#development-ios'
+        channel: '#development-android'
         text: 'Tangem app tests #${{ github.run_number }} failed'
         color: 'danger'
         fields: |
