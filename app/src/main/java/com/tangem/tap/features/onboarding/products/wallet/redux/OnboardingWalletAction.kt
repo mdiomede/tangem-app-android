@@ -4,7 +4,12 @@ import android.net.Uri
 import org.rekotlin.Action
 
 sealed class OnboardingWalletAction : Action {
-    object Init : OnboardingWalletAction()
+    data class Init(val seedPhraseStepProvider: (() -> Int)? = null) : OnboardingWalletAction()
+    data class SetSeedPhraseDependencies(
+        val isSeedPhraseSupported: Boolean,
+        val seedPhraseStepProvider: (() -> Int)? = null,
+    ) : OnboardingWalletAction()
+
     object GetToCreateWalletStep : OnboardingWalletAction()
     object GetToSaltPayStep : OnboardingWalletAction()
     object CreateWallet : OnboardingWalletAction()
