@@ -15,7 +15,9 @@ suspend fun <R> runCatching(dispatcher: CoroutineDispatcher, block: suspend () -
     }
 }
 
-class Debouncer {
+class Debouncer(
+    val name: String = "Default"
+) {
 
     private var debounceJob: Job? = null
 

@@ -116,23 +116,6 @@ private fun CheckSeedPhraseBlock(
 }
 
 @Composable
-private fun CheckSeedPhraseBlock2(
-    modifier: Modifier = Modifier,
-    state: CheckSeedPhraseState,
-) {
-    Column(modifier) {
-        listOf(state.tvSecondPhrase, state.tvSeventhPhrase, state.tvEleventhPhrase).forEach { field ->
-            OutlineTextField(
-                value = field.textFieldValue,
-                onValueChange = field.onTextFieldValueChanged,
-                label = field.getLabel(),
-                isError = field.isError,
-            )
-        }
-    }
-}
-
-@Composable
 private fun TextFieldState.getLabel(): String? {
     return labelRes?.let { stringResource(id = it) } ?: label
 }

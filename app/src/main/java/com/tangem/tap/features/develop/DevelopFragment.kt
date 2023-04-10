@@ -8,15 +8,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tangem.core.ui.res.TangemTheme
@@ -28,6 +34,7 @@ import com.tangem.feature.onboarding.presentation.wallet2.ui.IntroScreen
 import com.tangem.feature.onboarding.presentation.wallet2.ui.YourSeedPhraseScreen
 import com.tangem.feature.onboarding.presentation.wallet2.viewmodel.SeedPhraseViewModel
 import com.tangem.tap.features.details.ui.common.EmptyTopBarWithNavigation
+import com.tangem.wallet.R
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -55,6 +62,20 @@ class DevelopFragment : Fragment() {
                     EmptyTopBarWithNavigation(
                         onBackClick = { },
                     )
+                    TopAppBar(
+                        title = { ToolbarTitleView(viewModel.currentStep) },
+                        navigationIcon = {
+                            IconButton(onClick = { }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_back_24),
+                                    contentDescription = null,
+                                    tint = TangemTheme.colors.icon.primary1,
+                                )
+                            }
+                        },
+                        backgroundColor = TangemTheme.colors.background.primary,
+                        elevation = 0.dp,
+                    )
                 },
                 modifier = Modifier
                     .systemBarsPadding()
@@ -63,13 +84,22 @@ class DevelopFragment : Fragment() {
                     Column {
                         Box(
                             modifier = Modifier
-                                .background(Color.Cyan)
                                 .fillMaxWidth()
-                                .height(TangemTheme.dimens.size32),
+                                .wrapContentHeight()
+                                .padding(top = 8.dp),
                         ) {
-                            val maxProgress = OnboardingSeedPhraseStep.values().size
-                            val progress = (viewModel.currentStep.ordinal / maxProgress).toFloat()
-                            LinearProgressIndicator(progress = progress)
+                            val maxProgress = 1f
+                            val maxStateProgress = OnboardingSeedPhraseStep.values().size * 2
+                            val viewProgress = viewModel.currentStep.ordinal + 2f
+                            val currentProgress = maxProgress * viewProgress / maxStateProgress
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                color = Color.Black,
+                                backgroundColor = Color.Black.copy(alpha = 0.081f),
+                                progress = currentProgress,
+                            )
                         }
 
                         val modifier = Modifier.padding(padding)
@@ -109,5 +139,17 @@ class DevelopFragment : Fragment() {
                 },
             )
         }
+    }
+
+    @Composable
+    private fun ToolbarTitleView(currentStep: OnboardingSeedPhraseStep) {
+        val text = when (currentStep) {
+            OnboardingSeedPhraseStep.Intro -> "Tangem"
+            OnboardingSeedPhraseStep.AboutSeedPhrase -> "Создать кошелек"
+            OnboardingSeedPhraseStep.YourSeedPhrase -> "Создать кошелек"
+            OnboardingSeedPhraseStep.CheckSeedPhrase -> "Создать кошелек"
+            OnboardingSeedPhraseStep.ImportSeedPhrase -> "Импортировать кошелек"
+        }
+        Text(text)
     }
 }

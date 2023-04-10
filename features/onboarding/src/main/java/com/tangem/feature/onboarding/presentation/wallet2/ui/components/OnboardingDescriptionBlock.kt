@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.tangem.core.ui.components.SpacerH12
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.feature.onboarding.presentation.wallet2.model.OnboardingDescription
+import com.tangem.utils.extensions.isSingleItem
 
 @Composable
 fun OnboardingDescriptionBlock(
@@ -26,7 +27,7 @@ fun OnboardingDescriptionBlock(
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
     ) {
-        if (descriptionsList.size == 1) {
+        if (descriptionsList.isSingleItem()) {
             SingleDescription(descriptionsList[0])
         } else {
             CarouselDescription(descriptionsList)

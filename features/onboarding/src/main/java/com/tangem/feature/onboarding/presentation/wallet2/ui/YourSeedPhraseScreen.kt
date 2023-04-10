@@ -51,7 +51,7 @@ fun YourSeedPhraseScreen(
         Box(
             modifier = Modifier.weight(1f),
         ) {
-            PhraseGreedBlock(state.phraseList)
+            PhraseGreedBlock(state.mnemonicComponents)
         }
 
         Box(

@@ -2,6 +2,7 @@ package com.tangem.feature.onboarding.presentation.wallet2.model
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.text.input.TextFieldValue
+import com.tangem.feature.onboarding.domain.SeedPhraseError
 
 /**
  * Created by Anton Zhilenkov on 14.03.2023.
@@ -33,7 +34,7 @@ data class AboutState(
 )
 
 data class YourSeedPhraseState(
-    val phraseList: List<String> = listOf(),
+    val mnemonicComponents: List<String> = listOf(),
     val buttonContinue: ButtonState = ButtonState(),
 )
 
@@ -45,10 +46,10 @@ data class CheckSeedPhraseState(
 )
 
 data class ImportSeedPhraseState(
-    val tvPhrase: TextFieldState = TextFieldState(),
-    val successWords: List<String> = emptyList(),
-    val wrongWords: List<String> = emptyList(),
+    val tvSeedPhrase: TextFieldState = TextFieldState(),
+    val invalidWords: Set<String> = emptySet(),
     val suggestionsList: List<String> = emptyList(),
+    val error: SeedPhraseError? = null,
     val onSuggestedPhraseClick: (Int) -> Unit = {},
     val buttonCreateWallet: ButtonState = ButtonState(),
 )

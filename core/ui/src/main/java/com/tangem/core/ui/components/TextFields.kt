@@ -57,6 +57,7 @@ fun OutlineTextField(
     placeholder: String? = null,
     caption: String? = null,
     enabled: Boolean = true,
+    singleLine: Boolean = true,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
@@ -66,7 +67,7 @@ fun OutlineTextField(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
-        singleLine = true,
+        singleLine = singleLine,
         label = label,
         placeholder = placeholder,
         caption = caption,
@@ -201,7 +202,7 @@ private fun TangemTextFieldSize.toShape(): Shape = when (this) {
     TangemTextFieldSize.Default -> TangemTheme.shapes.roundedCornersSmall2
 }
 
-internal object TangemTextFieldsDefault {
+object TangemTextFieldsDefault {
     val defaultTextFieldColors: TangemTextFieldColors
         @Composable @Stable get() = TangemTextFieldColors(
             textColor = TangemTheme.colors.text.primary1,
@@ -232,7 +233,7 @@ internal object TangemTextFieldsDefault {
 }
 
 @Immutable
-internal data class TangemTextFieldColors(
+data class TangemTextFieldColors(
     private val textColor: Color,
     private val disabledTextColor: Color,
     private val cursorColor: Color,

@@ -1,11 +1,8 @@
 package com.tangem.feature.onboarding.data.di
 
-import com.tangem.crypto.bip39.DefaultMnemonic
-import com.tangem.crypto.bip39.EntropyLength
-import com.tangem.crypto.bip39.Mnemonic
-import com.tangem.feature.onboarding.data.DummySeedPhraseRepository
-import com.tangem.feature.onboarding.data.DummyWordlist
-import com.tangem.feature.onboarding.data.SeedPhraseRepository
+import com.tangem.datasource.asset.AssetReader
+import com.tangem.feature.onboarding.data.DefaultMnemonicRepository
+import com.tangem.feature.onboarding.data.MnemonicRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,15 +15,7 @@ class OnboardingDataModule {
 
     @Provides
     @Singleton
-    fun provideMnemonic(): Mnemonic = DefaultMnemonic(
-        entropy = EntropyLength.Bits128Length,
-        wordlist = DummyWordlist(),
-    )
-
-    @Provides
-    @Singleton
-    fun provideSeedPhraseSdkRepository(
-    ): SeedPhraseRepository {
-        return DummySeedPhraseRepository()
+    fun provideSeedPhraseSdkRepository(assetReader: AssetReader): MnemonicRepository {
+        return DefaultMnemonicRepository(assetReader)
     }
 }

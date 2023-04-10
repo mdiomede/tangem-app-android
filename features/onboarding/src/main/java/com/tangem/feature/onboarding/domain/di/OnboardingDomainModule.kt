@@ -1,6 +1,7 @@
 package com.tangem.feature.onboarding.domain.di
 
-import com.tangem.feature.onboarding.domain.DummySeedPhraseInteractor
+import com.tangem.feature.onboarding.data.MnemonicRepository
+import com.tangem.feature.onboarding.domain.DefaultSeedPhraseInteractor
 import com.tangem.feature.onboarding.domain.SeedPhraseInteractor
 import dagger.Module
 import dagger.Provides
@@ -14,8 +15,7 @@ class OnboardingDomainModule {
 
     @Provides
     @Singleton
-    fun provideSeedPhraseInteractor(
-    ): SeedPhraseInteractor {
-        return DummySeedPhraseInteractor()
+    fun provideSeedPhraseInteractor(repository: MnemonicRepository): SeedPhraseInteractor {
+        return DefaultSeedPhraseInteractor(repository)
     }
 }

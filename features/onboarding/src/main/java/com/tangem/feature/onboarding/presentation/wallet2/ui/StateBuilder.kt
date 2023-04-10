@@ -1,6 +1,9 @@
 package com.tangem.feature.onboarding.presentation.wallet2.ui
 
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.tangem.feature.onboarding.domain.InsertSuggestionResult
+import com.tangem.feature.onboarding.domain.SeedPhraseError
 import com.tangem.feature.onboarding.presentation.wallet2.model.AboutState
 import com.tangem.feature.onboarding.presentation.wallet2.model.ButtonState
 import com.tangem.feature.onboarding.presentation.wallet2.model.CheckSeedPhraseState
@@ -21,6 +24,7 @@ class StateBuilder(
 ) {
 
     val checkSeedPhrase: CheckSeedPhraseStateBuilder = CheckSeedPhraseStateBuilder()
+    val importSeedPhrase: ImportSeedPhraseStateBuilder = ImportSeedPhraseStateBuilder()
 
     fun init(): OnboardingSeedPhraseState = OnboardingSeedPhraseState(
         step = OnboardingSeedPhraseStep.Intro,
@@ -73,6 +77,10 @@ class StateBuilder(
             ),
         ),
         importSeedPhraseState = ImportSeedPhraseState(
+            tvSeedPhrase = TextFieldState(
+                onTextFieldValueChanged = uiActions.importSeedPhraseActions.phraseTextFieldAction.onTextFieldChanged,
+                onFocusChanged = uiActions.importSeedPhraseActions.phraseTextFieldAction.onFocusChanged,
+            ),
             onSuggestedPhraseClick = uiActions.importSeedPhraseActions.suggestedPhraseClick,
             buttonCreateWallet = ButtonState(
                 enabled = false,
@@ -91,7 +99,7 @@ class StateBuilder(
         step = step,
     )
 
-    fun generateSeedPhrase(
+    fun generateMnemonicComponents(
         uiState: OnboardingSeedPhraseState,
     ): OnboardingSeedPhraseState {
         return uiState.copy(
@@ -106,25 +114,32 @@ class StateBuilder(
         )
     }
 
-    fun seedPhraseGenerated(
+    fun mnemonicGenerated(
+        uiState: OnboardingSeedPhraseState,
+        mnemonicComponents: List<String>,
+    ): OnboardingSeedPhraseState {
+        return updateMnemonicComponents(uiState, mnemonicComponents)
+            .copy(
+                step = OnboardingSeedPhraseStep.YourSeedPhrase,
+                aboutState = uiState.aboutState.copy(
+                    buttonGenerateSeedPhrase = uiState.aboutState.buttonGenerateSeedPhrase.copy(
+                        showProgress = false,
+                    ),
+                    buttonImportSeedPhrase = uiState.aboutState.buttonImportSeedPhrase.copy(
+                        enabled = true,
+                    ),
+                ),
+            )
+    }
+
+    fun updateMnemonicComponents(
         uiState: OnboardingSeedPhraseState,
         phraseList: List<String>,
-    ): OnboardingSeedPhraseState {
-        return uiState.copy(
-            step = OnboardingSeedPhraseStep.YourSeedPhrase,
-            aboutState = uiState.aboutState.copy(
-                buttonGenerateSeedPhrase = uiState.aboutState.buttonGenerateSeedPhrase.copy(
-                    showProgress = false,
-                ),
-                buttonImportSeedPhrase = uiState.aboutState.buttonImportSeedPhrase.copy(
-                    enabled = true,
-                ),
-            ),
-            yourSeedPhraseState = uiState.yourSeedPhraseState.copy(
-                phraseList = phraseList,
-            ),
-        )
-    }
+    ): OnboardingSeedPhraseState = uiState.copy(
+        yourSeedPhraseState = uiState.yourSeedPhraseState.copy(
+            mnemonicComponents = phraseList,
+        ),
+    )
 }
 
 class CheckSeedPhraseStateBuilder {
@@ -194,6 +209,73 @@ class CheckSeedPhraseStateBuilder {
                 buttonCreateWallet = uiState.checkSeedPhraseState.buttonCreateWallet.copy(
                     enabled = enabled,
                 ),
+            ),
+        )
+    }
+}
+
+class ImportSeedPhraseStateBuilder {
+
+    fun updateTextField(
+        uiState: OnboardingSeedPhraseState,
+        textFieldValue: TextFieldValue,
+    ): OnboardingSeedPhraseState = uiState.copy(
+        importSeedPhraseState = uiState.importSeedPhraseState.copy(
+            tvSeedPhrase = uiState.importSeedPhraseState.tvSeedPhrase.copy(
+                textFieldValue = textFieldValue,
+            ),
+        ),
+    )
+
+    fun updateCreateWalletButton(
+        uiState: OnboardingSeedPhraseState,
+        enabled: Boolean,
+    ): OnboardingSeedPhraseState {
+        return uiState.copy(
+            importSeedPhraseState = uiState.importSeedPhraseState.copy(
+                buttonCreateWallet = uiState.importSeedPhraseState.buttonCreateWallet.copy(
+                    enabled = enabled,
+                ),
+            ),
+        )
+    }
+
+    fun updateInvalidWords(
+        uiState: OnboardingSeedPhraseState,
+        invalidWords: Set<String>,
+    ): OnboardingSeedPhraseState = uiState.copy(
+        importSeedPhraseState = uiState.importSeedPhraseState.copy(
+            invalidWords = invalidWords,
+        ),
+    )
+
+    fun updateSuggestions(
+        uiState: OnboardingSeedPhraseState,
+        suggestions: List<String>,
+    ): OnboardingSeedPhraseState = uiState.copy(
+        importSeedPhraseState = uiState.importSeedPhraseState.copy(
+            suggestionsList = suggestions,
+        ),
+    )
+
+    fun insertSuggestionWord(
+        uiState: OnboardingSeedPhraseState,
+        insertResult: InsertSuggestionResult,
+    ): OnboardingSeedPhraseState {
+        val newTextFieldValue = uiState.importSeedPhraseState.tvSeedPhrase.textFieldValue.copy(
+            text = insertResult.text,
+            selection = TextRange(insertResult.cursorPosition, insertResult.cursorPosition),
+        )
+        return updateTextField(uiState, newTextFieldValue)
+    }
+
+    fun updateError(
+        uiState: OnboardingSeedPhraseState,
+        error: SeedPhraseError?,
+    ): OnboardingSeedPhraseState {
+        return uiState.copy(
+            importSeedPhraseState = uiState.importSeedPhraseState.copy(
+                error = error,
             ),
         )
     }
