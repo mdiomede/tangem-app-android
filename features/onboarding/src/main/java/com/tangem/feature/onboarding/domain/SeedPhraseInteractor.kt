@@ -4,6 +4,8 @@ import com.tangem.common.core.TangemSdkError
 import com.tangem.crypto.bip39.Mnemonic
 import com.tangem.crypto.bip39.MnemonicErrorResult
 import com.tangem.feature.onboarding.data.MnemonicRepository
+import com.tangem.feature.onboarding.domain.SeedPhraseInteractor.Companion.MNEMONIC_DELIMITER
+import com.tangem.utils.extensions.isNotWhitespace
 import javax.inject.Inject
 
 /**
@@ -27,6 +29,7 @@ class DefaultSeedPhraseInteractor @Inject constructor(
 ) : SeedPhraseInteractor {
 
     private var currentMnemonic: Mnemonic? = null
+    private val partWordFinder: PartWordFinder = PartWordFinder()
 
     override suspend fun generateMnemonic(): Result<Mnemonic> {
         return try {
@@ -78,8 +81,15 @@ class DefaultSeedPhraseInteractor @Inject constructor(
         hasSelection: Boolean,
         cursorPosition: Int,
     ): List<String> {
-        // TODO: todo
-        return emptyList()
+        if (text.isEmpty() || cursorPosition == 0 || hasSelection) return emptyList()
+        val word = partWordFinder.getLeadPartOfWord(text, cursorPosition)
+            ?: return emptyList()
+
+        val suggestions = repository.getWordsDictionary()
+            .filter { it.startsWith(word, ignoreCase = false) && it != word }
+            .toList()
+
+        return suggestions
     }
 
     override suspend fun insertSuggestionWord(
@@ -87,8 +97,23 @@ class DefaultSeedPhraseInteractor @Inject constructor(
         suggestion: String,
         cursorPosition: Int,
     ): InsertSuggestionResult {
-        // TODO: todo
-        return InsertSuggestionResult("", 0)
+        val textPartLead = text.substring(0, cursorPosition)
+        val textPartLast = text.substring(cursorPosition, text.length)
+        val wordPartLast = partWordFinder.getLastPartOfWord(text, suggestion, cursorPosition)
+
+        val textBuilder = StringBuilder()
+            .append(textPartLead)
+            .append(wordPartLast)
+
+        if (textPartLast.isEmpty() || textPartLast[0].isNotWhitespace()) {
+            textBuilder.append(MNEMONIC_DELIMITER)
+        }
+        textBuilder.append(textPartLast)
+
+        val textWithSuggestion = textBuilder.toString()
+        val newCursorPosition = cursorPosition + wordPartLast.length + MNEMONIC_DELIMITER.length
+
+        return InsertSuggestionResult(textWithSuggestion, newCursorPosition)
     }
 }
 
