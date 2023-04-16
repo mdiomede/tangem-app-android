@@ -1,9 +1,5 @@
 package com.tangem.feature.onboarding.presentation.wallet2.ui
 
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
-import com.tangem.feature.onboarding.domain.InsertSuggestionResult
-import com.tangem.feature.onboarding.domain.SeedPhraseError
 import com.tangem.feature.onboarding.presentation.wallet2.model.AboutState
 import com.tangem.feature.onboarding.presentation.wallet2.model.ButtonState
 import com.tangem.feature.onboarding.presentation.wallet2.model.CheckSeedPhraseState
@@ -11,10 +7,6 @@ import com.tangem.feature.onboarding.presentation.wallet2.model.ImportSeedPhrase
 import com.tangem.feature.onboarding.presentation.wallet2.model.IntroState
 import com.tangem.feature.onboarding.presentation.wallet2.model.OnboardingSeedPhraseState
 import com.tangem.feature.onboarding.presentation.wallet2.model.OnboardingSeedPhraseStep
-import com.tangem.feature.onboarding.presentation.wallet2.model.SeedPhraseField
-import com.tangem.feature.onboarding.presentation.wallet2.model.TextFieldState
-import com.tangem.feature.onboarding.presentation.wallet2.model.UiActions
-import com.tangem.feature.onboarding.presentation.wallet2.model.YourSeedPhraseState
 import com.tangem.feature.onboarding.presentation.wallet2.model.TextFieldState
 import com.tangem.feature.onboarding.presentation.wallet2.model.UiActions
 import com.tangem.feature.onboarding.presentation.wallet2.model.YourSeedPhraseState

@@ -23,6 +23,7 @@ import com.tangem.feature.onboarding.presentation.wallet2.ui.StateBuilder
 import com.tangem.utils.coroutines.CoroutineDispatcherProvider
 import com.tangem.utils.coroutines.Debouncer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -54,8 +55,8 @@ class SeedPhraseViewModel @Inject constructor(
 
     //FIXME: delete
     // init {
-        // prepareCheckYourSeedPhraseTest()
-        // prepareImportSeedPhraseTest()
+    // prepareCheckYourSeedPhraseTest()
+    // prepareImportSeedPhraseTest()
     // }
 
     override fun onCleared() {
@@ -116,9 +117,10 @@ class SeedPhraseViewModel @Inject constructor(
                     updateUi { uiBuilder.checkSeedPhrase.updateTextFieldError(uiState, field, hasError) }
                 }
 
-                val allFieldsWithoutError = SeedPhraseField.values()
-                    .map { field -> field.getState(uiState) }
-                    .all { fieldState -> !fieldState.isError }
+                val allFieldsWithoutError =
+                    SeedPhraseField.values()
+                        .map { field -> field.getState(uiState) }
+                        .all { fieldState -> !fieldState.isError }
 
                 if (uiState.checkSeedPhraseState.buttonCreateWallet.enabled != allFieldsWithoutError) {
                     updateUi { uiBuilder.checkSeedPhrase.updateCreateWalletButton(uiState, allFieldsWithoutError) }
@@ -185,12 +187,10 @@ class SeedPhraseViewModel @Inject constructor(
             return
         }
 
-        interactor.validateMnemonicString(inputMnemonic)
-            .onSuccess {
+        interactor.validateMnemonicString(inputMnemonic).onSuccess {
                 log("SUCCESS validation")
                 updateUi { uiBuilder.importSeedPhrase.updateError(uiState, null) }
-            }
-            .onFailure {
+            }.onFailure {
                 val error = it as? SeedPhraseError ?: return
                 log("FAILURE: [${error::class.java.simpleName}]")
 
@@ -235,11 +235,9 @@ class SeedPhraseViewModel @Inject constructor(
     private fun buttonGenerateSeedPhraseClick() {
         viewModelScope.launchSingle {
             updateUi { uiBuilder.generateMnemonicComponents(uiState) }
-            interactor.generateMnemonic()
-                .onSuccess { mnemonic ->
-                    updateUi { uiBuilder.mnemonicGenerated(uiState, mnemonic.mnemonicComponents) }
-                }
-                .onFailure {
+            interactor.generateMnemonic().onSuccess { mnemonic ->
+                    updateUi { uiBuilder.mnemonicGenerated(uiState, mnemonic.mnemonicComponents.toImmutableList()) }
+                }.onFailure {
                     // show error
                 }
         }
@@ -350,12 +348,4 @@ class SeedPhraseViewModel @Inject constructor(
 fun log(message: String) {
     val methodName = Thread.currentThread().stackTrace[3].methodName
     Timber.d("$methodName: $message")
-}
-
-interface AboutSeedPhraseOpener {
-    fun open() {}
-}
-
-interface ChatSupportOpener {
-    fun open() {}
 }

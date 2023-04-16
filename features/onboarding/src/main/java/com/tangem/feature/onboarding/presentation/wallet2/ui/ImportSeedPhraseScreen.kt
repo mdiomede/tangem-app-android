@@ -17,6 +17,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -48,7 +49,9 @@ fun ImportSeedPhraseScreen(
             modifier = Modifier.weight(1f),
         ) {
             Column {
-                OnboardingDescriptionBlock(modifier) {
+                OnboardingDescriptionBlock(
+                    modifier = Modifier.padding(top = TangemTheme.dimens.size16),
+                ) {
                     DescriptionSubTitleText(text = stringResource(id = R.string.onboarding_seed_import_message))
                 }
                 PhraseBlock(
@@ -122,8 +125,7 @@ private fun PhraseBlock(
             val message = SeedPhraseErrorConverter(LocalContext.current).convert(state.error)
             if (message != null) {
                 Text(
-                    modifier = Modifier
-                        .fillMaxSize(),
+                    modifier = Modifier.fillMaxSize(),
                     text = message,
                     style = TangemTheme.typography.caption.copy(
                         color = TangemTheme.colors.text.warning,

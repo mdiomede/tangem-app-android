@@ -73,9 +73,7 @@ fun AboutSeedPhraseScreen(
                 },
                 secondActionContent = {
                     SecondaryButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = TangemTheme.dimens.size16),
+                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(id = R.string.onboarding_seed_intro_button_import),
                         enabled = state.buttonImportSeedPhrase.enabled,
                         showProgress = state.buttonImportSeedPhrase.showProgress,
