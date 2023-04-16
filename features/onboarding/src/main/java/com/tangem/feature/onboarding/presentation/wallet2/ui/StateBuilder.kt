@@ -10,6 +10,7 @@ import com.tangem.feature.onboarding.presentation.wallet2.model.OnboardingSeedPh
 import com.tangem.feature.onboarding.presentation.wallet2.model.TextFieldState
 import com.tangem.feature.onboarding.presentation.wallet2.model.UiActions
 import com.tangem.feature.onboarding.presentation.wallet2.model.YourSeedPhraseState
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * Created by Anton Zhilenkov on 14.03.2023.
@@ -110,7 +111,7 @@ class StateBuilder(
 
     fun mnemonicGenerated(
         uiState: OnboardingSeedPhraseState,
-        mnemonicComponents: List<String>,
+        mnemonicComponents: ImmutableList<String>,
     ): OnboardingSeedPhraseState {
         return updateMnemonicComponents(uiState, mnemonicComponents)
             .copy(
@@ -128,7 +129,7 @@ class StateBuilder(
 
     fun updateMnemonicComponents(
         uiState: OnboardingSeedPhraseState,
-        phraseList: List<String>,
+        phraseList: ImmutableList<String>,
     ): OnboardingSeedPhraseState = uiState.copy(
         yourSeedPhraseState = uiState.yourSeedPhraseState.copy(
             mnemonicComponents = phraseList,
