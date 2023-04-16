@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -29,7 +27,7 @@ import com.tangem.core.ui.components.TangemTextFieldsDefault
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.feature.onboarding.R
 import com.tangem.feature.onboarding.presentation.wallet2.model.ImportSeedPhraseState
-import com.tangem.feature.onboarding.presentation.wallet2.model.OnboardingDescription
+import com.tangem.feature.onboarding.presentation.wallet2.ui.components.DescriptionSubTitleText
 import com.tangem.feature.onboarding.presentation.wallet2.ui.components.OnboardingActionBlock
 import com.tangem.feature.onboarding.presentation.wallet2.ui.components.OnboardingDescriptionBlock
 import com.tangem.feature.onboarding.presentation.wallet2.viewmodel.InvalidWordsColorTransformation
@@ -40,8 +38,8 @@ import com.tangem.feature.onboarding.presentation.wallet2.viewmodel.SeedPhraseEr
  */
 @Composable
 fun ImportSeedPhraseScreen(
+    state: ImportSeedPhraseState,
     modifier: Modifier = Modifier,
-    state: ImportSeedPhraseState = ImportSeedPhraseState(),
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -50,13 +48,9 @@ fun ImportSeedPhraseScreen(
             modifier = Modifier.weight(1f),
         ) {
             Column {
-                OnboardingDescriptionBlock(
-                    descriptionsList = listOf(
-                        OnboardingDescription(
-                            subTitleRes = R.string.onboarding_seed_import_message,
-                        ),
-                    ),
-                )
+                OnboardingDescriptionBlock(modifier) {
+                    DescriptionSubTitleText(text = stringResource(id = R.string.onboarding_seed_import_message))
+                }
                 PhraseBlock(
                     modifier = Modifier
                         .padding(top = TangemTheme.dimens.size62)
@@ -68,9 +62,7 @@ fun ImportSeedPhraseScreen(
                 )
             }
         }
-        Box(
-            modifier = Modifier.wrapContentSize(),
-        ) {
+        Box {
             OnboardingActionBlock(
                 firstActionContent = {
                     PrimaryButtonIconLeft(
@@ -109,9 +101,18 @@ private fun PhraseBlock(
                 wordsToBrush = state.invalidWords,
                 style = SpanStyle(color = TangemTheme.colors.text.warning),
             ),
-            // keyboardActions = keyboardActions,
-            // keyboardOptions = keyboardOptions,
             colors = TangemTextFieldsDefault.defaultTextFieldColors,
+            /**
+             * FIXME: PR issue:
+
+            @MamaLemon MamaLemon 3 days ago
+            А почему мы напрямую здесь юзаем?
+
+            Member
+            Author
+            @gbixahue gbixahue 2 days ago
+            Потому, что здесь используется чистый OutlinedTextField из компоуза, т.к. OutlinedTextField из core не подошел
+             */
         )
         Box(
             modifier = Modifier

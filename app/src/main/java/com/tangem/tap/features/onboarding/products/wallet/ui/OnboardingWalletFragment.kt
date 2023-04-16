@@ -53,8 +53,10 @@ import org.rekotlin.StoreSubscriber
 
 @Suppress("LargeClass", "MagicNumber")
 @AndroidEntryPoint
-class OnboardingWalletFragment : BaseFragment(R.layout.fragment_onboarding_wallet),
-    StoreSubscriber<OnboardingWalletState>, FragmentOnBackPressedHandler {
+class OnboardingWalletFragment :
+    BaseFragment(R.layout.fragment_onboarding_wallet),
+    StoreSubscriber<OnboardingWalletState>,
+    FragmentOnBackPressedHandler {
 
     internal val binding: FragmentOnboardingWalletBinding by viewBinding(FragmentOnboardingWalletBinding::bind)
     internal val bindingSeedPhrase: LayoutOnboardingSeedPhraseBinding by lazy { binding.onboardingSeedPhraseContainer }

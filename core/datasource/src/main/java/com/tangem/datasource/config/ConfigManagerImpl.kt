@@ -6,6 +6,7 @@ import com.tangem.blockchain.common.BlockscoutCredentials
 import com.tangem.blockchain.common.GetBlockCredentials
 import com.tangem.blockchain.common.NowNodeCredentials
 import com.tangem.blockchain.common.QuickNodeCredentials
+import com.tangem.blockchain.common.TonCenterCredentials
 import com.tangem.datasource.config.ConfigManager.Companion.IS_CREATING_TWIN_CARDS_ALLOWED
 import com.tangem.datasource.config.ConfigManager.Companion.IS_SENDING_TO_PAY_ID_ENABLED
 import com.tangem.datasource.config.ConfigManager.Companion.IS_TOP_UP_ENABLED
@@ -42,11 +43,13 @@ internal class ConfigManagerImpl @Inject constructor() : ConfigManager {
 
     override fun resetToDefault(name: String) {
         when (name) {
-            IS_SENDING_TO_PAY_ID_ENABLED -> config =
-                config.copy(isSendingToPayIdEnabled = defaultConfig.isSendingToPayIdEnabled)
+            IS_SENDING_TO_PAY_ID_ENABLED ->
+                config =
+                    config.copy(isSendingToPayIdEnabled = defaultConfig.isSendingToPayIdEnabled)
             IS_TOP_UP_ENABLED -> config = config.copy(isTopUpEnabled = defaultConfig.isTopUpEnabled)
-            IS_CREATING_TWIN_CARDS_ALLOWED -> config =
-                config.copy(isCreatingTwinCardsAllowed = defaultConfig.isCreatingTwinCardsAllowed)
+            IS_CREATING_TWIN_CARDS_ALLOWED ->
+                config =
+                    config.copy(isCreatingTwinCardsAllowed = defaultConfig.isCreatingTwinCardsAllowed)
         }
     }
 
@@ -103,6 +106,10 @@ internal class ConfigManagerImpl @Inject constructor() : ConfigManager {
                 nowNodeCredentials = NowNodeCredentials(configValues.nowNodesApiKey),
                 getBlockCredentials = GetBlockCredentials(configValues.getBlockApiKey),
                 kaspaSecondaryApiUrl = configValues.kaspaSecondaryApiUrl,
+                tonCenterCredentials = TonCenterCredentials(
+                    mainnetApiKey = configValues.tonCenterKeys.mainnet,
+                    testnetApiKey = configValues.tonCenterKeys.testnet,
+                ),
             ),
             appsFlyerDevKey = configValues.appsFlyer.appsFlyerDevKey,
             amplitudeApiKey = configValues.amplitudeApiKey,

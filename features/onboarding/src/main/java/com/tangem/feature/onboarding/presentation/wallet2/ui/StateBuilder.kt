@@ -15,6 +15,10 @@ import com.tangem.feature.onboarding.presentation.wallet2.model.SeedPhraseField
 import com.tangem.feature.onboarding.presentation.wallet2.model.TextFieldState
 import com.tangem.feature.onboarding.presentation.wallet2.model.UiActions
 import com.tangem.feature.onboarding.presentation.wallet2.model.YourSeedPhraseState
+import com.tangem.feature.onboarding.presentation.wallet2.model.TextFieldState
+import com.tangem.feature.onboarding.presentation.wallet2.model.UiActions
+import com.tangem.feature.onboarding.presentation.wallet2.model.YourSeedPhraseState
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * Created by Anton Zhilenkov on 14.03.2023.
@@ -116,7 +120,7 @@ class StateBuilder(
 
     fun mnemonicGenerated(
         uiState: OnboardingSeedPhraseState,
-        mnemonicComponents: List<String>,
+        mnemonicComponents: ImmutableList<String>,
     ): OnboardingSeedPhraseState {
         return updateMnemonicComponents(uiState, mnemonicComponents)
             .copy(
@@ -134,149 +138,10 @@ class StateBuilder(
 
     fun updateMnemonicComponents(
         uiState: OnboardingSeedPhraseState,
-        phraseList: List<String>,
+        phraseList: ImmutableList<String>,
     ): OnboardingSeedPhraseState = uiState.copy(
         yourSeedPhraseState = uiState.yourSeedPhraseState.copy(
             mnemonicComponents = phraseList,
         ),
     )
-}
-
-class CheckSeedPhraseStateBuilder {
-
-    fun updateTextField(
-        uiState: OnboardingSeedPhraseState,
-        field: SeedPhraseField,
-        textFieldValue: TextFieldValue,
-    ): OnboardingSeedPhraseState = when (field) {
-        SeedPhraseField.Second -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvSecondPhrase = uiState.checkSeedPhraseState.tvSecondPhrase.copy(
-                    textFieldValue = textFieldValue,
-                ),
-            ),
-        )
-        SeedPhraseField.Seventh -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvSeventhPhrase = uiState.checkSeedPhraseState.tvSeventhPhrase.copy(
-                    textFieldValue = textFieldValue,
-                ),
-            ),
-        )
-        SeedPhraseField.Eleventh -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvEleventhPhrase = uiState.checkSeedPhraseState.tvEleventhPhrase.copy(
-                    textFieldValue = textFieldValue,
-                ),
-            ),
-        )
-    }
-
-    fun updateTextFieldError(
-        uiState: OnboardingSeedPhraseState,
-        field: SeedPhraseField,
-        hasError: Boolean,
-    ): OnboardingSeedPhraseState = when (field) {
-        SeedPhraseField.Second -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvSecondPhrase = uiState.checkSeedPhraseState.tvSecondPhrase.copy(
-                    isError = hasError,
-                ),
-            ),
-        )
-        SeedPhraseField.Seventh -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvSeventhPhrase = uiState.checkSeedPhraseState.tvSeventhPhrase.copy(
-                    isError = hasError,
-                ),
-            ),
-        )
-        SeedPhraseField.Eleventh -> uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                tvEleventhPhrase = uiState.checkSeedPhraseState.tvEleventhPhrase.copy(
-                    isError = hasError,
-                ),
-            ),
-        )
-    }
-
-    fun updateCreateWalletButton(
-        uiState: OnboardingSeedPhraseState,
-        enabled: Boolean,
-    ): OnboardingSeedPhraseState {
-        return uiState.copy(
-            checkSeedPhraseState = uiState.checkSeedPhraseState.copy(
-                buttonCreateWallet = uiState.checkSeedPhraseState.buttonCreateWallet.copy(
-                    enabled = enabled,
-                ),
-            ),
-        )
-    }
-}
-
-class ImportSeedPhraseStateBuilder {
-
-    fun updateTextField(
-        uiState: OnboardingSeedPhraseState,
-        textFieldValue: TextFieldValue,
-    ): OnboardingSeedPhraseState = uiState.copy(
-        importSeedPhraseState = uiState.importSeedPhraseState.copy(
-            tvSeedPhrase = uiState.importSeedPhraseState.tvSeedPhrase.copy(
-                textFieldValue = textFieldValue,
-            ),
-        ),
-    )
-
-    fun updateCreateWalletButton(
-        uiState: OnboardingSeedPhraseState,
-        enabled: Boolean,
-    ): OnboardingSeedPhraseState {
-        return uiState.copy(
-            importSeedPhraseState = uiState.importSeedPhraseState.copy(
-                buttonCreateWallet = uiState.importSeedPhraseState.buttonCreateWallet.copy(
-                    enabled = enabled,
-                ),
-            ),
-        )
-    }
-
-    fun updateInvalidWords(
-        uiState: OnboardingSeedPhraseState,
-        invalidWords: Set<String>,
-    ): OnboardingSeedPhraseState = uiState.copy(
-        importSeedPhraseState = uiState.importSeedPhraseState.copy(
-            invalidWords = invalidWords,
-        ),
-    )
-
-    fun updateSuggestions(
-        uiState: OnboardingSeedPhraseState,
-        suggestions: List<String>,
-    ): OnboardingSeedPhraseState = uiState.copy(
-        importSeedPhraseState = uiState.importSeedPhraseState.copy(
-            suggestionsList = suggestions,
-        ),
-    )
-
-    fun insertSuggestionWord(
-        uiState: OnboardingSeedPhraseState,
-        insertResult: InsertSuggestionResult,
-    ): OnboardingSeedPhraseState {
-        val newTextFieldValue = uiState.importSeedPhraseState.tvSeedPhrase.textFieldValue.copy(
-            text = insertResult.text,
-            selection = TextRange(insertResult.cursorPosition, insertResult.cursorPosition),
-        )
-        return updateTextField(uiState, newTextFieldValue)
-    }
-
-    fun updateError(
-        uiState: OnboardingSeedPhraseState,
-        error: SeedPhraseError?,
-    ): OnboardingSeedPhraseState {
-        return uiState.copy(
-            importSeedPhraseState = uiState.importSeedPhraseState.copy(
-                error = error,
-            ),
-        )
-    }
 }

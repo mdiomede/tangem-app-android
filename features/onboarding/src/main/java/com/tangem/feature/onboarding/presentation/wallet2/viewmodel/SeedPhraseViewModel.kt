@@ -41,9 +41,6 @@ class SeedPhraseViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatcherProvider,
 ) : ViewModel() {
 
-    var aboutSeedPhraseUriProvider: AboutSeedPhraseOpener? = null
-    var chatLauncher: ChatSupportOpener? = null
-
     private var uiBuilder = StateBuilder(createUiActions())
 
     var uiState: OnboardingSeedPhraseState by mutableStateOf(uiBuilder.init())
@@ -56,9 +53,15 @@ class SeedPhraseViewModel @Inject constructor(
     private var suggestionWordInserted: AtomicBoolean = AtomicBoolean(false)
 
     //FIXME: delete
-    init {
+    // init {
         // prepareCheckYourSeedPhraseTest()
         // prepareImportSeedPhraseTest()
+    // }
+
+    override fun onCleared() {
+        textFieldsDebouncers.forEach { entry -> entry.value.release() }
+        textFieldsDebouncers.clear()
+        super.onCleared()
     }
 
     private fun createUiActions(): UiActions = UiActions(
@@ -78,15 +81,12 @@ class SeedPhraseViewModel @Inject constructor(
             buttonCreateWalletClick = ::buttonCreateWalletWithSeedPhraseClick,
             secondTextFieldAction = TextFieldUiAction(
                 onTextFieldChanged = { value -> onTextFieldChanged(SeedPhraseField.Second, value) },
-                onFocusChanged = { isFocused -> onFocusChanged(SeedPhraseField.Second, isFocused) },
             ),
             seventhTextFieldAction = TextFieldUiAction(
                 onTextFieldChanged = { value -> onTextFieldChanged(SeedPhraseField.Seventh, value) },
-                onFocusChanged = { isFocused -> onFocusChanged(SeedPhraseField.Seventh, isFocused) },
             ),
             eleventhTextFieldAction = TextFieldUiAction(
                 onTextFieldChanged = { value -> onTextFieldChanged(SeedPhraseField.Eleventh, value) },
-                onFocusChanged = { isFocused -> onFocusChanged(SeedPhraseField.Eleventh, isFocused) },
             ),
         ),
         importSeedPhraseActions = ImportSeedPhraseUiAction(
@@ -99,21 +99,7 @@ class SeedPhraseViewModel @Inject constructor(
         menuChatClick = ::menuChatClick,
     )
 
-    override fun onCleared() {
-        textFieldsDebouncers.forEach { entry -> entry.value.release() }
-        textFieldsDebouncers.clear()
-        super.onCleared()
-    }
-
     // region CheckSeedPhrase
-    private fun onFocusChanged(field: SeedPhraseField, isFocused: Boolean) {
-        when (field) {
-            SeedPhraseField.Second -> {}
-            SeedPhraseField.Seventh -> {}
-            SeedPhraseField.Eleventh -> {}
-        }
-    }
-
     private fun onTextFieldChanged(field: SeedPhraseField, textFieldValue: TextFieldValue) {
         viewModelScope.launchSingle {
             updateUi { uiBuilder.checkSeedPhrase.updateTextField(uiState, field, textFieldValue) }
@@ -243,7 +229,7 @@ class SeedPhraseViewModel @Inject constructor(
     }
 
     private fun buttonReadMoreAboutSeedPhraseClick() {
-        aboutSeedPhraseUriProvider?.open()
+        // TODO: open the about info through a router
     }
 
     private fun buttonGenerateSeedPhraseClick() {
@@ -291,14 +277,14 @@ class SeedPhraseViewModel @Inject constructor(
     }
 
     private fun menuChatClick() {
-        chatLauncher?.open()
+        // TODO: open the support chat through a router
     }
     // endregion ButtonClickHandlers
 
     // region Utils
     /**
-     * Updating the UI with a contract where all copying of objects are called in the IO context and updating the
-     * UiState in the main context.
+     * Updating the UI with a contract where all copying of objects are called in the Single thread context and
+     * updating the UiState in the main context.
      */
     private suspend fun updateUi(updateBlock: suspend () -> OnboardingSeedPhraseState) {
         withSingleContext {
@@ -308,7 +294,7 @@ class SeedPhraseViewModel @Inject constructor(
     }
 
     private fun createOrGetDebouncer(name: String): Debouncer {
-        return textFieldsDebouncers[name] ?: Debouncer(name).apply { textFieldsDebouncers[name] = this }
+        return textFieldsDebouncers[name] ?: Debouncer().apply { textFieldsDebouncers[name] = this }
     }
 
     private fun SeedPhraseField.getState(uiState: OnboardingSeedPhraseState): TextFieldState = when (this) {

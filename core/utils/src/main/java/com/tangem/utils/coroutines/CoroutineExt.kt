@@ -3,7 +3,9 @@ package com.tangem.utils.coroutines
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
@@ -15,9 +17,13 @@ suspend fun <R> runCatching(dispatcher: CoroutineDispatcher, block: suspend () -
     }
 }
 
-class Debouncer(
-    val name: String = "Default"
-) {
+suspend inline fun ifActive(crossinline block: suspend () -> Unit) = coroutineScope {
+    if (isActive) {
+        block()
+    }
+}
+
+class Debouncer {
 
     private var debounceJob: Job? = null
 
