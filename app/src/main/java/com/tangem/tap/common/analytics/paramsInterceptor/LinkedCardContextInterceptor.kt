@@ -2,7 +2,7 @@ package com.tangem.tap.common.analytics.paramsInterceptor
 
 import com.tangem.core.analytics.AnalyticsEvent
 import com.tangem.core.analytics.api.ParamsInterceptor
-import com.tangem.domain.common.ScanResponse
+import com.tangem.domain.models.scan.ScanResponse
 
 /**
  * Created by Anton Zhilenkov on 22.02.2023.
