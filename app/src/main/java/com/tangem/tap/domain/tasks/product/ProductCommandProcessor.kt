@@ -2,7 +2,7 @@ package com.tangem.tap.domain.tasks.product
 
 import com.tangem.common.CompletionResult
 import com.tangem.common.core.CardSession
-import com.tangem.domain.common.CardDTO
+import com.tangem.domain.models.scan.CardDTO
 
 /**
  * Created by Anton Zhilenkov on 28/09/2021.
