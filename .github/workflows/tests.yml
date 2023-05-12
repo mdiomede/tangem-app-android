@@ -3,7 +3,6 @@ name: Tests
 on:
   pull_request:
     branches:
-      - 'releases/**'
       - 'release'
       - 'develop'
       - 'master'
@@ -37,6 +36,10 @@ jobs:
       with:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
+
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11'
 
     - name: Bundle install
       run: |
