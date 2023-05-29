@@ -11,8 +11,10 @@ import com.tangem.feature.swap.domain.models.toStringWithRightOffset
 import com.tangem.feature.swap.domain.models.ui.*
 import com.tangem.lib.crypto.TransactionManager
 import com.tangem.lib.crypto.UserWalletManager
+import com.tangem.lib.crypto.models.AnalyticsData
 import com.tangem.lib.crypto.models.ProxyFees
 import com.tangem.lib.crypto.models.ProxyFiatCurrency
+import com.tangem.lib.crypto.models.TxData
 import com.tangem.lib.crypto.models.transactions.SendTxResult
 import com.tangem.utils.toFiatString
 import java.math.BigDecimal
@@ -120,12 +122,18 @@ internal class SwapInteractorImpl @Inject constructor(
             approveData.approveModel.data
         }
         val result = transactionManager.sendApproveTransaction(
-            networkId = networkId,
-            feeAmount = approveData.fee,
-            gasLimit = approveData.gasLimit,
-            destinationAddress = approveData.approveModel.toAddress,
-            dataToSign = dataToSign,
+            txData = TxData(
+                networkId = networkId,
+                feeAmount = approveData.fee,
+                gasLimit = approveData.gasLimit,
+                destinationAddress = approveData.approveModel.toAddress,
+                dataToSign = dataToSign,
+            ),
             derivationPath = derivationPath,
+            analyticsData = AnalyticsData(
+                feeType = ,
+                additionalAnalyticsParam =
+            )
         )
         return when (result) {
             is SendTxResult.Success -> {

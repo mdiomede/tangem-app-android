@@ -49,9 +49,21 @@ sealed class Basic(
         params = mapOf(AnalyticsParam.Currency to currency.value),
     )
 
-    class TransactionSent(sentFrom: AnalyticsParam.TxSentFrom) : Basic(
+    class TransactionSent(
+        sentFrom: AnalyticsParam.TxSentFrom,
+        currency: String,
+        feeType: AnalyticsParam.FeeType?,
+        additional: Map<String, String> = emptyMap(),
+    ) : Basic(
         event = "Transaction sent",
-        params = mapOf(AnalyticsParam.Source to sentFrom.value),
+        params = buildMap {
+            this[AnalyticsParam.Source] = sentFrom.value
+            feeType?.let {
+                this[AnalyticsParam.FeeType] = it.value
+            }
+            this[AnalyticsParam.Currency] = currency
+            this.putAll(additional)
+        },
     )
 
     class ScanError(error: Throwable) : Basic(

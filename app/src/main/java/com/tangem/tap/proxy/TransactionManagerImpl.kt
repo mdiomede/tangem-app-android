@@ -34,14 +34,11 @@ class TransactionManagerImpl(
 ) : TransactionManager {
 
     override suspend fun sendApproveTransaction(
-        networkId: String,
-        feeAmount: BigDecimal,
-        gasLimit: Int,
-        destinationAddress: String,
-        dataToSign: String,
+        txData: TxData,
         derivationPath: String?,
+        analyticsData: AnalyticsData,
     ): SendTxResult {
-        val blockchain = requireNotNull(Blockchain.fromNetworkId(networkId)) { "blockchain not found" }
+        val blockchain = requireNotNull(Blockchain.fromNetworkId(txData.networkId)) { "blockchain not found" }
         val walletManager = getActualWalletManager(blockchain, derivationPath)
         walletManager.update()
         val amount = Amount(value = BigDecimal.ZERO, blockchain = blockchain)
@@ -49,40 +46,39 @@ class TransactionManagerImpl(
             walletManager = walletManager,
             amount = amount,
             blockchain = blockchain,
-            feeAmount = feeAmount,
-            gasLimit = gasLimit,
-            destinationAddress = destinationAddress,
-            dataToSign = dataToSign,
+            feeAmount = txData.feeAmount,
+            gasLimit = txData.gasLimit,
+            destinationAddress = txData.destinationAddress,
+            dataToSign = txData.dataToSign,
+            feeType = analyticsData.feeType,
+            additionalAnalyticsParam = analyticsData.additionalAnalyticsParam,
         )
     }
 
     override suspend fun sendTransaction(
-        networkId: String,
-        amountToSend: BigDecimal,
-        feeAmount: BigDecimal,
-        gasLimit: Int,
-        destinationAddress: String,
-        dataToSign: String,
+        txData: TxData,
         isSwap: Boolean,
-        currencyToSend: Currency,
         derivationPath: String?,
+        analyticsData: AnalyticsData
     ): SendTxResult {
-        val blockchain = requireNotNull(Blockchain.fromNetworkId(networkId)) { "blockchain not found" }
+        val blockchain = requireNotNull(Blockchain.fromNetworkId(txData.networkId)) { "blockchain not found" }
         val walletManager = getActualWalletManager(blockchain, derivationPath)
         walletManager.update()
         val amount = if (isSwap) {
-            createAmountForSwap(amountToSend, currencyToSend, blockchain)
+            createAmountForSwap(txData.amountToSend, txData.currencyToSend, blockchain)
         } else {
-            createAmount(amountToSend, currencyToSend, blockchain)
+            createAmount(txData.amountToSend, txData.currencyToSend, blockchain)
         }
         return sendTransactionInternal(
             walletManager = walletManager,
             amount = amount,
             blockchain = blockchain,
-            feeAmount = feeAmount,
-            gasLimit = gasLimit,
-            destinationAddress = destinationAddress,
-            dataToSign = dataToSign,
+            feeAmount = txData.feeAmount,
+            gasLimit = txData.gasLimit,
+            destinationAddress = txData.destinationAddress,
+            dataToSign = txData.dataToSign,
+            feeType = analyticsData.feeType,
+            additionalAnalyticsParam = analyticsData.additionalAnalyticsParam,
         )
     }
 
@@ -95,6 +91,8 @@ class TransactionManagerImpl(
         gasLimit: Int,
         destinationAddress: String,
         dataToSign: String,
+        feeType: String,
+        additionalAnalyticsParam: Map<String, String>
     ): SendTxResult {
         val txData = walletManager.createTransaction(
             amount = amount,
@@ -110,7 +108,12 @@ class TransactionManagerImpl(
             FirebaseCrashlytics.getInstance().recordException(ex)
             return SendTxResult.UnknownError(ex)
         }
-        return handleSendResult(sendResult)
+        return handleSendResult(
+            result = sendResult,
+            currency = amount.currencySymbol,
+            feeType = feeType,
+            additionalAnalyticsParam = additionalAnalyticsParam,
+        )
     }
 
     override fun getExplorerTransactionLink(networkId: String, txAddress: String): String {
@@ -319,10 +322,22 @@ class TransactionManagerImpl(
         }
     }
 
-    private fun handleSendResult(result: SimpleResult): SendTxResult {
+    private fun handleSendResult(
+        result: SimpleResult,
+        currency: String,
+        feeType: String,
+        additionalAnalyticsParam: Map<String, String>
+    ): SendTxResult {
         when (result) {
             is SimpleResult.Success -> {
-                analytics.send(Basic.TransactionSent(AnalyticsParam.TxSentFrom.Swap))
+                analytics.send(
+                    Basic.TransactionSent(
+                        sentFrom = AnalyticsParam.TxSentFrom.Swap,
+                        feeType = AnalyticsParam.FeeType.fromString(feeType),
+                        currency = currency,
+                        additional = additionalAnalyticsParam
+                    )
+                )
                 return SendTxResult.Success
             }
             is SimpleResult.Failure -> {

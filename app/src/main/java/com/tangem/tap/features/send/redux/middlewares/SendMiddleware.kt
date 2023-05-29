@@ -47,10 +47,7 @@ import com.tangem.tap.features.send.redux.FeeAction.RequestFee
 import com.tangem.tap.features.send.redux.PrepareSendScreen
 import com.tangem.tap.features.send.redux.SendAction
 import com.tangem.tap.features.send.redux.SendActionUi
-import com.tangem.tap.features.send.redux.states.ButtonState
-import com.tangem.tap.features.send.redux.states.ExternalTransactionData
-import com.tangem.tap.features.send.redux.states.MainCurrencyType
-import com.tangem.tap.features.send.redux.states.TransactionExtrasState
+import com.tangem.tap.features.send.redux.states.*
 import com.tangem.tap.features.wallet.models.Currency
 import com.tangem.tap.features.wallet.redux.WalletAction
 import com.tangem.tap.scope
@@ -134,9 +131,16 @@ private fun verifyAndSendTransaction(
                     },
                     sendAllCallback = {
                         sendTransaction(
-                            action, walletManager, amountToSend, feeAmount, destinationAddress,
-                            sendState.transactionExtrasState, card, sendState.externalTransactionData,
-                            dispatch,
+                            action = action,
+                            walletManager = walletManager,
+                            amountToSend = amountToSend,
+                            feeAmount = feeAmount,
+                            feeType = sendState.feeState.selectedFeeType,
+                            destinationAddress = destinationAddress,
+                            transactionExtras = sendState.transactionExtrasState,
+                            card = card,
+                            externalTransactionData = sendState.externalTransactionData,
+                            dispatch = dispatch,
                         )
                     },
                     reduceAmount,
@@ -145,8 +149,16 @@ private fun verifyAndSendTransaction(
         }
         else -> {
             sendTransaction(
-                action, walletManager, amountToSend, feeAmount, destinationAddress,
-                sendState.transactionExtrasState, card, sendState.externalTransactionData, dispatch,
+                action = action,
+                walletManager = walletManager,
+                amountToSend = amountToSend,
+                feeAmount = feeAmount,
+                feeType = sendState.feeState.selectedFeeType,
+                destinationAddress = destinationAddress,
+                transactionExtras = sendState.transactionExtrasState,
+                card = card,
+                externalTransactionData = sendState.externalTransactionData,
+                dispatch = dispatch,
             )
         }
     }
@@ -158,6 +170,7 @@ private fun sendTransaction(
     walletManager: WalletManager,
     amountToSend: Amount,
     feeAmount: Amount,
+    feeType: FeeType,
     destinationAddress: String,
     transactionExtras: TransactionExtrasState,
     card: CardDTO,
@@ -253,7 +266,13 @@ private fun sendTransaction(
                         Analytics.send(Basic.TransactionSent(AnalyticsParam.TxSentFrom.Sell))
                         dispatch(WalletAction.TradeCryptoAction.FinishSelling(externalTransactionData.transactionId))
                     } else {
-                        Analytics.send(Basic.TransactionSent(AnalyticsParam.TxSentFrom.Send))
+                        Analytics.send(
+                            Basic.TransactionSent(
+                                sentFrom = AnalyticsParam.TxSentFrom.Send,
+                                feeType = AnalyticsParam.FeeType(feeType),
+                                currency = amountToSend.currencySymbol
+                            )
+                        )
                         dispatch(NavigationAction.PopBackTo())
                     }
                     scope.launch(Dispatchers.IO) {

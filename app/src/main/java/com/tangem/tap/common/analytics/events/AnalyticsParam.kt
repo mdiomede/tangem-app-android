@@ -93,10 +93,30 @@ sealed class AnalyticsParam {
         object Sell : TxSentFrom("Sell")
     }
 
+    sealed class FeeType(val value: String) {
+        object Fixed : FeeType("Fixed")
+        object Min : FeeType("Min")
+        object Normal : FeeType("Normal")
+        object Max : FeeType("Max")
+
+        companion object {
+            fun fromString(feeType: String): FeeType? {
+                return when (feeType) {
+                    "min" -> Min
+                    "normal" -> Normal
+                    "max" -> Max
+                    "fixed" -> Fixed
+                    else -> null
+                }
+            }
+        }
+    }
+
     companion object Key {
         const val Source = "Source"
         const val Balance = "Balance"
         const val Batch = "Batch"
+        const val FeeType = "Fee Type"
         const val ProductType = "Product Type"
         const val Firmware = "Firmware"
         const val Currency = "Currency"
