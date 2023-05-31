@@ -3,34 +3,29 @@ package com.tangem.feature.referral.ui
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat.startActivity
-import com.tangem.core.ui.components.PrimaryStartIconButton
+import com.tangem.core.ui.components.PrimaryButtonIconLeft
 import com.tangem.core.ui.components.SmallInfoCard
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.feature.referral.presentation.R
 
 @Suppress("LongParameterList")
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ParticipateBottomBlock(
     purchasedWalletCount: Int,
@@ -117,28 +112,28 @@ private fun AdditionalButtons(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(TangemTheme.dimens.spacing16),
     ) {
-        PrimaryStartIconButton(
-            modifier = Modifier.weight(1f),
+        PrimaryButtonIconLeft(
             text = stringResource(id = R.string.common_copy),
-            iconResId = R.drawable.ic_copy_24,
+            icon = painterResource(id = R.drawable.ic_copy_24),
             onClick = {
                 onCopyClick.invoke()
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 clipboardManager.setText(AnnotatedString(code))
                 onShowCopySnackbar()
             },
+            modifier = Modifier.weight(1f),
         )
 
         val context = LocalContext.current
-        PrimaryStartIconButton(
-            modifier = Modifier.weight(1f),
+        PrimaryButtonIconLeft(
             text = stringResource(id = R.string.common_share),
-            iconResId = R.drawable.ic_share_24,
+            icon = painterResource(id = R.drawable.ic_share_24),
             onClick = {
                 onShareClick.invoke()
                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 context.shareText(context.getString(R.string.referral_share_link, shareLink))
             },
+            modifier = Modifier.weight(1f),
         )
     }
 }

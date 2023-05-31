@@ -2,7 +2,6 @@ package com.tangem.core.ui.res
 
 import androidx.compose.ui.graphics.Color
 
-@Suppress("unused")
 object TangemColorPalette {
     // region Base
     val Black = Color(0xFF000000)
