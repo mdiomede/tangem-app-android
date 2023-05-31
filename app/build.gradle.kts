@@ -9,6 +9,21 @@ plugins {
     id("configuration")
 }
 
+// android {
+//     kotlinOptions {
+//         freeCompilerArgs = freeCompilerArgs + listOf(
+//             "-P",
+//             "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+//                 project.buildDir.absolutePath + "/compose_metrics"
+//         )
+//         freeCompilerArgs = freeCompilerArgs + listOf(
+//             "-P",
+//             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+//                 project.buildDir.absolutePath + "/compose_metrics"
+//         )
+//     }
+// }
+
 dependencies {
     implementation(files("libs/walletconnect-1.5.6.aar"))
     implementation(project(":domain:legacy"))

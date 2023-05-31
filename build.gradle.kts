@@ -10,6 +10,27 @@ plugins {
     alias(deps.plugins.firebase.crashlytics) apply false
 }
 
+// I don't understand why it is not working
+subprojects {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            if (project.findProperty("generateComposeReports") == "true") {
+                println("found")
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_metrics"
+                )
+                freeCompilerArgs = freeCompilerArgs + listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_metrics"
+                )
+            } else {
+                println("not found")
+            }
+        }
+    }
+}
+
 val clean by tasks.registering {
     delete(rootProject.buildDir)
 }
