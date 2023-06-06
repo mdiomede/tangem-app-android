@@ -12,10 +12,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -86,9 +86,8 @@ private fun TokenList(
                 key = { _, item -> item.id },
             ) { index, item ->
                 DraggableItem(
-                    item = item,
                     index = index,
-                    lastItemIndex = state.items.lastIndex,
+                    item = item,
                     reorderableState = reorderableListState,
                     onDragStart = dragConfig.onDragStart,
                 )
@@ -107,7 +106,6 @@ private fun TokenList(
 private fun LazyItemScope.DraggableItem(
     index: Int,
     item: DraggableItem,
-    lastItemIndex: Int,
     reorderableState: ReorderableLazyListState,
     onDragStart: ((DraggableItem) -> Unit)?,
 ) {
@@ -121,8 +119,7 @@ private fun LazyItemScope.DraggableItem(
             onDragStart?.invoke(item)
         }
 
-        val itemModifier = Modifier
-            .clipFirstLastAndDraggingItems(index, lastItemIndex, isDragging)
+        val itemModifier = Modifier.applyShapeAndShadow(item.roundingMode, item.showShadow)
 
         when (item) {
             is DraggableItem.GroupHeader -> DraggableNetworkGroupItem(
@@ -239,35 +236,42 @@ private fun Actions(config: OrganizeTokensStateHolder.ActionsConfig, modifier: M
     }
 }
 
-private fun Modifier.clipFirstLastAndDraggingItems(index: Int, lastItemIndex: Int, isDragging: Boolean): Modifier =
+private fun Modifier.applyShapeAndShadow(roundingMode: DraggableItem.RoundingMode, showShadow: Boolean): Modifier =
     composed {
-        when {
-            isDragging -> {
-                val elevation by animateDpAsState(
-                    targetValue = TangemTheme.dimens.elevation12,
-                    label = "dragging_item_shadow_elevation",
-                )
-
-                this.shadow(elevation, shape = TangemTheme.shapes.roundedCornersXMedium)
-            }
-            index == 0 -> {
-                this.clip(
-                    RoundedCornerShape(
-                        topStart = TangemTheme.dimens.radius16,
-                        topEnd = TangemTheme.dimens.radius16,
-                    ),
-                )
-            }
-            index == lastItemIndex -> {
-                this.clip(
-                    RoundedCornerShape(
-                        bottomStart = TangemTheme.dimens.radius16,
-                        bottomEnd = TangemTheme.dimens.radius16,
-                    ),
-                )
-            }
-            else -> this
+        val radius = TangemTheme.dimens.radius16
+        val shape = when (roundingMode) {
+            is DraggableItem.RoundingMode.None -> RectangleShape
+            is DraggableItem.RoundingMode.Top -> RoundedCornerShape(
+                topStart = radius,
+                topEnd = radius,
+            )
+            is DraggableItem.RoundingMode.Bottom -> RoundedCornerShape(
+                bottomStart = radius,
+                bottomEnd = radius,
+            )
+            is DraggableItem.RoundingMode.All -> RoundedCornerShape(
+                size = radius,
+            )
         }
+        val padding = if (roundingMode.showGap) {
+            val value = TangemTheme.dimens.spacing4
+            when (roundingMode) {
+                is DraggableItem.RoundingMode.None -> padding()
+                is DraggableItem.RoundingMode.All -> padding(vertical = value)
+                is DraggableItem.RoundingMode.Top -> padding(top = value)
+                is DraggableItem.RoundingMode.Bottom -> padding(bottom = value)
+            }
+        } else {
+            padding()
+        }
+
+        this
+            .then(padding)
+            .shadow(
+                elevation = if (showShadow) TangemTheme.dimens.elevation12 else TangemTheme.dimens.elevation0,
+                shape = shape,
+                clip = true,
+            )
     }
 
 // region Preview

@@ -58,9 +58,13 @@ internal sealed class OrganizeTokensListState {
 @Immutable
 internal sealed interface DraggableItem {
     val id: String
+    val roundingMode: RoundingMode
+    val showShadow: Boolean
 
     data class GroupHeader(
         val groupState: NetworkGroupState.Draggable,
+        override val roundingMode: RoundingMode = RoundingMode.None,
+        override val showShadow: Boolean = false,
     ) : DraggableItem {
         override val id: String = groupState.id
     }
@@ -68,11 +72,43 @@ internal sealed interface DraggableItem {
     data class Token(
         val tokenItemState: TokenItemState.Draggable,
         val groupId: String,
+        override val showShadow: Boolean = false,
+        override val roundingMode: RoundingMode = RoundingMode.None,
     ) : DraggableItem {
         override val id: String = tokenItemState.id
     }
 
     data class GroupDivider(
         override val id: String,
-    ) : DraggableItem
+    ) : DraggableItem {
+        override val showShadow: Boolean = false
+        override val roundingMode: RoundingMode = RoundingMode.None
+    }
+
+    fun roundingMode(mode: RoundingMode): DraggableItem = when (this) {
+        is GroupDivider -> this
+        is GroupHeader -> this.copy(roundingMode = mode)
+        is Token -> this.copy(roundingMode = mode)
+    }
+
+    fun showShadow(show: Boolean): DraggableItem = when (this) {
+        is GroupDivider -> this
+        is GroupHeader -> this.copy(showShadow = show)
+        is Token -> this.copy(showShadow = show)
+    }
+
+    @Immutable
+    sealed interface RoundingMode {
+        val showGap: Boolean
+
+        object None : RoundingMode {
+            override val showGap: Boolean = false
+        }
+
+        data class Top(override val showGap: Boolean = false) : RoundingMode
+
+        data class Bottom(override val showGap: Boolean = false) : RoundingMode
+
+        data class All(override val showGap: Boolean = false) : RoundingMode
+    }
 }
