@@ -9,6 +9,7 @@ import com.tangem.feature.wallet.presentation.organizetokens.OrganizeTokensState
 import com.tangem.feature.wallet.presentation.wallet.state.WalletCardState
 import com.tangem.feature.wallet.presentation.wallet.state.WalletStateHolder
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
 
 internal object WalletPreviewData {
@@ -107,21 +108,7 @@ internal object WalletPreviewData {
 
     val loadingTokenItemState = TokenItemState.Loading(id = UUID.randomUUID().toString())
 
-    val organizeTokensState = OrganizeTokensStateHolder(
-        tokens = TokenListState.GroupedByNetwork(
-            groups = persistentListOf(),
-        ),
-        header = OrganizeTokensStateHolder.HeaderConfig(
-            onSortByBalanceClick = {},
-            onGroupByNetworkClick = {},
-        ),
-        actions = OrganizeTokensStateHolder.ActionsConfig(
-            onApplyClick = {},
-            onCancelClick = {},
-        ),
-    )
-
-    private val draggableTokenList = persistentListOf(
+    val draggableTokenList = persistentListOf(
         tokenItemDragState.copy(
             id = "token_1",
             name = "Ethereum",
@@ -136,9 +123,26 @@ internal object WalletPreviewData {
         ),
         tokenItemDragState.copy(
             id = "token_3",
-            name = "USDT",
+            name = "Arbitrum",
             tokenIconResId = R.drawable.img_arbitrum_22,
             networkIconResId = R.drawable.img_eth_22,
+            fiatAmount = "88,01 $",
+        ),
+        tokenItemDragState.copy(
+            id = "token_4",
+            networkIconResId = null,
+            fiatAmount = "3 172,14 $",
+        ),
+        tokenItemDragState.copy(
+            id = "token_5",
+            name = "Doge",
+            tokenIconResId = R.drawable.img_dogecoin_22,
+            fiatAmount = "803,65 $",
+        ),
+        tokenItemDragState.copy(
+            id = "token_6",
+            name = "Arbitrum",
+            tokenIconResId = R.drawable.img_arbitrum_22,
             fiatAmount = "88,01 $",
         ),
     )
@@ -170,8 +174,33 @@ internal object WalletPreviewData {
     )
 
     val draggableNetworkGroup = NetworkGroupState.Draggable(
-        id = UUID.randomUUID().toString(),
+        id = "group_1",
         networkName = "Ethereum",
-        tokens = draggableTokenList,
+        tokens = draggableTokenList.take(3).toPersistentList(),
+    )
+
+    val draggableNetworkGroups = persistentListOf(
+        draggableNetworkGroup,
+        NetworkGroupState.Draggable(
+            id = "group_2",
+            networkName = "Polygon",
+            tokens = draggableTokenList.takeLast(n = 3).toPersistentList(),
+        ),
+    )
+
+    val groupedOrganizeTokensState = OrganizeTokensStateHolder(
+        tokens = TokenListState.GroupedByNetwork(groups = draggableNetworkGroups),
+        header = OrganizeTokensStateHolder.HeaderConfig(
+            onSortByBalanceClick = {},
+            onGroupByNetworkClick = {},
+        ),
+        actions = OrganizeTokensStateHolder.ActionsConfig(
+            onApplyClick = {},
+            onCancelClick = {},
+        ),
+    )
+
+    val organizeTokensState = groupedOrganizeTokensState.copy(
+        tokens = TokenListState.Ungrouped(draggableTokenList),
     )
 }
