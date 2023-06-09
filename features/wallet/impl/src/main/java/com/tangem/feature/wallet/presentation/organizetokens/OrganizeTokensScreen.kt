@@ -8,10 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -29,9 +26,9 @@ import com.tangem.core.ui.components.SecondaryButton
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.feature.wallet.impl.R
 import com.tangem.feature.wallet.presentation.common.WalletPreviewData
-import com.tangem.feature.wallet.presentation.common.component.NetworkGroupItem
-import com.tangem.feature.wallet.presentation.common.component.TokenItem
-import com.tangem.feature.wallet.presentation.common.state.TokenListState
+import com.tangem.feature.wallet.presentation.common.component.DraggableNetworkGroupItem
+import com.tangem.feature.wallet.presentation.common.component.DraggableTokenItem
+import org.burnoutcrew.reorderable.*
 
 @Composable
 internal fun OrganizeTokensScreen(state: OrganizeTokensStateHolder) {
@@ -43,9 +40,10 @@ internal fun OrganizeTokensScreen(state: OrganizeTokensStateHolder) {
         },
         content = { paddingValues ->
             TokenList(
-                listState = tokensListState,
-                state = state.tokens,
                 modifier = Modifier.padding(paddingValues),
+                listState = tokensListState,
+                state = state.itemsState,
+                dragConfig = state.dragConfig,
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -56,48 +54,89 @@ internal fun OrganizeTokensScreen(state: OrganizeTokensStateHolder) {
     )
 }
 
+// TODO: Fix list animations
 @Composable
-private fun TokenList(listState: LazyListState, state: TokenListState, modifier: Modifier = Modifier) {
+private fun TokenList(
+    listState: LazyListState,
+    state: OrganizeTokensListState,
+    dragConfig: OrganizeTokensStateHolder.DragConfig,
+    modifier: Modifier = Modifier,
+) {
     Box(modifier = modifier) {
+        val reorderableListState = rememberReorderableLazyListState(
+            onMove = dragConfig.onItemDragged,
+            listState = listState,
+            canDragOver = dragConfig.canDragItemOver,
+            onDragEnd = { _, _ -> dragConfig.onItemDragEnd() },
+        )
+
         LazyColumn(
             modifier = Modifier
+                .reorderable(reorderableListState)
                 .align(Alignment.TopCenter)
                 .padding(horizontal = TangemTheme.dimens.spacing16),
-            state = listState,
+            state = reorderableListState.listState,
             contentPadding = PaddingValues(
                 top = TangemTheme.dimens.spacing12,
                 bottom = TangemTheme.dimens.spacing92,
             ),
         ) {
-            when (state) {
-                is TokenListState.GroupedByNetwork -> {
-                    itemsIndexed(
-                        items = state.groups,
-                        key = { _, group -> group.id },
-                    ) { index, group ->
-                        NetworkGroupItem(
-                            modifier = Modifier
-                                .clipFirstAndLastItems(index, state.groups.lastIndex),
-                            state = group,
-                        )
-                    }
-                }
-                is TokenListState.Ungrouped -> {
-                    itemsIndexed(
-                        items = state.tokens,
-                        key = { _, token -> token.id },
-                    ) { index, token ->
-                        TokenItem(
-                            modifier = Modifier
-                                .clipFirstAndLastItems(index, state.tokens.lastIndex),
-                            state = token,
-                        )
-                    }
+            itemsIndexed(
+                items = state.items,
+                key = { _, item -> item.id },
+            ) { index, item ->
+                DraggableItem(
+                    item = item,
+                    index = index,
+                    lastItemIndex = state.items.lastIndex,
+                    reorderableState = reorderableListState,
+                    onDragStart = dragConfig.onDragStart,
+                )
+
+                if (item is DraggableItem.GroupDivider) {
+                    Box(modifier = Modifier.fillMaxWidth())
                 }
             }
         }
 
         BottomGradient(modifier = Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+@Composable
+private fun LazyItemScope.DraggableItem(
+    index: Int,
+    item: DraggableItem,
+    lastItemIndex: Int,
+    reorderableState: ReorderableLazyListState,
+    onDragStart: ((DraggableItem) -> Unit)?,
+) {
+    ReorderableItem(
+        reorderableState = reorderableState,
+        index = index,
+        key = item.id,
+    ) { isDragging ->
+
+        if (isDragging) {
+            onDragStart?.invoke(item)
+        }
+
+        val itemModifier = Modifier
+            .clipFirstLastAndDraggingItems(index, lastItemIndex, isDragging)
+
+        when (item) {
+            is DraggableItem.GroupHeader -> DraggableNetworkGroupItem(
+                modifier = itemModifier,
+                state = item.groupState,
+                reorderableTokenListState = reorderableState,
+            )
+            is DraggableItem.Token -> DraggableTokenItem(
+                modifier = itemModifier,
+                state = item.tokenItemState,
+                reorderableTokenListState = reorderableState,
+            )
+            is DraggableItem.GroupDivider -> Unit
+        }
     }
 }
 
@@ -200,29 +239,36 @@ private fun Actions(config: OrganizeTokensStateHolder.ActionsConfig, modifier: M
     }
 }
 
-private fun Modifier.clipFirstAndLastItems(index: Int, lastItemIndex: Int): Modifier = composed {
-    when (index) {
-        0 -> {
-            this
-                .clip(
+private fun Modifier.clipFirstLastAndDraggingItems(index: Int, lastItemIndex: Int, isDragging: Boolean): Modifier =
+    composed {
+        when {
+            isDragging -> {
+                val elevation by animateDpAsState(
+                    targetValue = TangemTheme.dimens.elevation12,
+                    label = "dragging_item_shadow_elevation",
+                )
+
+                this.shadow(elevation, shape = TangemTheme.shapes.roundedCornersXMedium)
+            }
+            index == 0 -> {
+                this.clip(
                     RoundedCornerShape(
                         topStart = TangemTheme.dimens.radius16,
                         topEnd = TangemTheme.dimens.radius16,
                     ),
                 )
-        }
-        lastItemIndex -> {
-            this
-                .clip(
+            }
+            index == lastItemIndex -> {
+                this.clip(
                     RoundedCornerShape(
                         bottomStart = TangemTheme.dimens.radius16,
                         bottomEnd = TangemTheme.dimens.radius16,
                     ),
                 )
+            }
+            else -> this
         }
-        else -> this
     }
-}
 
 // region Preview
 

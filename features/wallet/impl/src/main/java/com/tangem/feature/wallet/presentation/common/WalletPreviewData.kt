@@ -4,7 +4,8 @@ import com.tangem.core.ui.R
 import com.tangem.feature.wallet.presentation.common.state.NetworkGroupState
 import com.tangem.feature.wallet.presentation.common.state.TokenItemState
 import com.tangem.feature.wallet.presentation.common.state.TokenItemState.TokenOptionsState
-import com.tangem.feature.wallet.presentation.common.state.TokenListState
+import com.tangem.feature.wallet.presentation.organizetokens.DraggableItem
+import com.tangem.feature.wallet.presentation.organizetokens.OrganizeTokensListState
 import com.tangem.feature.wallet.presentation.organizetokens.OrganizeTokensStateHolder
 import com.tangem.feature.wallet.presentation.wallet.state.WalletCardState
 import com.tangem.feature.wallet.presentation.wallet.state.WalletStateHolder
@@ -108,45 +109,6 @@ internal object WalletPreviewData {
 
     val loadingTokenItemState = TokenItemState.Loading(id = UUID.randomUUID().toString())
 
-    val draggableTokenList = persistentListOf(
-        tokenItemDragState.copy(
-            id = "token_1",
-            name = "Ethereum",
-            tokenIconResId = R.drawable.img_eth_22,
-            networkIconResId = null,
-            fiatAmount = "3 172,14 $",
-        ),
-        tokenItemDragState.copy(
-            id = "token_2",
-            networkIconResId = R.drawable.img_eth_22,
-            fiatAmount = "803,65 $",
-        ),
-        tokenItemDragState.copy(
-            id = "token_3",
-            name = "Arbitrum",
-            tokenIconResId = R.drawable.img_arbitrum_22,
-            networkIconResId = R.drawable.img_eth_22,
-            fiatAmount = "88,01 $",
-        ),
-        tokenItemDragState.copy(
-            id = "token_4",
-            networkIconResId = null,
-            fiatAmount = "3 172,14 $",
-        ),
-        tokenItemDragState.copy(
-            id = "token_5",
-            name = "Doge",
-            tokenIconResId = R.drawable.img_dogecoin_22,
-            fiatAmount = "803,65 $",
-        ),
-        tokenItemDragState.copy(
-            id = "token_6",
-            name = "Arbitrum",
-            tokenIconResId = R.drawable.img_arbitrum_22,
-            fiatAmount = "88,01 $",
-        ),
-    )
-
     val networkGroup = NetworkGroupState.Content(
         id = UUID.randomUUID().toString(),
         networkName = "Ethereum",
@@ -176,23 +138,66 @@ internal object WalletPreviewData {
     val draggableNetworkGroup = NetworkGroupState.Draggable(
         id = "group_1",
         networkName = "Ethereum",
-        tokens = draggableTokenList.take(3).toPersistentList(),
     )
 
-    val draggableNetworkGroups = persistentListOf(
-        draggableNetworkGroup,
-        NetworkGroupState.Draggable(
-            id = "group_2",
-            networkName = "Polygon",
-            tokens = draggableTokenList.takeLast(n = 3).toPersistentList(),
-        ),
-    )
+    private const val networksSize = 10
+    private const val tokensSize = 3
+    val draggableItems = List(networksSize) { it }
+        .flatMap { index ->
+            val lastNetworkIndex = networksSize - 1
+            val n = index + 1
+
+            val group = DraggableItem.GroupHeader(
+                groupState = NetworkGroupState.Draggable(
+                    id = "group_$n",
+                    networkName = "$n",
+                ),
+            )
+
+            val tokens: MutableList<DraggableItem.Token> = mutableListOf()
+            repeat(times = tokensSize) { i ->
+                val nt = i + 1
+                tokens.add(
+                    DraggableItem.Token(
+                        tokenItemState = tokenItemDragState.copy(
+                            id = "${group.id}_token_$nt",
+                            name = "Token $nt",
+                            networkIconResId = R.drawable.img_eth_22.takeIf { i != 0 },
+                        ),
+                        groupId = group.id,
+                    ),
+                )
+            }
+
+            val divider = DraggableItem.GroupDivider(id = "divider_$n")
+
+            buildList {
+                add(group)
+                addAll(tokens)
+                if (index != lastNetworkIndex) {
+                    add(divider)
+                }
+            }
+        }
+        .toPersistentList()
+
+    val draggableTokens = draggableItems
+        .filterIsInstance<DraggableItem.Token>()
+        .toPersistentList()
 
     val groupedOrganizeTokensState = OrganizeTokensStateHolder(
-        tokens = TokenListState.GroupedByNetwork(groups = draggableNetworkGroups),
+        itemsState = OrganizeTokensListState.GroupedByNetwork(
+            items = draggableItems,
+        ),
         header = OrganizeTokensStateHolder.HeaderConfig(
             onSortByBalanceClick = {},
             onGroupByNetworkClick = {},
+        ),
+        dragConfig = OrganizeTokensStateHolder.DragConfig(
+            onItemDragged = { _, _ -> },
+            onDragStart = {},
+            canDragItemOver = { _, _ -> false },
+            onItemDragEnd = {},
         ),
         actions = OrganizeTokensStateHolder.ActionsConfig(
             onApplyClick = {},
@@ -201,6 +206,8 @@ internal object WalletPreviewData {
     )
 
     val organizeTokensState = groupedOrganizeTokensState.copy(
-        tokens = TokenListState.Ungrouped(draggableTokenList),
+        itemsState = OrganizeTokensListState.Ungrouped(
+            items = draggableTokens,
+        ),
     )
 }
