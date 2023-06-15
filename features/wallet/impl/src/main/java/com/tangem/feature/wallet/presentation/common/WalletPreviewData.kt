@@ -12,6 +12,7 @@ import com.tangem.feature.wallet.presentation.wallet.state.WalletStateHolder
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import java.util.UUID
+import kotlin.random.Random
 
 internal object WalletPreviewData {
 
@@ -142,7 +143,7 @@ internal object WalletPreviewData {
 
     private const val networksSize = 10
     private const val tokensSize = 3
-    val draggableItems = List(networksSize) { it }
+    private val draggableItems = List(networksSize) { it }
         .flatMap { index ->
             val lastNetworkIndex = networksSize - 1
             val lastTokenIndex = tokensSize - 1
@@ -167,10 +168,11 @@ internal object WalletPreviewData {
                     DraggableItem.Token(
                         tokenItemState = tokenItemDragState.copy(
                             id = "${group.id}_token_$nt",
-                            name = "Token $nt",
+                            name = "Token ${n}_$nt",
                             networkIconResId = R.drawable.img_eth_22.takeIf { i != 0 },
+                            fiatAmount = "${Random.nextInt(from = 0, until = 5_000)} $",
                         ),
-                        groupId = group.id,
+                        tokenGroupState = group.groupState,
                         roundingMode = when {
                             i == lastTokenIndex && index == lastNetworkIndex -> DraggableItem.RoundingMode.Bottom()
                             else -> DraggableItem.RoundingMode.None

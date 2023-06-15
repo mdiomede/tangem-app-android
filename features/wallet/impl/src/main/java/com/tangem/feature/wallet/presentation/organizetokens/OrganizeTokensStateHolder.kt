@@ -71,11 +71,12 @@ internal sealed interface DraggableItem {
 
     data class Token(
         val tokenItemState: TokenItemState.Draggable,
-        val groupId: String,
+        val tokenGroupState: NetworkGroupState.Draggable,
         override val showShadow: Boolean = false,
         override val roundingMode: RoundingMode = RoundingMode.None,
     ) : DraggableItem {
         override val id: String = tokenItemState.id
+        val groupId: String = tokenGroupState.id
     }
 
     data class GroupDivider(

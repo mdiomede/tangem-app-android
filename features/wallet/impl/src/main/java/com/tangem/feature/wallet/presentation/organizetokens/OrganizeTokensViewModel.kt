@@ -38,22 +38,33 @@ internal class OrganizeTokensViewModel @Inject constructor() : ViewModel() {
             onDragStart = this::startMoving,
         ),
         header = HeaderConfig(
-            onSortByBalanceClick = { /* no-op */ },
+            onSortByBalanceClick = this::toggleByBalanceSorting,
             onGroupByNetworkClick = this::toggleTokensByNetworkGrouping,
         ),
     )
 
     private fun toggleTokensByNetworkGrouping() {
-        val newListState = when (val itemsState = uiState.itemsState) {
+        val updatedItemsState = when (val itemsState = uiState.itemsState) {
             is OrganizeTokensListState.GroupedByNetwork -> OrganizeTokensListState.Ungrouped(
-                items = itemsState.items.filterIsInstance<DraggableItem.Token>().toPersistentList(),
+                items = itemsState.items.ungroup().toPersistentList(),
             )
             is OrganizeTokensListState.Ungrouped -> OrganizeTokensListState.GroupedByNetwork(
-                items = WalletPreviewData.draggableItems,
+                items = itemsState.items.group().toPersistentList(),
             )
         }
 
-        uiState = uiState.copy(itemsState = newListState)
+        uiState = uiState.copy(itemsState = updatedItemsState)
+    }
+
+    private fun toggleByBalanceSorting() {
+        val updatedItemsState = when (val itemsState = uiState.itemsState) {
+            is OrganizeTokensListState.GroupedByNetwork -> OrganizeTokensListState.Ungrouped(
+                items = itemsState.items.ungroupAndSortByBalance().toPersistentList(),
+            )
+            is OrganizeTokensListState.Ungrouped -> itemsState.updateItems { it.ungroupAndSortByBalance() }
+        }
+
+        uiState = uiState.copy(itemsState = updatedItemsState)
     }
 
     private fun checkCanMoveItemOver(moveOverItemPosition: ItemPosition, movedItemPosition: ItemPosition): Boolean {

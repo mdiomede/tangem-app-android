@@ -3,6 +3,42 @@ package com.tangem.feature.wallet.presentation.organizetokens.utils
 import com.tangem.feature.wallet.presentation.organizetokens.DraggableItem
 import org.burnoutcrew.reorderable.ItemPosition
 
+internal fun List<DraggableItem.Token>.group(): List<DraggableItem> {
+    val groupedTokens = this
+        .groupBy { it.tokenGroupState }
+    val groups = groupedTokens.keys
+    val lastGroupIndex = groups.size - 1
+
+    return groups
+        .flatMapIndexed { index, group ->
+            buildList {
+                add(DraggableItem.GroupHeader(group))
+                addAll(groupedTokens[group].orEmpty())
+                if (index != lastGroupIndex) {
+                    add(DraggableItem.GroupDivider(id = getGroupDividerId(index)))
+                }
+            }
+        }
+        .uniteItems()
+}
+
+internal fun List<DraggableItem>.ungroup(): List<DraggableItem.Token> {
+    return this.filterIsInstance<DraggableItem.Token>()
+}
+
+@Suppress("UNCHECKED_CAST")
+internal fun List<DraggableItem>.ungroupAndSortByBalance(): List<DraggableItem.Token> {
+    return this
+        .filterIsInstance<DraggableItem.Token>()
+        .sortedByDescending { item ->
+            // FIXME: May be move its to domain
+            item.tokenItemState.fiatAmount
+                .filter(Char::isDigit)
+                .toInt()
+        }
+        .uniteItems() as List<DraggableItem.Token>
+}
+
 internal fun List<DraggableItem>.findItemsToMove(
     moveOverItemKey: Any?,
     movedItemKey: Any?,
@@ -30,6 +66,7 @@ internal fun checkCanMoveHeaderOver(
     moveOverItem: DraggableItem,
     lastItemIndex: Int,
 ): Boolean {
+    // Group item can be moved only to group divider or to ages of the items list
     return when {
         moveOverItemPosition.index == 0 -> true
         moveOverItemPosition.index == lastItemIndex -> true
@@ -39,9 +76,10 @@ internal fun checkCanMoveHeaderOver(
 }
 
 internal fun checkCanMoveTokenOver(item: DraggableItem.Token, moveOverItem: DraggableItem): Boolean {
+    // Token item can be moved only in its group
     return when (moveOverItem) {
-        is DraggableItem.GroupHeader -> false // Token item can not be moved to group item
-        is DraggableItem.Token -> item.groupId == moveOverItem.groupId // Token item can not be moved over its group
+        is DraggableItem.GroupHeader -> false
+        is DraggableItem.Token -> item.tokenGroupState.id == moveOverItem.tokenGroupState.id
         is DraggableItem.GroupDivider -> false
     }
 }
@@ -83,7 +121,7 @@ internal fun List<DraggableItem>.collapseGroup(group: DraggableItem.GroupHeader)
     groupIdToTokens = this
         .asSequence()
         .filterIsInstance<DraggableItem.Token>()
-        .groupBy { it.groupId }
+        .groupBy { it.tokenGroupState.id }
 
     return this
         .filterNot { it is DraggableItem.Token && it.groupId == group.id }
@@ -102,7 +140,7 @@ internal fun List<DraggableItem>.expandGroups(): List<DraggableItem> {
                 add(group)
                 addAll(groupIdToTokens?.get(group.id).orEmpty())
                 if (index != lastGroupIndex) {
-                    add(DraggableItem.GroupDivider(id = "group_divider_$index"))
+                    add(DraggableItem.GroupDivider(id = getGroupDividerId(index)))
                 }
             }
         }
@@ -159,3 +197,5 @@ internal fun List<DraggableItem>.roundGroups(movingItem: DraggableItem): List<Dr
         }
     }
 }
+
+private fun getGroupDividerId(index: Int): String = "group_divider_$index"
