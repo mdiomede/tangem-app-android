@@ -3,7 +3,8 @@ package com.tangem.feature.learn2earn.domain
 import com.tangem.utils.converter.TwoWayConverter
 
 /**
- * Converter which helps prepare a list of headers to put it into the Intent and extract them later.
+ * A converter that helps prepare a list of headers to put in an intent and retrieve them later.
+ *
  * @author Anton Zhilenkov on 07.06.2023.
  */
 internal class HeadersConverter : TwoWayConverter<Map<String, String>, ArrayList<String>> {
