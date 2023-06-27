@@ -13,7 +13,7 @@ import javax.inject.Inject
  * @author Anton Zhilenkov on 21.06.2023.
  */
 @HiltViewModel
-class WebViewViewModel @Inject constructor(
+internal class WebViewViewModel @Inject constructor(
     private val handler: WebViewRedirectHandler,
 ) : ViewModel(), WebViewRedirectHandler {
 
