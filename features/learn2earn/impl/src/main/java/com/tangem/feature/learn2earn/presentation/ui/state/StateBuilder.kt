@@ -3,7 +3,7 @@ package com.tangem.feature.learn2earn.presentation.ui.state
 /**
  * @author Anton Zhilenkov on 20.06.2023.
  */
-internal fun Learn2earnState.Companion.init(uiActions: UiActions): Learn2earnState {
+internal fun Learn2earnState.Companion.init(uiActions: Learn2earnUiActions): Learn2earnState {
     return Learn2earnState(
         storyScreenState = StoryScreenState(
             isVisible = false,
