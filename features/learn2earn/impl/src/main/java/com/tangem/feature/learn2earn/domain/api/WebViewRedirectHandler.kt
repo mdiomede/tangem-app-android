@@ -9,10 +9,10 @@ import android.net.Uri
  * @author Anton Zhilenkov on 12.06.2023.
  */
 interface WebViewRedirectHandler {
-    fun handleRedirect(uri: Uri): RedirectConsequences
+    fun handleRedirect(uri: Uri): WebViewAction
 }
 
-enum class RedirectConsequences {
+enum class WebViewAction {
     NOTHING,
     PROCEED,
     FINISH_SESSION,
