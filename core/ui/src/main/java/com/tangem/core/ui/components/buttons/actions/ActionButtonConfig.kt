@@ -9,6 +9,7 @@ import androidx.annotation.DrawableRes
  * @property iconResId icon resource id
  * @property onClick   lambda be invoked when action component is clicked
  * @property enabled   enabled
+ * @property dimContent determines whether the button content will be dimmed
  *
  * @author Andrew Khokhlov on 23/06/2023
  */
@@ -17,4 +18,5 @@ data class ActionButtonConfig(
     @DrawableRes val iconResId: Int,
     val onClick: () -> Unit,
     val enabled: Boolean = true,
+    val dimContent: Boolean = false,
 )

@@ -1,12 +1,14 @@
 package com.tangem.feature.wallet.presentation.router
 
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -56,9 +58,11 @@ internal class DefaultWalletRouter(private val navigationStateHolder: Navigation
                         router = this@DefaultWalletRouter
                     }
 
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
                 OrganizeTokensScreen(
-                    modifier = Modifier.systemBarsPadding(),
-                    state = viewModel.uiState,
+                    modifier = Modifier.statusBarsPadding(),
+                    state = uiState,
                 )
             }
         }

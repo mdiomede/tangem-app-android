@@ -1,5 +1,6 @@
 package com.tangem.feature.wallet.presentation.organizetokens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,8 @@ import org.burnoutcrew.reorderable.*
 
 @Composable
 internal fun OrganizeTokensScreen(state: OrganizeTokensState, modifier: Modifier = Modifier) {
+    BackHandler(onBack = state.onBackClick)
+
     val tokensListState = rememberLazyListState()
 
     Scaffold(
@@ -43,10 +46,12 @@ internal fun OrganizeTokensScreen(state: OrganizeTokensState, modifier: Modifier
         },
         content = { paddingValues ->
             TokenList(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
                 listState = tokensListState,
                 state = state.itemsState,
-                dragConfig = state.dndConfig,
+                dndConfig = state.dndConfig,
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
@@ -61,15 +66,15 @@ internal fun OrganizeTokensScreen(state: OrganizeTokensState, modifier: Modifier
 private fun TokenList(
     listState: LazyListState,
     state: OrganizeTokensListState,
-    dragConfig: OrganizeTokensState.DragAndDropConfig,
+    dndConfig: OrganizeTokensState.DragAndDropConfig,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
         val reorderableListState = rememberReorderableLazyListState(
-            onMove = dragConfig.onItemDragged,
+            onMove = dndConfig.onItemDragged,
             listState = listState,
-            canDragOver = dragConfig.canDragItemOver,
-            onDragEnd = { _, _ -> dragConfig.onItemDragEnd() },
+            canDragOver = dndConfig.canDragItemOver,
+            onDragEnd = { _, _ -> dndConfig.onItemDragEnd() },
         )
         val items = state.items
 
@@ -77,7 +82,8 @@ private fun TokenList(
             modifier = Modifier
                 .reorderable(reorderableListState)
                 .align(Alignment.TopCenter)
-                .padding(horizontal = TangemTheme.dimens.spacing16),
+                .padding(horizontal = TangemTheme.dimens.spacing16)
+                .fillMaxSize(),
             state = reorderableListState.listState,
             contentPadding = PaddingValues(
                 top = TangemTheme.dimens.spacing12,
@@ -90,7 +96,7 @@ private fun TokenList(
             ) { index, item ->
 
                 val onDragStart = remember(item) {
-                    { dragConfig.onDragStart(item) }
+                    { dndConfig.onDragStart(item) }
                 }
 
                 DraggableItem(
@@ -210,14 +216,23 @@ private fun TopBar(
                 config = ActionButtonConfig(
                     text = stringResource(id = R.string.organize_tokens_sort_by_balance),
                     iconResId = R.drawable.ic_sort_24,
+                    enabled = config.isEnabled,
                     onClick = config.onSortClick,
+                    dimContent = !config.isSortedByBalance,
                 ),
                 modifier = Modifier.weight(1f),
                 color = TangemTheme.colors.background.primary,
             )
             RoundedActionButton(
                 config = ActionButtonConfig(
-                    text = stringResource(id = R.string.organize_tokens_group),
+                    text = stringResource(
+                        id = if (config.isGrouped) {
+                            R.string.organize_tokens_ungroup
+                        } else {
+                            R.string.organize_tokens_group
+                        },
+                    ),
+                    enabled = config.isEnabled,
                     iconResId = R.drawable.ic_group_24,
                     onClick = config.onGroupClick,
                 ),
@@ -246,6 +261,8 @@ private fun Actions(config: OrganizeTokensState.ActionsConfig, modifier: Modifie
             modifier = Modifier.weight(1f),
             text = stringResource(id = R.string.common_apply),
             onClick = config.onApplyClick,
+            showProgress = config.showApplyProgress,
+            enabled = config.canApply,
         )
     }
 }

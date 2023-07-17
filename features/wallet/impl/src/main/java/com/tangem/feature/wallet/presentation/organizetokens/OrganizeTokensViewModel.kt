@@ -1,30 +1,49 @@
 package com.tangem.feature.wallet.presentation.organizetokens
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tangem.common.Provider
+import com.tangem.domain.tokens.ApplyTokenListSortingUseCase
+import com.tangem.domain.tokens.GetTokenListUseCase
+import com.tangem.domain.tokens.ToggleTokenListGroupingUseCase
+import com.tangem.domain.tokens.ToggleTokenListSortingUseCase
 import com.tangem.domain.wallets.models.UserWalletId
-import com.tangem.feature.wallet.presentation.common.WalletPreviewData
-import com.tangem.feature.wallet.presentation.organizetokens.utils.common.*
+import com.tangem.feature.wallet.presentation.organizetokens.utils.converter.items.ListStateToTokensIdsConverter
+import com.tangem.feature.wallet.presentation.organizetokens.utils.dnd.DragAndDropAdapter
 import com.tangem.feature.wallet.presentation.router.InnerWalletRouter
 import com.tangem.feature.wallet.presentation.router.WalletRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ItemPosition
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-// FIXME: Implemented with preview data
 @HiltViewModel
-internal class OrganizeTokensViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
+internal class OrganizeTokensViewModel @Inject constructor(
+    private val getTokenListUseCase: GetTokenListUseCase,
+    private val toggleTokenListGroupingUseCase: ToggleTokenListGroupingUseCase,
+    private val toggleTokenListSortingUseCase: ToggleTokenListSortingUseCase,
+    private val applyTokenListSortingUseCase: ApplyTokenListSortingUseCase,
+    savedStateHandle: SavedStateHandle,
+) : ViewModel(), OrganizeTokensIntents {
 
-    @Volatile
-    private var movingItem: DraggableItem? = null
+    private val dragAndDropAdapter by lazy {
+        DragAndDropAdapter(
+            scopeProvider = Provider(::viewModelScope),
+            stateProvider = Provider(stateHolder.state::itemsState),
+        )
+    }
+
+    private val stateHolder by lazy {
+        OrganizeTokensStateHolder(
+            intents = this,
+            fiatCurrencyCode = "USD", // TODO: https://tangem.atlassian.net/browse/AND-4006
+            fiatCurrencySymbol = "$", // TODO: https://tangem.atlassian.net/browse/AND-4006
+        )
+    }
 
     var router: InnerWalletRouter by Delegates.notNull()
     val userWalletId: UserWalletId by lazy {
@@ -33,98 +52,94 @@ internal class OrganizeTokensViewModel @Inject constructor(savedStateHandle: Sav
         UserWalletId(userWalletIdValue)
     }
 
-    var uiState: OrganizeTokensState by mutableStateOf(getInitialState())
-        private set
+    val uiState: StateFlow<OrganizeTokensState> = stateHolder.stateFlow
+        .onSubscription {
+            bootstrapTokenListUpdates()
+            bootstrapDragAndDropUpdates()
+        }
+        .stateIn(viewModelScope, started = SharingStarted.WhileSubscribed(), stateHolder.getInitialState())
 
-    private fun getInitialState(): OrganizeTokensState = WalletPreviewData.organizeTokensState.copy(
-        itemsState = OrganizeTokensListState.Ungrouped(
-            items = WalletPreviewData.draggableTokens,
-        ),
-        dndConfig = OrganizeTokensState.DragAndDropConfig(
-            onItemDragged = this::moveItem,
-            canDragItemOver = this::checkCanMoveItemOver,
-            onItemDragEnd = this::endMoving,
-            onDragStart = this::startMoving,
-        ),
-        header = OrganizeTokensState.HeaderConfig(
-            onSortClick = { /* no-op */ },
-            onGroupClick = this::toggleTokensByNetworkGrouping,
-        ),
-    )
+    override fun onBackClick() {
+        router.popBackStack()
+    }
 
-    private fun toggleTokensByNetworkGrouping() {
-        val newListState = when (val itemsState = uiState.itemsState) {
-            is OrganizeTokensListState.GroupedByNetwork -> OrganizeTokensListState.Ungrouped(
-                items = itemsState.items.filterIsInstance<DraggableItem.Token>().toPersistentList(),
+    override fun onSortClick() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val list = stateHolder.tokenList ?: return@launch
+
+            toggleTokenListSortingUseCase(list).fold(
+                ifLeft = stateHolder::updateStateWithError,
+                ifRight = stateHolder::updateStateWithTokenList,
             )
-            is OrganizeTokensListState.Ungrouped -> OrganizeTokensListState.GroupedByNetwork(
-                items = WalletPreviewData.draggableItems,
+        }
+    }
+
+    override fun onGroupClick() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val list = stateHolder.tokenList ?: return@launch
+
+            toggleTokenListGroupingUseCase(list).fold(
+                ifLeft = stateHolder::updateStateWithError,
+                ifRight = stateHolder::updateStateWithTokenList,
             )
-            is OrganizeTokensListState.Empty -> itemsState
-        }
-
-        uiState = uiState.copy(itemsState = newListState)
-    }
-
-    private fun checkCanMoveItemOver(moveOverItemPosition: ItemPosition, movedItemPosition: ItemPosition): Boolean {
-        val items = (uiState.itemsState as? OrganizeTokensListState.GroupedByNetwork)
-            ?.items
-            ?: return true // If ungrouped then item can be moved anywhere
-
-        val (moveOverItem, movedItem) = items.findItemsToMove(moveOverItemPosition.key, movedItemPosition.key)
-
-        if (moveOverItem == null || movedItem == null) {
-            return false
-        }
-
-        return when (movedItem) {
-            is DraggableItem.GroupHeader -> checkCanMoveHeaderOver(moveOverItemPosition, moveOverItem, items.lastIndex)
-            is DraggableItem.Token -> checkCanMoveTokenOver(movedItem, moveOverItem)
-            is DraggableItem.GroupPlaceholder -> false
         }
     }
 
-    private fun startMoving(movingItem: DraggableItem) = viewModelScope.launch(Dispatchers.Default) {
-        if (this@OrganizeTokensViewModel.movingItem != null) return@launch
-        this@OrganizeTokensViewModel.movingItem = movingItem
+    override fun onApplyClick() {
+        viewModelScope.launch(Dispatchers.Default) {
+            stateHolder.updateStateToDisplayProgress()
 
-        val updatedItemsState = uiState.itemsState.updateItems { items ->
-            when (movingItem) {
-                is DraggableItem.GroupHeader -> items.collapseGroup(movingItem)
-                is DraggableItem.Token -> when (uiState.itemsState) {
-                    is OrganizeTokensListState.GroupedByNetwork -> items.divideGroups(movingItem)
-                    is OrganizeTokensListState.Ungrouped -> items.divideItems(movingItem)
-                    is OrganizeTokensListState.Empty -> uiState.itemsState.items
-                }
-                is DraggableItem.GroupPlaceholder -> items
-            }
+            val items = stateHolder.state.itemsState
+            val converter = ListStateToTokensIdsConverter()
+
+            val result = applyTokenListSortingUseCase(
+                userWalletId = userWalletId,
+                sortedTokensIds = converter.convert(items),
+                isGroupedByNetwork = items is OrganizeTokensListState.GroupedByNetwork,
+                isSortedByBalance = stateHolder.state.header.isSortedByBalance,
+            )
+
+            result.fold(
+                ifLeft = stateHolder::updateStateWithError,
+                ifRight = { stateHolder.updateStateToHideProgress() },
+            )
         }
-
-        uiState = uiState.copy(itemsState = updatedItemsState)
     }
 
-    private fun endMoving() = viewModelScope.launch(Dispatchers.Default) {
-        if (movingItem == null) return@launch
-
-        val updatedItemsState = uiState.itemsState.updateItems { items ->
-            when (movingItem) {
-                is DraggableItem.GroupHeader -> items.expandGroups()
-                is DraggableItem.Token -> items.uniteItems()
-                is DraggableItem.GroupPlaceholder,
-                null,
-                -> items
-            }
-        }
-
-        uiState = uiState.copy(itemsState = updatedItemsState)
-        movingItem = null
+    override fun onCancelClick() {
+        router.popBackStack()
     }
 
-    private fun moveItem(from: ItemPosition, to: ItemPosition) = viewModelScope.launch(Dispatchers.Default) {
-        uiState = uiState.copy(
-            itemsState = uiState.itemsState.updateItems {
-                it.moveItem(from.index, to.index)
-            },
-        )
+    override fun onItemDragged(from: ItemPosition, to: ItemPosition) {
+        dragAndDropAdapter.onItemDragged(from, to)
+    }
+
+    override fun canDragItemOver(dragOver: ItemPosition, dragging: ItemPosition): Boolean {
+        return dragAndDropAdapter.canDragItemOver(dragOver, dragging)
+    }
+
+    override fun onItemDraggingStart(item: DraggableItem) {
+        dragAndDropAdapter.onItemDraggingStart(item)
+    }
+
+    override fun onItemDraggingEnd() {
+        dragAndDropAdapter.onItemDraggingEnd()
+    }
+
+    private fun bootstrapTokenListUpdates() {
+        viewModelScope.launch(Dispatchers.Default) {
+            getTokenListUseCase(userWalletId).first().fold(
+                ifLeft = stateHolder::updateStateWithError,
+                ifRight = stateHolder::updateStateWithTokenList,
+            )
+        }
+    }
+
+    private fun bootstrapDragAndDropUpdates() {
+        dragAndDropAdapter.tokenListStateUpdates
+            .distinctUntilChanged()
+            .onEach(stateHolder::updateStateWithManualSorting)
+            .flowOn(Dispatchers.Default)
+            .launchIn(viewModelScope)
     }
 }

@@ -90,7 +90,7 @@ internal class OrganizeTokensStateHolder(
         state = tokenListSortingErrorConverter.convert(error)
     }
 
-    private fun getInitialState(): OrganizeTokensState {
+    fun getInitialState(): OrganizeTokensState {
         return OrganizeTokensState(
             onBackClick = intents::onBackClick,
             itemsState = OrganizeTokensListState.Empty,
