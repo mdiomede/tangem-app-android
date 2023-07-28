@@ -1,4 +1,4 @@
-package com.tangem.feature.wallet.presentation.organizetokens.utils
+package com.tangem.feature.wallet.presentation.organizetokens.utils.common
 
 import com.tangem.feature.wallet.presentation.organizetokens.DraggableItem
 import kotlinx.collections.immutable.PersistentList
@@ -64,8 +64,10 @@ internal fun List<DraggableItem>.divideItems(movingItem: DraggableItem): List<Dr
     }
 }
 
-internal fun List<DraggableItem>.uniteItems(): List<DraggableItem> {
+@Suppress("UNCHECKED_CAST") // Erased type
+internal fun <T : DraggableItem> List<T>.uniteItems(): List<T> {
     val lastItemIndex = this.lastIndex
+
     return this.mapIndexed { index, item ->
         val mode = when (index) {
             0 -> DraggableItem.RoundingMode.Top()
@@ -76,7 +78,7 @@ internal fun List<DraggableItem>.uniteItems(): List<DraggableItem> {
         item
             .roundingMode(mode)
             .showShadow(show = false)
-    }
+    } as List<T>
 }
 
 // TODO: Move to domain
