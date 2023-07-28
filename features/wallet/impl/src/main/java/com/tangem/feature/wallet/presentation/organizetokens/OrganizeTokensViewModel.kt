@@ -3,11 +3,14 @@ package com.tangem.feature.wallet.presentation.organizetokens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tangem.domain.wallets.models.UserWalletId
 import com.tangem.feature.wallet.presentation.common.WalletPreviewData
 import com.tangem.feature.wallet.presentation.organizetokens.utils.common.*
 import com.tangem.feature.wallet.presentation.router.InnerWalletRouter
+import com.tangem.feature.wallet.presentation.router.WalletRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
@@ -18,12 +21,17 @@ import kotlin.properties.Delegates
 
 // FIXME: Implemented with preview data
 @HiltViewModel
-internal class OrganizeTokensViewModel @Inject constructor() : ViewModel() {
+internal class OrganizeTokensViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     @Volatile
     private var movingItem: DraggableItem? = null
 
     var router: InnerWalletRouter by Delegates.notNull()
+    val userWalletId: UserWalletId by lazy {
+        val userWalletIdValue: String = checkNotNull(savedStateHandle[WalletRoute.userWalletIdKey])
+
+        UserWalletId(userWalletIdValue)
+    }
 
     var uiState: OrganizeTokensState by mutableStateOf(getInitialState())
         private set
