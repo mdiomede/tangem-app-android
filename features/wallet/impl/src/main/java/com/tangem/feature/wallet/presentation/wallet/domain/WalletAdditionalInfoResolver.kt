@@ -19,11 +19,7 @@ internal object WalletAdditionalInfoResolver {
      * @param isLocked          check if wallet is locked
      * @param currencyAmount    amount of currency
      */
-    fun resolve(
-        cardTypesResolver: CardTypesResolver,
-        isLocked: Boolean,
-        currencyAmount: BigDecimal? = null,
-    ): String {
+    fun resolve(cardTypesResolver: CardTypesResolver, isLocked: Boolean, currencyAmount: BigDecimal? = null): String {
         return if (cardTypesResolver.isMultiwalletAllowed()) {
             val backupInfo = "${cardTypesResolver.getBackupCardsCount()} cards"
             when {

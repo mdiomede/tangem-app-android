@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
  * Main factory for creating [WalletStateHolder]
  *
  * @property currentStateProvider current ui state provider
- * @param    currentCardTypeResolverProvider current card type resolver
+ * @param currentCardTypeResolverProvider current card type resolver
  * @property clickCallbacks       screen click intents
  */
 internal class WalletStateFactory(
