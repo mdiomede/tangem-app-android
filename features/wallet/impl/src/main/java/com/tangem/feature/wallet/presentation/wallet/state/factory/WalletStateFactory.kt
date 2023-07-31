@@ -14,7 +14,7 @@ import com.tangem.feature.wallet.presentation.wallet.state.WalletBottomSheetConf
 import com.tangem.feature.wallet.presentation.wallet.state.WalletNotification
 import com.tangem.feature.wallet.presentation.wallet.state.WalletStateHolder
 import com.tangem.feature.wallet.presentation.wallet.state.factory.WalletLoadedTokensListConverter.LoadedTokensListModel
-import com.tangem.feature.wallet.presentation.wallet.viewmodels.WalletClickCallbacks
+import com.tangem.feature.wallet.presentation.wallet.viewmodels.WalletClickIntents
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.Flow
 
@@ -22,18 +22,20 @@ import kotlinx.coroutines.flow.Flow
  * Main factory for creating [WalletStateHolder]
  *
  * @property currentStateProvider current ui state provider
- * @property clickCallbacks       screen click callbacks
+ * @param    currentCardTypeResolverProvider current card type resolver
+ * @property clickCallbacks       screen click intents
  */
 internal class WalletStateFactory(
     private val currentStateProvider: Provider<WalletStateHolder>,
     currentCardTypeResolverProvider: Provider<CardTypesResolver>,
-    private val clickCallbacks: WalletClickCallbacks,
+    private val clickCallbacks: WalletClickIntents,
 ) {
 
-    private val skeletonConverter = WalletSkeletonStateConverter(clickCallbacks = clickCallbacks)
+    private val skeletonConverter = WalletSkeletonStateConverter(clickIntents = clickCallbacks)
     private val loadedTokensListConverter = WalletLoadedTokensListConverter(
         currentStateProvider = currentStateProvider,
-        clickCallbacks = clickCallbacks,
+        cardTypeResolverProvider = currentCardTypeResolverProvider,
+        clickIntents = clickCallbacks,
     )
     private val loadingTransactionsStateConverter = WalletLoadingTxHistoryConverter(
         currentStateProvider = currentStateProvider,
