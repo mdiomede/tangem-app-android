@@ -3,7 +3,7 @@ package com.tangem.feature.tokendetails.presentation.tokendetails.state.factory
 import com.tangem.core.ui.components.marketprice.MarketPriceBlockState
 import com.tangem.core.ui.components.transactions.state.TxHistoryState
 import com.tangem.core.ui.extensions.TextReference
-import com.tangem.core.ui.extensions.iconResId
+import com.tangem.core.ui.extensions.networkBadgeIconResId
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.domain.tokens.models.CryptoCurrency
 import com.tangem.feature.tokendetails.presentation.tokendetails.state.*
@@ -38,7 +38,7 @@ internal class TokenDetailsSkeletonStateConverter(
                     is CryptoCurrency.Token -> TokenInfoBlockState.Currency.Token(
                         networkName = currency.network.standardType.name,
                         blockchainName = currency.network.name,
-                        networkIcon = currency.iconResId,
+                        networkIcon = requireNotNull(currency.networkBadgeIconResId),
                     )
                 },
             ),
