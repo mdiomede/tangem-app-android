@@ -15,12 +15,14 @@ import com.tangem.domain.txhistory.models.TxHistoryItem
 import com.tangem.domain.txhistory.models.TxHistoryListError
 import com.tangem.domain.txhistory.models.TxHistoryStateError
 import com.tangem.domain.wallets.models.UserWallet
+import com.tangem.feature.wallet.presentation.common.state.TokenItemState
 import com.tangem.feature.wallet.presentation.wallet.state.ActionsBottomSheetConfig
 import com.tangem.feature.wallet.presentation.wallet.state.WalletMultiCurrencyState
 import com.tangem.feature.wallet.presentation.wallet.state.WalletSingleCurrencyState
 import com.tangem.feature.wallet.presentation.wallet.state.WalletState
 import com.tangem.feature.wallet.presentation.wallet.state.components.WalletBottomSheetConfig
 import com.tangem.feature.wallet.presentation.wallet.state.components.WalletNotification
+import com.tangem.feature.wallet.presentation.wallet.state.components.WalletTokensListState
 import com.tangem.feature.wallet.presentation.wallet.state.factory.txhistory.WalletLoadedTxHistoryConverter
 import com.tangem.feature.wallet.presentation.wallet.state.factory.txhistory.WalletLoadingTxHistoryConverter
 import com.tangem.feature.wallet.presentation.wallet.utils.CurrencyStatusErrorConverter
@@ -43,6 +45,7 @@ internal class WalletStateFactory(
     private val currentCardTypeResolverProvider: Provider<CardTypesResolver>,
     private val currentWalletProvider: Provider<UserWallet>,
     private val appCurrencyProvider: Provider<AppCurrency>,
+    private val isWalletContentHiddenProvider: Provider<Boolean>,
     private val clickIntents: WalletClickIntents,
 ) {
 
@@ -62,6 +65,7 @@ internal class WalletStateFactory(
             cardTypeResolverProvider = currentCardTypeResolverProvider,
             currentWalletProvider = currentWalletProvider,
             appCurrencyProvider = appCurrencyProvider,
+            isWalletContentHiddenProvider = isWalletContentHiddenProvider,
             clickIntents = clickIntents,
         )
     }
@@ -226,25 +230,49 @@ internal class WalletStateFactory(
 
     fun getHiddenBalanceState(hiddenBalance: Boolean): WalletState {
         return when (val state = currentStateProvider() as? WalletState.ContentState) {
-            is WalletMultiCurrencyState.Content -> state.copy(
-                walletsListConfig = state.walletsListConfig.copy(
-                    wallets = state.walletsListConfig.wallets.map {
-                        it.updateHiddenState(hiddenBalance)
-                    }.toImmutableList()
-                )
-            )
+            is WalletMultiCurrencyState.Content -> {
+                val patchedTokens = (state.tokensListState as? WalletTokensListState.Content)?.let { content ->
+                    content.copy(items = content.items.map { tokenListItemState ->
+                        if (tokenListItemState is WalletTokensListState.TokensListItemState.Token) {
+                            if (tokenListItemState.state is TokenItemState.Content) {
+                                tokenListItemState.copy(
+                                    state = tokenListItemState.state.copy(
+                                        tokenOptions =
+                                        tokenListItemState.state.tokenOptions.updateHiddenState(hiddenBalance)
+                                    )
+                                )
+                            } else {
+                                tokenListItemState
+                            }
+                        } else {
+                            tokenListItemState
+                        }
+                    }.toImmutableList())
 
-            is WalletSingleCurrencyState.Content -> state.copy(
-                walletsListConfig = state.walletsListConfig.copy(
-                    wallets = state.walletsListConfig.wallets.map {
-                        it.updateHiddenState(hiddenBalance)
-                    }.toImmutableList()
+                } ?: state.tokensListState
+
+
+                state.copy(
+                    walletsListConfig = state.walletsListConfig.copy(
+                        wallets = state.walletsListConfig.wallets.map {
+                            it.updateHiddenState(hiddenBalance)
+                        }.toImmutableList()
+                    ),
+                    tokensListState = patchedTokens
                 )
-            )
+            }
+
+            is WalletSingleCurrencyState.Content -> {
+                state.copy(
+                    walletsListConfig = state.walletsListConfig.copy(
+                        wallets = state.walletsListConfig.wallets.map {
+                            it.updateHiddenState(hiddenBalance)
+                        }.toImmutableList()
+                    )
+                )
+            }
 
             else -> currentStateProvider()
         }
-
     }
-
 }

@@ -30,6 +30,7 @@ internal class WalletLoadedTokensListConverter(
     appCurrencyProvider: Provider<AppCurrency>,
     cardTypeResolverProvider: Provider<CardTypesResolver>,
     currentWalletProvider: Provider<UserWallet>,
+    isWalletContentHiddenProvider: Provider<Boolean>,
     clickIntents: WalletClickIntents,
 ) : Converter<Either<TokenListError, TokenList>, WalletState> {
 
@@ -38,7 +39,7 @@ internal class WalletLoadedTokensListConverter(
         cardTypeResolverProvider = cardTypeResolverProvider,
         currentWalletProvider = currentWalletProvider,
         appCurrencyProvider = appCurrencyProvider,
-        isWalletContentHidden = true, // TODO: https://tangem.atlassian.net/browse/AND-4007
+        isWalletContentHiddenProvider = isWalletContentHiddenProvider,
         clickIntents = clickIntents,
     )
 

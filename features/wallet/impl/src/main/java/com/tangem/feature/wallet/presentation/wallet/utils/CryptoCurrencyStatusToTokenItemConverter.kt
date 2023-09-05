@@ -42,7 +42,10 @@ internal class CryptoCurrencyStatusToTokenItemConverter(
             amount = getFormattedAmount(),
             hasPending = value.hasCurrentNetworkTransactions,
             tokenOptions = if (isWalletContentHidden) {
-                TokenItemState.TokenOptionsState.Hidden(getPriceChangeConfig())
+                TokenItemState.TokenOptionsState.Hidden(
+                    fiatAmount = getFormattedFiatAmount(),
+                    config = getPriceChangeConfig(),
+                )
             } else {
                 TokenItemState.TokenOptionsState.Visible(
                     fiatAmount = getFormattedFiatAmount(),

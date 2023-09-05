@@ -154,6 +154,7 @@ internal object WalletPreviewData {
                     valueInPercent = "2%",
                     type = PriceChangeConfig.Type.UP,
                 ),
+                fiatAmount = "321 $"
             ),
             onItemClick = {},
             onItemLongClick = {},

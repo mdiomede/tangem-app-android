@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.tangem.core.ui.components.marketprice.PriceChangeConfig
+import com.tangem.feature.wallet.presentation.wallet.state.components.WalletCardState
 
 /** Token item state */
 @Immutable
@@ -156,10 +157,42 @@ internal sealed interface TokenItemState {
          *
          * @property config value of price changing
          */
-        data class Hidden(override val config: PriceChangeConfig) : TokenOptionsState
+        data class Hidden(
+            override val config: PriceChangeConfig,
+            val fiatAmount: String,
+        ) : TokenOptionsState
+
+
+        fun updateHiddenState(hiddenBalance: Boolean) : TokenOptionsState {
+            return when {
+                this is TokenOptionsState.Visible && hiddenBalance -> {
+                    visibleToHidden(this)
+                }
+                this is TokenOptionsState.Hidden && !hiddenBalance -> {
+                    hiddenToVisible(this)
+                }
+                else -> this
+            }
+        }
+
+        private fun visibleToHidden(state: Visible) : Hidden {
+            return Hidden(
+                config = state.config,
+                fiatAmount = state.fiatAmount
+            )
+        }
+
+        private fun hiddenToVisible(state: Hidden) : Visible {
+            return Visible(
+                config = state.config,
+                fiatAmount = state.fiatAmount
+            )
+        }
+
     }
 
+
     companion object {
-        const val DOTS = "•••"
+        const val DOTS = "***"
     }
 }
