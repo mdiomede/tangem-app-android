@@ -58,6 +58,7 @@ internal sealed interface WalletCardState {
      * @property imageResId     wallet image resource id
      * @property onRenameClick  lambda be invoked when Rename button is clicked
      * @property onDeleteClick  lambda be invoked when Delete button is clicked
+     * @property balance        wallet balance
      */
     data class HiddenContent(
         override val id: UserWalletId,
@@ -66,6 +67,7 @@ internal sealed interface WalletCardState {
         override val imageResId: Int?,
         override val onRenameClick: (UserWalletId, String) -> Unit,
         override val onDeleteClick: (UserWalletId) -> Unit,
+        val balance: String,
     ) : WalletCardState
 
     /**
@@ -135,8 +137,44 @@ internal sealed interface WalletCardState {
         }
     }
 
+    fun updateHiddenState(hiddenBalance: Boolean) : WalletCardState {
+        return when {
+            this is Content && hiddenBalance -> {
+                contentToHidden(this)
+            }
+            this is HiddenContent && !hiddenBalance -> {
+                hiddenToContent(this)
+            }
+            else -> this
+        }
+    }
+
+    private fun contentToHidden(content: Content) : HiddenContent {
+        return HiddenContent(
+            id = content.id,
+            title = content.title,
+            additionalInfo = content.additionalInfo,
+            imageResId = content.imageResId,
+            onRenameClick = content.onRenameClick,
+            onDeleteClick = content.onDeleteClick,
+            balance = content.balance
+        )
+    }
+
+    private fun hiddenToContent(hiddenContent: HiddenContent) : Content {
+        return Content(
+            id = hiddenContent.id,
+            title = hiddenContent.title,
+            additionalInfo = hiddenContent.additionalInfo,
+            imageResId = hiddenContent.imageResId,
+            onRenameClick = hiddenContent.onRenameClick,
+            onDeleteClick = hiddenContent.onDeleteClick,
+            balance = hiddenContent.balance
+        )
+    }
+
     companion object {
-        val HIDDEN_BALANCE_TEXT by lazy { TextReference.Str(value = "•••") }
+        val HIDDEN_BALANCE_TEXT by lazy { TextReference.Str(value = "***") }
         val EMPTY_BALANCE_TEXT by lazy { TextReference.Str(value = "—") }
     }
 }

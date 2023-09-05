@@ -3,6 +3,7 @@ package com.tangem.feature.wallet.presentation.wallet.state.factory
 import androidx.paging.PagingData
 import arrow.core.Either
 import com.tangem.common.Provider
+import com.tangem.core.ui.utils.BigDecimalFormatter.formatFiatAmount
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.common.CardTypesResolver
 import com.tangem.domain.tokens.error.CurrencyStatusError
@@ -26,6 +27,7 @@ import com.tangem.feature.wallet.presentation.wallet.utils.CurrencyStatusErrorCo
 import com.tangem.feature.wallet.presentation.wallet.utils.TokenListErrorConverter
 import com.tangem.feature.wallet.presentation.wallet.viewmodels.WalletClickIntents
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -167,7 +169,6 @@ internal class WalletStateFactory(
                 isBottomSheetShow = true,
                 onBottomSheetDismiss = clickIntents::onDismissBottomSheet,
             )
-            else -> state
         }
     }
 
@@ -181,7 +182,6 @@ internal class WalletStateFactory(
                 bottomSheetConfig = state.bottomSheetConfig?.copy(isShow = false),
             )
             is WalletSingleCurrencyState.Locked -> state.copy(isBottomSheetShow = false)
-            else -> state
         }
     }
 
@@ -223,4 +223,28 @@ internal class WalletStateFactory(
     fun getStateByCurrencyStatusError(error: CurrencyStatusError): WalletState {
         return currencyStatusErrorConverter.convert(error)
     }
+
+    fun getHiddenBalanceState(hiddenBalance: Boolean): WalletState {
+        return when (val state = currentStateProvider() as? WalletState.ContentState) {
+            is WalletMultiCurrencyState.Content -> state.copy(
+                walletsListConfig = state.walletsListConfig.copy(
+                    wallets = state.walletsListConfig.wallets.map {
+                        it.updateHiddenState(hiddenBalance)
+                    }.toImmutableList()
+                )
+            )
+
+            is WalletSingleCurrencyState.Content -> state.copy(
+                walletsListConfig = state.walletsListConfig.copy(
+                    wallets = state.walletsListConfig.wallets.map {
+                        it.updateHiddenState(hiddenBalance)
+                    }.toImmutableList()
+                )
+            )
+
+            else -> currentStateProvider()
+        }
+
+    }
+
 }

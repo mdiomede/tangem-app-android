@@ -19,6 +19,7 @@ import com.tangem.domain.common.util.derivationStyleProvider
 import com.tangem.domain.demo.IsDemoCardUseCase
 import com.tangem.domain.redux.ReduxStateHolder
 import com.tangem.domain.settings.CanUseBiometryUseCase
+import com.tangem.domain.settings.IsBalanceHiddenUseCase
 import com.tangem.domain.settings.IsUserAlreadyRateAppUseCase
 import com.tangem.domain.settings.ShouldShowSaveWalletScreenUseCase
 import com.tangem.domain.tokens.*
@@ -88,6 +89,7 @@ internal class WalletViewModel @Inject constructor(
     private val shouldShowSaveWalletScreenUseCase: ShouldShowSaveWalletScreenUseCase,
     private val canUseBiometryUseCase: CanUseBiometryUseCase,
     private val shouldSaveUserWalletsUseCase: ShouldSaveUserWalletsUseCase,
+    private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
     private val reduxStateHolder: ReduxStateHolder,
     private val dispatchers: CoroutineDispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver, WalletClickIntents {
@@ -143,6 +145,14 @@ internal class WalletViewModel @Inject constructor(
             .flowWithLifecycle(owner.lifecycle)
             .distinctUntilChanged()
             .onEach(::updateWallets)
+            .flowOn(dispatchers.io)
+            .launchIn(viewModelScope)
+
+        isBalanceHiddenUseCase()
+            .flowWithLifecycle(owner.lifecycle)
+            .onEach { isBalanceHidden ->
+                uiState = stateFactory.getHiddenBalanceState(hiddenBalance = isBalanceHidden)
+            }
             .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }

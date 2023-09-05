@@ -61,6 +61,7 @@ internal object WalletPreviewData {
             imageResId = R.drawable.ill_businessman_3d,
             onRenameClick = { _, _ -> },
             onDeleteClick = {},
+            balance = "8923,05 $",
         )
     }
 

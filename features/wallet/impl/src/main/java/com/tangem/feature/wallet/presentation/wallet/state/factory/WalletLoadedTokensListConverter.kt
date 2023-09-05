@@ -38,7 +38,7 @@ internal class WalletLoadedTokensListConverter(
         cardTypeResolverProvider = cardTypeResolverProvider,
         currentWalletProvider = currentWalletProvider,
         appCurrencyProvider = appCurrencyProvider,
-        isWalletContentHidden = false, // TODO: https://tangem.atlassian.net/browse/AND-4007
+        isWalletContentHidden = true, // TODO: https://tangem.atlassian.net/browse/AND-4007
         clickIntents = clickIntents,
     )
 

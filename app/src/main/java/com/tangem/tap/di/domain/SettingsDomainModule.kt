@@ -1,6 +1,7 @@
 package com.tangem.tap.di.domain
 
 import com.tangem.domain.settings.CanUseBiometryUseCase
+import com.tangem.domain.settings.IsBalanceHiddenUseCase
 import com.tangem.domain.settings.IsUserAlreadyRateAppUseCase
 import com.tangem.domain.settings.ShouldShowSaveWalletScreenUseCase
 import com.tangem.domain.settings.repositories.SettingsRepository
@@ -36,5 +37,11 @@ internal object SettingsDomainModule {
         return CanUseBiometryUseCase(
             legacySettingsRepository = DefaultLegacySettingsRepository(tangemSdkManager = tangemSdkManager),
         )
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun providesIsBalanceHiddenUseCase(): IsBalanceHiddenUseCase {
+        return IsBalanceHiddenUseCase()
     }
 }
