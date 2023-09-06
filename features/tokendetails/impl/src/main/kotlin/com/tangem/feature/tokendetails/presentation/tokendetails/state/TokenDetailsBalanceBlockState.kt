@@ -15,6 +15,7 @@ internal sealed class TokenDetailsBalanceBlockState {
         override val actionButtons: ImmutableList<TokenDetailsActionButton>,
         val fiatBalance: String,
         val cryptoBalance: String,
+        val hidden: Boolean
     ) : TokenDetailsBalanceBlockState()
 
     data class Error(

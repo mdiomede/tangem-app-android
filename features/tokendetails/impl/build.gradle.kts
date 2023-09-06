@@ -53,6 +53,7 @@ dependencies {
     implementation(projects.domain.appCurrency.models)
     implementation(projects.domain.legacy)
     implementation(projects.domain.models)
+    implementation(projects.domain.settings)
     implementation(projects.domain.tokens)
     implementation(projects.domain.tokens.models)
     implementation(projects.domain.txhistory)
