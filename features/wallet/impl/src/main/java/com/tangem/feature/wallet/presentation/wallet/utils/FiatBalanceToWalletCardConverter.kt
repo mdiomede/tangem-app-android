@@ -15,7 +15,7 @@ internal class FiatBalanceToWalletCardConverter(
     private val cardTypeResolverProvider: Provider<CardTypesResolver>,
     private val appCurrencyProvider: Provider<AppCurrency>,
     private val currentWalletProvider: Provider<UserWallet>,
-    private val isWalletContentHidden: Boolean,
+    private val isBalanceHidden: Boolean,
 ) : Converter<FiatBalance, WalletCardState> {
 
     override fun convert(value: FiatBalance): WalletCardState {
@@ -47,7 +47,7 @@ internal class FiatBalanceToWalletCardConverter(
     private fun FiatBalance.Loaded.convertToWalletCardState(): WalletCardState {
         val appCurrency = appCurrencyProvider()
 
-        return if (isWalletContentHidden) {
+        return if (isBalanceHidden) {
             WalletCardState.HiddenContent(
                 id = currentState.id,
                 title = currentState.title,

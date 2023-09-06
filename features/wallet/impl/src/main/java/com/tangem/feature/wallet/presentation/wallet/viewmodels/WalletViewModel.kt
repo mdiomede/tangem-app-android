@@ -122,7 +122,7 @@ internal class WalletViewModel @Inject constructor(
             wallets[requireNotNull(uiState as? WalletState.ContentState).walletsListConfig.selectedWalletIndex]
         },
         appCurrencyProvider = Provider(selectedAppCurrencyFlow::value),
-        isWalletContentHiddenProvider = Provider(isBalanceHiddenFlow::value),
+        isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value),
         clickIntents = this,
     )
 

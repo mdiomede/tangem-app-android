@@ -17,12 +17,12 @@ import kotlinx.collections.immutable.persistentListOf
 
 internal class TokenListToContentItemsConverter(
     appCurrencyProvider: Provider<AppCurrency>,
-    isWalletContentHidden: Boolean,
+    isBalanceHidden: Boolean,
     private val clickIntents: WalletClickIntents,
 ) : Converter<TokenList, WalletTokensListState> {
 
     private val tokenStatusConverter = CryptoCurrencyStatusToTokenItemConverter(
-        isWalletContentHidden = isWalletContentHidden,
+        isBalanceHidden = isBalanceHidden,
         appCurrencyProvider = appCurrencyProvider,
         clickIntents = clickIntents,
     )

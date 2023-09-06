@@ -3,7 +3,6 @@ package com.tangem.feature.wallet.presentation.wallet.state.factory
 import androidx.paging.PagingData
 import arrow.core.Either
 import com.tangem.common.Provider
-import com.tangem.core.ui.utils.BigDecimalFormatter.formatFiatAmount
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.common.CardTypesResolver
 import com.tangem.domain.tokens.error.CurrencyStatusError
@@ -45,7 +44,7 @@ internal class WalletStateFactory(
     private val currentCardTypeResolverProvider: Provider<CardTypesResolver>,
     private val currentWalletProvider: Provider<UserWallet>,
     private val appCurrencyProvider: Provider<AppCurrency>,
-    private val isWalletContentHiddenProvider: Provider<Boolean>,
+    private val isBalanceHiddenProvider: Provider<Boolean>,
     private val clickIntents: WalletClickIntents,
 ) {
 
@@ -65,7 +64,7 @@ internal class WalletStateFactory(
             cardTypeResolverProvider = currentCardTypeResolverProvider,
             currentWalletProvider = currentWalletProvider,
             appCurrencyProvider = appCurrencyProvider,
-            isWalletContentHiddenProvider = isWalletContentHiddenProvider,
+            isBalanceHiddenProvider = isBalanceHiddenProvider,
             clickIntents = clickIntents,
         )
     }
