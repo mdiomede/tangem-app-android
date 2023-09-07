@@ -10,16 +10,12 @@ class IsBalanceHiddenUseCase {
     // TODO add flip trigger https://tangem.atlassian.net/browse/AND-4476
     operator fun invoke(): Flow<Boolean> {
         return flow {
+            var value = true
             while (true) {
-                emit(false)
+                emit(value)
+                value = !value
                 delay(3000)
-            // var value = true
-            // while (true) {
-            //     emit(value)
-            //     value = !value
-            //     delay(3000)
             }
         }
     }
-
 }

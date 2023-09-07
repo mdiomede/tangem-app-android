@@ -38,8 +38,8 @@ class AmountReducer : SendInternalReducer {
                         val viewValue = state.restoreDecimalSeparator(fiatToSend.stripZeroPlainString())
                         state.copy(
                             viewAmountValue = InputViewValue(viewValue),
-                            viewBalanceValue = rescaledBalance.stripZeroPlainString(),
-                            mainCurrency = state.createMainCurrency(currency, currencyCanBeSwitched),
+                            viewBalanceValue = if (state.hideBalance) STARS else rescaledBalance.stripZeroPlainString(),
+                            mainCurrency = state.createMainCurrency(currency, true),
                             maxLengthOfAmount = sendState.getDecimals(currency),
                             cursorAtTheSamePosition = false,
                         )
@@ -80,7 +80,20 @@ class AmountReducer : SendInternalReducer {
             }
             is AmountAction.SetAmountError -> state.copy(error = action.error)
             is AmountAction.SetDecimalSeparator -> state.copy(decimalSeparator = action.separator)
+            is AmountAction.HideBalance -> {
+                val rescaledBalance = sendState.convertExtractCryptoToFiat(state.balanceCrypto, true)
+
+                state.copy(
+                    hideBalance = action.hide,
+                    viewBalanceValue = if (action.hide) STARS else rescaledBalance.stripZeroPlainString()
+                )
+            }
+
         }
         return updateLastState(sendState.copy(amountState = result), result)
+    }
+
+    companion object {
+        const val STARS = "***"
     }
 }
