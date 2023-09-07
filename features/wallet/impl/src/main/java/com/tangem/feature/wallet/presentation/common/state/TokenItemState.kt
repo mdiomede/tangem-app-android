@@ -156,7 +156,4 @@ internal sealed interface TokenItemState {
 
     }
 
-    companion object {
-        const val DOTS = "***"
-    }
 }

@@ -3,11 +3,11 @@ package com.tangem.feature.swap.viewmodels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.tangem.common.Provider
 import com.tangem.core.analytics.api.AnalyticsEventHandler
 import com.tangem.core.ui.utils.InputNumberFormatter
+import com.tangem.domain.settings.IsBalanceHiddenUseCase
 import com.tangem.feature.swap.analytics.SwapEvents
 import com.tangem.feature.swap.domain.BlockchainInteractor
 import com.tangem.feature.swap.domain.SwapInteractor
@@ -27,8 +27,9 @@ import com.tangem.utils.coroutines.CoroutineDispatcherProvider
 import com.tangem.utils.coroutines.Debouncer
 import com.tangem.utils.coroutines.runCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.text.DecimalFormat
@@ -44,8 +45,9 @@ internal class SwapViewModel @Inject constructor(
     private val blockchainInteractor: BlockchainInteractor,
     private val dispatchers: CoroutineDispatcherProvider,
     private val analyticsEventHandler: AnalyticsEventHandler,
+    private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val currency = Json.decodeFromString<Currency>(
         savedStateHandle[SwapFragment.CURRENCY_BUNDLE_KEY]
@@ -53,15 +55,24 @@ internal class SwapViewModel @Inject constructor(
     )
     private val derivationPath = savedStateHandle.get<String>(SwapFragment.DERIVATION_PATH)
 
+    private val isBalanceHiddenFlow: StateFlow<Boolean> = isBalanceHiddenUseCase.invoke().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = true,
+    )
+
     private val stateBuilder = StateBuilder(
         actions = createUiActions(),
+        isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value)
     )
+
     private val inputNumberFormatter =
         InputNumberFormatter(NumberFormat.getInstance(Locale.getDefault()) as DecimalFormat)
     private val amountDebouncer = Debouncer()
     private val singleTaskScheduler = SingleTaskScheduler<SwapState>()
 
     private var dataState by mutableStateOf(SwapProcessDataState(networkId = currency.networkId))
+
     var uiState: SwapStateHolder by mutableStateOf(
         stateBuilder.createInitialLoadingState(
             initialCurrency = currency,
@@ -80,6 +91,18 @@ internal class SwapViewModel @Inject constructor(
     init {
         swapInteractor.initDerivationPath(derivationPath)
         initTokens(currency)
+    }
+
+    override fun onCreate(owner: LifecycleOwner) {
+        isBalanceHiddenUseCase()
+            .flowWithLifecycle(owner.lifecycle)
+            .flowOn(dispatchers.io)
+            .onEach { isBalanceHidden ->
+                withContext(dispatchers.main) {
+                    uiState = stateBuilder.updateBalanceHiddenState(uiState, isBalanceHidden)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     override fun onCleared() {

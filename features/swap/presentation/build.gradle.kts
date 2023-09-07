@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.core.featuretoggles)
     implementation(projects.core.utils)
     implementation(projects.core.ui)
+    implementation(projects.common)
 
     /** AndroidX */
     implementation(deps.androidx.activity.compose)

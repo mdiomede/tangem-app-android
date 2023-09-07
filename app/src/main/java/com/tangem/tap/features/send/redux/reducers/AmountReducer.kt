@@ -1,5 +1,6 @@
 package com.tangem.tap.features.send.redux.reducers
 
+import com.tangem.common.Strings.STARS
 import com.tangem.common.extensions.isZero
 import com.tangem.tap.common.extensions.stripZeroPlainString
 import com.tangem.tap.features.send.redux.AmountAction
@@ -93,7 +94,4 @@ class AmountReducer : SendInternalReducer {
         return updateLastState(sendState.copy(amountState = result), result)
     }
 
-    companion object {
-        const val STARS = "***"
-    }
 }

@@ -13,6 +13,7 @@ import com.tangem.utils.coroutines.runCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -27,23 +28,18 @@ import javax.inject.Inject
 internal class SendViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatcherProvider,
     private val appStateHolder: AppStateHolder,
-    private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase
+    private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
-
-    private val isBalanceHiddenFlow: StateFlow<Boolean> = isBalanceHiddenUseCase.invoke().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = true,
-    )
 
     override fun onCreate(owner: LifecycleOwner) {
         isBalanceHiddenUseCase()
             .flowWithLifecycle(owner.lifecycle)
+            .flowOn(dispatchers.io)
             .onEach { isBalanceHidden ->
-                appStateHolder.mainStore?.dispatch(AmountAction.HideBalance(isBalanceHidden))
+                withContext(dispatchers.main) {
+                    appStateHolder.mainStore?.dispatch(AmountAction.HideBalance(isBalanceHidden))
+                }
             }
-            // .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }
-
 }

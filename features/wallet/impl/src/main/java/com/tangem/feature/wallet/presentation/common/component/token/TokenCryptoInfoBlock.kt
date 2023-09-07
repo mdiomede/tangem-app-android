@@ -9,13 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.res.painterResource
+import com.tangem.common.Strings.STARS
 import com.tangem.core.ui.components.RectangleShimmer
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.core.ui.res.TangemTypography
 import com.tangem.feature.wallet.impl.R
 import com.tangem.feature.wallet.presentation.common.state.TokenItemState
-import com.tangem.feature.wallet.presentation.common.state.TokenItemState.Companion.DOTS
-import com.tangem.feature.wallet.presentation.common.state.TokenItemState.TokenOptionsState
 
 @Composable
 internal fun TokenCryptoInfoBlock(state: TokenItemState, modifier: Modifier = Modifier) {
@@ -39,7 +38,7 @@ private fun ContentBlock(state: TokenItemState.ContentState, modifier: Modifier 
 
         AmountText(
             amount = when (state) {
-                is TokenItemState.Content -> if (state.tokenOptions.balanceHidden) DOTS else state.amount
+                is TokenItemState.Content -> if (state.tokenOptions.balanceHidden) STARS else state.amount
                 is TokenItemState.Draggable -> state.fiatAmount
                 is TokenItemState.Unreachable -> null
             },
