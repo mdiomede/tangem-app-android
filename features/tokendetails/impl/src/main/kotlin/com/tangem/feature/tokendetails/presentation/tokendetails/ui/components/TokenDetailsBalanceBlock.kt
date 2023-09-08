@@ -72,7 +72,7 @@ private fun FiatBalance(state: TokenDetailsBalanceBlockState, modifier: Modifier
         )
         is TokenDetailsBalanceBlockState.Content -> Text(
             modifier = modifier,
-            text = if (state.hidden) DOTS else state.fiatBalance,
+            text = if (state.isBalanceHidden) DOTS else state.fiatBalance,
             style = TangemTheme.typography.h2,
             color = TangemTheme.colors.text.primary1,
         )
@@ -96,7 +96,7 @@ private fun CryptoBalance(state: TokenDetailsBalanceBlockState, modifier: Modifi
         )
         is TokenDetailsBalanceBlockState.Content -> Text(
             modifier = modifier,
-            text = if (state.hidden) DOTS else state.cryptoBalance,
+            text = if (state.isBalanceHidden) DOTS else state.cryptoBalance,
             style = TangemTheme.typography.caption,
             color = TangemTheme.colors.text.primary1,
         )

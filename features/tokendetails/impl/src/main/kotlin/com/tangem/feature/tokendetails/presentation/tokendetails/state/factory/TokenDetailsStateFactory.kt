@@ -126,7 +126,7 @@ internal class TokenDetailsStateFactory(
 
         possibleTokenBalanceBlockState?.let {
             return currentState.copy(
-                tokenBalanceBlockState = possibleTokenBalanceBlockState.copy(hidden = isBalanceHidden)
+                tokenBalanceBlockState = possibleTokenBalanceBlockState.copy(isBalanceHidden = isBalanceHidden)
             )
         } ?: return currentState
 
