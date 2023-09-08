@@ -98,11 +98,7 @@ internal class WalletViewModel @Inject constructor(
     var router: InnerWalletRouter by Delegates.notNull()
 
     private val selectedAppCurrencyFlow: StateFlow<AppCurrency> = createSelectedAppCurrencyFlow()
-    private val isBalanceHiddenFlow: StateFlow<Boolean> = isBalanceHiddenUseCase.invoke().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = true,
-    )
+    private val isBalanceHiddenFlow: StateFlow<Boolean> = createIsBalanceHiddenFlow()
 
     private val notificationsListFactory = WalletNotificationsListFactory(
         wasCardScannedCallback = getCardWasScannedUseCase::invoke,
@@ -157,7 +153,7 @@ internal class WalletViewModel @Inject constructor(
         isBalanceHiddenUseCase()
             .flowWithLifecycle(owner.lifecycle)
             .onEach { isBalanceHidden ->
-                uiState = stateFactory.getHiddenBalanceState(hiddenBalance = isBalanceHidden)
+                uiState = stateFactory.getHiddenBalanceState(isBalanceHidden = isBalanceHidden)
             }
             .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
@@ -623,6 +619,14 @@ internal class WalletViewModel @Inject constructor(
                 started = SharingStarted.Eagerly,
                 initialValue = AppCurrency.Default,
             )
+    }
+
+    private fun createIsBalanceHiddenFlow(): StateFlow<Boolean> {
+        return isBalanceHiddenUseCase.invoke().stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = true,
+        )
     }
 
     private fun WalletState.isLoadingState(): Boolean {

@@ -139,22 +139,8 @@ internal sealed interface TokenItemState {
     data class TokenOptionsState(
         val config: PriceChangeConfig,
         val fiatAmount: String,
-        val balanceHidden: Boolean,
-    ) {
-
-        fun updateHiddenState(hideBalance: Boolean): TokenOptionsState {
-            return when {
-                !this.balanceHidden && hideBalance -> {
-                    copy(balanceHidden = true)
-                }
-                this.balanceHidden && !hideBalance -> {
-                    copy(balanceHidden = false)
-                }
-                else -> this
-            }
-        }
-
-    }
+        val isBalanceHidden: Boolean,
+    )
 
     companion object {
         const val DOTS = "***"

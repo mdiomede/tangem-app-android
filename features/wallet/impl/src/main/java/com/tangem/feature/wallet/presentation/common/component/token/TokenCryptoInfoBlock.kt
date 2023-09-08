@@ -15,7 +15,6 @@ import com.tangem.core.ui.res.TangemTypography
 import com.tangem.feature.wallet.impl.R
 import com.tangem.feature.wallet.presentation.common.state.TokenItemState
 import com.tangem.feature.wallet.presentation.common.state.TokenItemState.Companion.DOTS
-import com.tangem.feature.wallet.presentation.common.state.TokenItemState.TokenOptionsState
 
 @Composable
 internal fun TokenCryptoInfoBlock(state: TokenItemState, modifier: Modifier = Modifier) {
@@ -39,7 +38,7 @@ private fun ContentBlock(state: TokenItemState.ContentState, modifier: Modifier 
 
         AmountText(
             amount = when (state) {
-                is TokenItemState.Content -> if (state.tokenOptions.balanceHidden) DOTS else state.amount
+                is TokenItemState.Content -> if (state.tokenOptions.isBalanceHidden) DOTS else state.amount
                 is TokenItemState.Draggable -> state.fiatAmount
                 is TokenItemState.Unreachable -> null
             },

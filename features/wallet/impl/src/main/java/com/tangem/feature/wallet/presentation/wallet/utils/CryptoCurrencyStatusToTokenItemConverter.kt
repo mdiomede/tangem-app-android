@@ -13,7 +13,7 @@ import java.math.BigDecimal
 
 internal class CryptoCurrencyStatusToTokenItemConverter(
     private val appCurrencyProvider: Provider<AppCurrency>,
-    private val isBalanceHidden: Boolean,
+    private val isBalanceHiddenProvider: Provider<Boolean>,
     private val clickIntents: WalletClickIntents,
 ) : Converter<CryptoCurrencyStatus, TokenItemState> {
 
@@ -44,7 +44,7 @@ internal class CryptoCurrencyStatusToTokenItemConverter(
             tokenOptions = TokenItemState.TokenOptionsState(
                 fiatAmount = getFormattedFiatAmount(),
                 config = getPriceChangeConfig(),
-                balanceHidden = isBalanceHidden
+                isBalanceHidden = isBalanceHiddenProvider()
             ),
             onItemClick = { clickIntents.onTokenItemClick(currency) },
             onItemLongClick = { clickIntents.onTokenItemLongClick(cryptoCurrencyStatus = this) },

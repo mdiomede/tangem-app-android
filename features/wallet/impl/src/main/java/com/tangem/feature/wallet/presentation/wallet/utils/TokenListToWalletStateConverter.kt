@@ -23,7 +23,7 @@ internal class TokenListToWalletStateConverter(
 ) : Converter<TokenList, WalletMultiCurrencyState.Content> {
 
     private val tokenListToContentConverter = TokenListToContentItemsConverter(
-        isBalanceHidden = isBalanceHiddenProvider(),
+        isBalanceHiddenProvider = isBalanceHiddenProvider,
         appCurrencyProvider = appCurrencyProvider,
         clickIntents = clickIntents,
     )
@@ -44,7 +44,7 @@ internal class TokenListToWalletStateConverter(
             currentWalletProvider = currentWalletProvider,
             cardTypeResolverProvider = cardTypeResolverProvider,
             appCurrencyProvider = appCurrencyProvider,
-            isBalanceHidden = isBalanceHiddenProvider(),
+            isBalanceHiddenProvider = isBalanceHiddenProvider,
         )
 
         return walletsListConfig.copy(
