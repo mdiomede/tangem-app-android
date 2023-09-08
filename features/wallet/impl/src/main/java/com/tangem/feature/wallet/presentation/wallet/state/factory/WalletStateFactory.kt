@@ -29,6 +29,7 @@ import com.tangem.feature.wallet.presentation.wallet.utils.CurrencyStatusErrorCo
 import com.tangem.feature.wallet.presentation.wallet.utils.WalletHiddenBalanceStateUpdater
 import com.tangem.feature.wallet.presentation.wallet.utils.TokenListErrorConverter
 import com.tangem.feature.wallet.presentation.wallet.viewmodels.WalletClickIntents
+import com.tangem.feature.wallet.presentation.wallet.viewmodels.WalletsUpdateActionResolver
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -51,13 +52,17 @@ internal class WalletStateFactory(
 ) {
 
     private val tokenActionsProvider by lazy { TokenActionsProvider(clickIntents) }
-    private val skeletonConverter by lazy {
-        WalletSkeletonStateConverter(
-            currentStateProvider = currentStateProvider,
-            clickIntents = clickIntents
-        )
-    }
+
+    private val skeletonConverter by lazy { WalletSkeletonStateConverter(currentStateProvider, clickIntents) }
+
+    private val walletsUnlockStateConverter by lazy { WalletsUnlockStateConverter(currentStateProvider, clickIntents) }
+
+    private val walletRenameStateConverter by lazy { WalletRenameStateConverter(currentStateProvider) }
+
+    private val walletDeleteStateConverter by lazy { WalletDeleteStateConverter(currentStateProvider) }
+
     private val walletHiddenBalanceStateUpdater by lazy { WalletHiddenBalanceStateUpdater() }
+
     private val tokenItemHiddenStateUpdater by lazy { TokenItemHiddenStateUpdater() }
 
     private val tokenListErrorConverter by lazy {
@@ -106,17 +111,12 @@ internal class WalletStateFactory(
     private val lockedConverter by lazy {
         WalletLockedConverter(
             currentStateProvider = currentStateProvider,
-            currentCardTypeResolverProvider = currentCardTypeResolverProvider,
-            currentWalletProvider = currentWalletProvider,
             clickIntents = clickIntents,
         )
     }
 
     private val refreshStateConverter by lazy {
-        WalletRefreshStateConverter(
-            currentStateProvider = currentStateProvider,
-            intents = clickIntents,
-        )
+        WalletRefreshStateConverter(currentStateProvider)
     }
 
     private val cryptoCurrencyActionsConverter by lazy {
@@ -134,6 +134,21 @@ internal class WalletStateFactory(
                 wallets = wallets,
                 selectedWalletIndex = selectedWalletIndex,
             ),
+        )
+    }
+
+    fun getStateWithUpdatedWalletName(name: String): WalletState = walletRenameStateConverter.convert(value = name)
+
+    fun getUnlockedState(action: WalletsUpdateActionResolver.Action.UnlockWallet): WalletState {
+        return walletsUnlockStateConverter.convert(value = action)
+    }
+
+    fun getStateWithoutDeletedWallet(
+        cacheState: WalletState.ContentState,
+        action: WalletsUpdateActionResolver.Action.DeleteWallet,
+    ): WalletState {
+        return walletDeleteStateConverter.convert(
+            value = WalletDeleteStateConverter.DeleteWalletModel(cacheState = cacheState, action = action),
         )
     }
 
