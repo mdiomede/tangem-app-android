@@ -11,6 +11,7 @@ import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.redux.ReduxStateHolder
 import com.tangem.domain.settings.IsBalanceHiddenUseCase
+import com.tangem.domain.settings.ListenToFlipsUseCase
 import com.tangem.domain.tokens.GetCryptoCurrencyActionsUseCase
 import com.tangem.domain.tokens.GetCurrencyStatusUpdatesUseCase
 import com.tangem.domain.tokens.GetNetworkCoinStatusUseCase
@@ -52,6 +53,7 @@ internal class TokenDetailsViewModel @Inject constructor(
     private val removeCurrencyUseCase: RemoveCurrencyUseCase,
     private val getNetworkCoinStatusUseCase: GetNetworkCoinStatusUseCase,
     private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
+    private val listenToFlipsUseCase: ListenToFlipsUseCase,
     private val reduxStateHolder: ReduxStateHolder,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DefaultLifecycleObserver, TokenDetailsClickIntents {
@@ -89,6 +91,11 @@ internal class TokenDetailsViewModel @Inject constructor(
             .onEach { isBalanceHidden ->
                 uiState = stateFactory.getStateWithUpdatedHidden(isBalanceHidden = isBalanceHidden)
             }
+            .flowOn(dispatchers.io)
+            .launchIn(viewModelScope)
+
+        listenToFlipsUseCase()
+            .flowWithLifecycle(owner.lifecycle)
             .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }

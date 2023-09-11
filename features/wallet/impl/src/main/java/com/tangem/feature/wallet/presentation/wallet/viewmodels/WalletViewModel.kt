@@ -18,10 +18,7 @@ import com.tangem.domain.common.util.cardTypesResolver
 import com.tangem.domain.common.util.derivationStyleProvider
 import com.tangem.domain.demo.IsDemoCardUseCase
 import com.tangem.domain.redux.ReduxStateHolder
-import com.tangem.domain.settings.CanUseBiometryUseCase
-import com.tangem.domain.settings.IsBalanceHiddenUseCase
-import com.tangem.domain.settings.IsUserAlreadyRateAppUseCase
-import com.tangem.domain.settings.ShouldShowSaveWalletScreenUseCase
+import com.tangem.domain.settings.*
 import com.tangem.domain.tokens.*
 import com.tangem.domain.tokens.legacy.TradeCryptoAction
 import com.tangem.domain.tokens.model.CryptoCurrencyStatus
@@ -90,6 +87,7 @@ internal class WalletViewModel @Inject constructor(
     private val canUseBiometryUseCase: CanUseBiometryUseCase,
     private val shouldSaveUserWalletsUseCase: ShouldSaveUserWalletsUseCase,
     private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
+    private val listenToFlipsUseCase: ListenToFlipsUseCase,
     private val reduxStateHolder: ReduxStateHolder,
     private val dispatchers: CoroutineDispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver, WalletClickIntents {
@@ -159,6 +157,11 @@ internal class WalletViewModel @Inject constructor(
             .onEach { isBalanceHidden ->
                 uiState = stateFactory.getHiddenBalanceState(hiddenBalance = isBalanceHidden)
             }
+            .flowOn(dispatchers.io)
+            .launchIn(viewModelScope)
+
+        listenToFlipsUseCase()
+            .flowWithLifecycle(owner.lifecycle)
             .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }

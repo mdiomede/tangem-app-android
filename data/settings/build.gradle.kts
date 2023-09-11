@@ -14,11 +14,13 @@ dependencies {
 
     /** DI */
     implementation(deps.hilt.android)
+
     kapt(deps.hilt.kapt)
 
     implementation(deps.kotlin.coroutines)
 
     implementation(projects.core.utils)
+    implementation(projects.core.datasource)
 
     implementation(projects.domain.settings)
 
