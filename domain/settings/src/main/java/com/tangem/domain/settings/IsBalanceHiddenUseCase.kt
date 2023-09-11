@@ -10,5 +10,4 @@ class IsBalanceHiddenUseCase(
     operator fun invoke(): Flow<Boolean> {
         return settingsRepository.isBalanceHiddenEvents()
     }
-
 }

@@ -144,7 +144,4 @@ internal sealed interface TokenItemState {
         val isBalanceHidden: Boolean,
     )
 
-    companion object {
-        const val DOTS = "***"
-    }
 }
