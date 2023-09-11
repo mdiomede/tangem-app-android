@@ -12,7 +12,6 @@ import android.widget.EditText
 import androidx.core.view.postDelayed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -79,7 +78,6 @@ class SendFragment : BaseStoreFragment(R.layout.fragment_send) {
         lifecycle.addObserver(viewModel)
         Analytics.send(Token.Send.ScreenOpened())
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

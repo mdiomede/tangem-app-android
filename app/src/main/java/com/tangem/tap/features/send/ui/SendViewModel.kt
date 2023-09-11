@@ -3,16 +3,10 @@ package com.tangem.tap.features.send.ui
 import androidx.lifecycle.*
 import com.tangem.domain.settings.IsBalanceHiddenUseCase
 import com.tangem.tap.features.send.redux.AmountAction
-import com.tangem.tap.features.shop.domain.GetShopifySalesProductsUseCase
-import com.tangem.tap.features.shop.domain.ShopifyOrderingAvailabilityUseCase
-import com.tangem.tap.features.shop.redux.ShopAction
 import com.tangem.tap.proxy.AppStateHolder
-import com.tangem.tap.store
 import com.tangem.utils.coroutines.CoroutineDispatcherProvider
-import com.tangem.utils.coroutines.runCatching
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

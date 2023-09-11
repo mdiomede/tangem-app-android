@@ -86,12 +86,10 @@ class AmountReducer : SendInternalReducer {
 
                 state.copy(
                     hideBalance = action.hide,
-                    viewBalanceValue = if (action.hide) STARS else rescaledBalance.stripZeroPlainString()
+                    viewBalanceValue = if (action.hide) STARS else rescaledBalance.stripZeroPlainString(),
                 )
             }
-
         }
         return updateLastState(sendState.copy(amountState = result), result)
     }
-
 }

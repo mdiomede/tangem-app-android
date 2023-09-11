@@ -63,7 +63,7 @@ internal class SwapViewModel @Inject constructor(
 
     private val stateBuilder = StateBuilder(
         actions = createUiActions(),
-        isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value)
+        isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value),
     )
 
     private val inputNumberFormatter =

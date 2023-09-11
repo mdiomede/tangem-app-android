@@ -3,7 +3,6 @@ package com.tangem.domain.settings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlin.random.Random
 
 class IsBalanceHiddenUseCase {
 

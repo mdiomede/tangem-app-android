@@ -371,7 +371,7 @@ private val sendCard = SwapCardData(
     canSelectAnotherToken = false,
     balance = "123",
     coinId = "",
-    isBalanceHidden = false
+    isBalanceHidden = false,
 )
 
 private val receiveCard = SwapCardData(
@@ -384,7 +384,7 @@ private val receiveCard = SwapCardData(
     canSelectAnotherToken = true,
     balance = "33333",
     coinId = "",
-    isBalanceHidden = false
+    isBalanceHidden = false,
 )
 
 val stateSelectable = SelectableItemsState(

@@ -40,7 +40,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 canSelectAnotherToken = false,
                 isNotNativeToken = initialCurrency.isNonNative(),
                 balance = "",
-                isBalanceHidden = true
+                isBalanceHidden = true,
             ),
             receiveCardData = SwapCardData(
                 type = TransactionCardType.ReceiveCard(),
@@ -52,7 +52,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 balance = "",
                 isNotNativeToken = false,
                 coinId = null,
-                isBalanceHidden = true
+                isBalanceHidden = true,
             ),
             fee = FeeState.Loading,
             networkCurrency = networkInfo.blockchainCurrency,
@@ -87,7 +87,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 isNotNativeToken = fromToken.isNonNative(),
                 canSelectAnotherToken = canSelectSendToken,
                 balance = if (!canSelectSendToken) uiStateHolder.sendCardData.balance else "",
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             receiveCardData = SwapCardData(
                 type = TransactionCardType.ReceiveCard(),
@@ -99,7 +99,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 isNotNativeToken = toToken.isNonNative(),
                 canSelectAnotherToken = canSelectReceiveToken,
                 balance = if (!canSelectReceiveToken) uiStateHolder.receiveCardData.balance else "",
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             fee = FeeState.Loading,
             swapButton = SwapButton(enabled = false, loading = true, onClick = {}),
@@ -149,7 +149,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 tokenCurrency = uiStateHolder.sendCardData.tokenCurrency,
                 canSelectAnotherToken = uiStateHolder.sendCardData.canSelectAnotherToken,
                 balance = quoteModel.fromTokenInfo.tokenWalletBalance,
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             receiveCardData = SwapCardData(
                 type = TransactionCardType.ReceiveCard(),
@@ -161,7 +161,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 tokenCurrency = uiStateHolder.receiveCardData.tokenCurrency,
                 canSelectAnotherToken = uiStateHolder.receiveCardData.canSelectAnotherToken,
                 balance = quoteModel.toTokenInfo.tokenWalletBalance,
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             networkCurrency = quoteModel.networkCurrency,
             warnings = warnings,
@@ -199,7 +199,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 tokenCurrency = uiStateHolder.sendCardData.tokenCurrency,
                 canSelectAnotherToken = uiStateHolder.sendCardData.canSelectAnotherToken,
                 balance = emptyAmountState.fromTokenWalletBalance,
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             receiveCardData = SwapCardData(
                 type = TransactionCardType.ReceiveCard(),
@@ -211,7 +211,7 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
                 tokenCurrency = uiStateHolder.receiveCardData.tokenCurrency,
                 canSelectAnotherToken = uiStateHolder.receiveCardData.canSelectAnotherToken,
                 balance = emptyAmountState.toTokenWalletBalance,
-                isBalanceHidden = isBalanceHiddenProvider()
+                isBalanceHidden = isBalanceHiddenProvider(),
             ),
             warnings = emptyList(),
             fee = FeeState.Empty,
@@ -263,16 +263,16 @@ internal class StateBuilder(val actions: UiActions, val isBalanceHiddenProvider:
         )
     }
 
-    fun updateBalanceHiddenState(uiState: SwapStateHolder, isBalanceHidden: Boolean) : SwapStateHolder {
+    fun updateBalanceHiddenState(uiState: SwapStateHolder, isBalanceHidden: Boolean): SwapStateHolder {
         val patchedSendCardData = uiState.sendCardData.copy(
-            isBalanceHidden = isBalanceHidden
+            isBalanceHidden = isBalanceHidden,
         )
         val patchedReceiveCardData = uiState.receiveCardData.copy(
-            isBalanceHidden = isBalanceHidden
+            isBalanceHidden = isBalanceHidden,
         )
         return uiState.copy(
             sendCardData = patchedSendCardData,
-            receiveCardData = patchedReceiveCardData
+            receiveCardData = patchedReceiveCardData,
         )
     }
 
