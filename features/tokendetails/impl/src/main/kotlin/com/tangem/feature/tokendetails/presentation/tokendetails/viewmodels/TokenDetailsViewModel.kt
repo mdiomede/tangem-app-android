@@ -10,6 +10,7 @@ import com.tangem.common.Provider
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.redux.ReduxStateHolder
+import com.tangem.domain.settings.IsBalanceHiddenUseCase
 import com.tangem.domain.tokens.GetCryptoCurrencyActionsUseCase
 import com.tangem.domain.tokens.GetCurrencyStatusUpdatesUseCase
 import com.tangem.domain.tokens.GetNetworkCoinStatusUseCase
@@ -50,6 +51,7 @@ internal class TokenDetailsViewModel @Inject constructor(
     private val getCryptoCurrencyActionsUseCase: GetCryptoCurrencyActionsUseCase,
     private val removeCurrencyUseCase: RemoveCurrencyUseCase,
     private val getNetworkCoinStatusUseCase: GetNetworkCoinStatusUseCase,
+    private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
     private val reduxStateHolder: ReduxStateHolder,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DefaultLifecycleObserver, TokenDetailsClickIntents {
@@ -64,19 +66,31 @@ internal class TokenDetailsViewModel @Inject constructor(
     private var wallet by Delegates.notNull<UserWallet>()
 
     private val selectedAppCurrencyFlow: StateFlow<AppCurrency> = createSelectedAppCurrencyFlow()
+    private val isBalanceHiddenFlow: StateFlow<Boolean> = createIsBalanceHiddenFlow()
+
     private val stateFactory = TokenDetailsStateFactory(
         currentStateProvider = Provider { uiState },
         appCurrencyProvider = Provider(selectedAppCurrencyFlow::value),
+        isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value),
         clickIntents = this,
         symbol = cryptoCurrency.symbol,
-        decimals = cryptoCurrency.decimals,
+        decimals = cryptoCurrency.decimals
     )
+
     var uiState: TokenDetailsState by mutableStateOf(stateFactory.getInitialState(cryptoCurrency))
         private set
 
     override fun onCreate(owner: LifecycleOwner) {
         getWallet()
         updateContent(selectedWallet = wallet)
+
+        isBalanceHiddenUseCase()
+            .flowWithLifecycle(owner.lifecycle)
+            .onEach { isBalanceHidden ->
+                uiState = stateFactory.getStateWithUpdatedHidden(isBalanceHidden = isBalanceHidden)
+            }
+            .flowOn(dispatchers.io)
+            .launchIn(viewModelScope)
     }
 
     private fun getWallet() {
@@ -147,6 +161,15 @@ internal class TokenDetailsViewModel @Inject constructor(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
                 initialValue = AppCurrency.Default,
+            )
+    }
+
+    private fun createIsBalanceHiddenFlow(): StateFlow<Boolean> {
+        return isBalanceHiddenUseCase.invoke()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = true,
             )
     }
 

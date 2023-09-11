@@ -11,6 +11,7 @@ import com.tangem.domain.tokens.models.CryptoCurrency
 import com.tangem.domain.txhistory.models.TxHistoryItem
 import com.tangem.domain.txhistory.models.TxHistoryListError
 import com.tangem.domain.txhistory.models.TxHistoryStateError
+import com.tangem.feature.tokendetails.presentation.tokendetails.state.TokenDetailsBalanceBlockState
 import com.tangem.feature.tokendetails.presentation.tokendetails.state.TokenDetailsState
 import com.tangem.feature.tokendetails.presentation.tokendetails.state.components.TokenDetailsDialogConfig
 import com.tangem.feature.tokendetails.presentation.tokendetails.state.factory.txhistory.TokenDetailsLoadedTxHistoryConverter
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 internal class TokenDetailsStateFactory(
     private val currentStateProvider: Provider<TokenDetailsState>,
     private val appCurrencyProvider: Provider<AppCurrency>,
+    private val isBalanceHiddenProvider: Provider<Boolean>,
     private val clickIntents: TokenDetailsClickIntents,
     symbol: String,
     decimals: Int,
@@ -34,6 +36,7 @@ internal class TokenDetailsStateFactory(
         TokenDetailsLoadedBalanceConverter(
             currentStateProvider = currentStateProvider,
             appCurrencyProvider = appCurrencyProvider,
+            isBalanceHiddenProvider = isBalanceHiddenProvider,
             symbol = symbol,
             decimals = decimals,
         )
@@ -117,4 +120,17 @@ internal class TokenDetailsStateFactory(
             ),
         )
     }
-}
+
+    fun getStateWithUpdatedHidden(isBalanceHidden: Boolean) : TokenDetailsState {
+        val currentState = currentStateProvider()
+        val possibleTokenBalanceBlockState = currentState.tokenBalanceBlockState as?
+            TokenDetailsBalanceBlockState.Content
+
+        possibleTokenBalanceBlockState?.let {
+            return currentState.copy(
+                tokenBalanceBlockState = possibleTokenBalanceBlockState.copy(isBalanceHidden = isBalanceHidden)
+            )
+        } ?: return currentState
+
+    }
+ }
