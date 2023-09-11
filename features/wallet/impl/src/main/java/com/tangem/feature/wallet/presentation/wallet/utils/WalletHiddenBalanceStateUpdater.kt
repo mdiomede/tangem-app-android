@@ -2,7 +2,7 @@ package com.tangem.feature.wallet.presentation.wallet.utils
 
 import com.tangem.feature.wallet.presentation.wallet.state.components.WalletCardState
 
-internal class WalletHiddenBalanceStateUpdater() {
+internal class WalletHiddenBalanceStateUpdater {
 
     fun updateHiddenState(walletCardState: WalletCardState, hiddenBalance: Boolean): WalletCardState {
         return when {

@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.Flow
  * @property currentWalletProvider           current wallet
  * @property clickIntents                    screen click intents
  */
+@Suppress("TooManyFunctions")
 internal class WalletStateFactory(
     private val currentStateProvider: Provider<WalletState>,
     private val currentCardTypeResolverProvider: Provider<CardTypesResolver>,
