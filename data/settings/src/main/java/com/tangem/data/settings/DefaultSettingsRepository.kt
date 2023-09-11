@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 internal class DefaultSettingsRepository(
     private val preferencesDataSource: PreferencesDataSource,
     private val dispatchers: CoroutineDispatcherProvider,
-    private val isBalanceHiddenStore: HiddenBalanceStore
+    private val isBalanceHiddenStore: HiddenBalanceStore,
 ) : SettingsRepository {
 
     override suspend fun isUserAlreadyRateApp(): Boolean {
@@ -34,5 +34,4 @@ internal class DefaultSettingsRepository(
     override suspend fun isBalanceHidden(): Boolean {
         return isBalanceHiddenStore.getSyncOrFalse()
     }
-
 }

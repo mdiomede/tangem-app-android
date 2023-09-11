@@ -41,11 +41,9 @@ internal object SettingsDomainModule {
 
     @Provides
     @ViewModelScoped
-    fun providesIsBalanceHiddenUseCase(
-        settingsRepository: SettingsRepository,
-    ): IsBalanceHiddenUseCase {
+    fun providesIsBalanceHiddenUseCase(settingsRepository: SettingsRepository): IsBalanceHiddenUseCase {
         return IsBalanceHiddenUseCase(
-            settingsRepository = settingsRepository
+            settingsRepository = settingsRepository,
         )
     }
 
@@ -57,7 +55,7 @@ internal object SettingsDomainModule {
     ): ListenToFlipsUseCase {
         return ListenToFlipsUseCase(
             flipDetector = DeviceFlipDetectorImpl(context),
-            settingsRepository = settingsRepository
+            settingsRepository = settingsRepository,
         )
     }
 }

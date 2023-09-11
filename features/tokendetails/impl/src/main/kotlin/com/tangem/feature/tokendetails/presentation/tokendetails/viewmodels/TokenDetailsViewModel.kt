@@ -76,7 +76,7 @@ internal class TokenDetailsViewModel @Inject constructor(
         isBalanceHiddenProvider = Provider(isBalanceHiddenFlow::value),
         clickIntents = this,
         symbol = cryptoCurrency.symbol,
-        decimals = cryptoCurrency.decimals
+        decimals = cryptoCurrency.decimals,
     )
 
     var uiState: TokenDetailsState by mutableStateOf(stateFactory.getInitialState(cryptoCurrency))

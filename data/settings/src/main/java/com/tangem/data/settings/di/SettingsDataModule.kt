@@ -25,8 +25,7 @@ internal object SettingsDataModule {
         return DefaultSettingsRepository(
             preferencesDataSource = preferencesDataSource,
             dispatchers = dispatchers,
-            isBalanceHiddenStore = hiddenBalanceStore
+            isBalanceHiddenStore = hiddenBalanceStore,
         )
     }
-
 }

@@ -143,5 +143,4 @@ internal sealed interface TokenItemState {
         val fiatAmount: String,
         val isBalanceHidden: Boolean,
     )
-
 }

@@ -11,5 +11,4 @@ internal class HiddenBalanceStateStore(
     override suspend fun getSyncOrFalse(): Boolean {
         return getSyncOrNull() ?: false
     }
-
 }

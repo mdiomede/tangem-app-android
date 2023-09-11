@@ -9,5 +9,4 @@ interface HiddenBalanceStore {
     suspend fun getSyncOrFalse(): Boolean
 
     suspend fun store(item: Boolean)
-
 }

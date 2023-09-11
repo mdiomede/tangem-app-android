@@ -17,5 +17,4 @@ class ListenToFlipsUseCase(
             settingsRepository.storeBalanceHiddenFlag(!isBalanceHidden)
         }
     }
-
 }

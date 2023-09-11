@@ -12,6 +12,5 @@ interface SettingsRepository {
 
     suspend fun storeBalanceHiddenFlag(isBalanceHidden: Boolean)
 
-    suspend fun isBalanceHidden() : Boolean
-
+    suspend fun isBalanceHidden(): Boolean
 }
