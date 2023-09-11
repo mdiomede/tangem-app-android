@@ -8,6 +8,7 @@ import com.tangem.common.Provider
 import com.tangem.core.analytics.api.AnalyticsEventHandler
 import com.tangem.core.ui.utils.InputNumberFormatter
 import com.tangem.domain.settings.IsBalanceHiddenUseCase
+import com.tangem.domain.settings.ListenToFlipsUseCase
 import com.tangem.feature.swap.analytics.SwapEvents
 import com.tangem.feature.swap.domain.BlockchainInteractor
 import com.tangem.feature.swap.domain.SwapInteractor
@@ -46,6 +47,7 @@ internal class SwapViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatcherProvider,
     private val analyticsEventHandler: AnalyticsEventHandler,
     private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
+    private val listenToFlipsUseCase: ListenToFlipsUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -102,6 +104,11 @@ internal class SwapViewModel @Inject constructor(
                     uiState = stateBuilder.updateBalanceHiddenState(uiState, isBalanceHidden)
                 }
             }
+            .launchIn(viewModelScope)
+
+        listenToFlipsUseCase()
+            .flowWithLifecycle(owner.lifecycle)
+            .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }
 

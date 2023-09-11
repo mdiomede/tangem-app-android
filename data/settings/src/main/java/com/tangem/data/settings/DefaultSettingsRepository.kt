@@ -1,5 +1,6 @@
 package com.tangem.data.settings
 
+import android.util.Log
 import com.tangem.data.source.preferences.PreferencesDataSource
 import com.tangem.datasource.local.appcurrency.HiddenBalanceStore
 import com.tangem.domain.settings.repositories.SettingsRepository
@@ -28,6 +29,7 @@ internal class DefaultSettingsRepository(
     }
 
     override suspend fun storeBalanceHiddenFlag(isBalanceHidden: Boolean) {
+        Log.e("storage!", "stored $isBalanceHidden")
         isBalanceHiddenStore.store(isBalanceHidden)
     }
 

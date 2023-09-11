@@ -2,6 +2,7 @@ package com.tangem.tap.features.send.ui
 
 import androidx.lifecycle.*
 import com.tangem.domain.settings.IsBalanceHiddenUseCase
+import com.tangem.domain.settings.ListenToFlipsUseCase
 import com.tangem.tap.features.send.redux.AmountAction
 import com.tangem.tap.proxy.AppStateHolder
 import com.tangem.utils.coroutines.CoroutineDispatcherProvider
@@ -23,6 +24,7 @@ internal class SendViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatcherProvider,
     private val appStateHolder: AppStateHolder,
     private val isBalanceHiddenUseCase: IsBalanceHiddenUseCase,
+    private val listenToFlipsUseCase: ListenToFlipsUseCase
 ) : ViewModel(), DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -34,6 +36,11 @@ internal class SendViewModel @Inject constructor(
                     appStateHolder.mainStore?.dispatch(AmountAction.HideBalance(isBalanceHidden))
                 }
             }
+            .launchIn(viewModelScope)
+
+        listenToFlipsUseCase()
+            .flowWithLifecycle(owner.lifecycle)
+            .flowOn(dispatchers.io)
             .launchIn(viewModelScope)
     }
 }
