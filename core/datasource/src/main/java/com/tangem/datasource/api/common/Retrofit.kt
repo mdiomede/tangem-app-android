@@ -2,6 +2,7 @@ package com.tangem.datasource.api.common
 
 import android.util.Log
 import com.ihsanbal.logging.Level
+import com.ihsanbal.logging.Logger
 import com.ihsanbal.logging.LoggingInterceptor
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -33,11 +34,12 @@ fun createRetrofitInstance(
         .build()
 }
 
-fun createNetworkLoggingInterceptor(): Interceptor {
+fun createNetworkLoggingInterceptor(logger: Logger? = null): Interceptor {
     return LoggingInterceptor.Builder()
         .setLevel(Level.BODY)
         .log(Log.VERBOSE)
         .tag(NETWORK_LOGS_TAG)
+        .logger(logger)
         .build()
 }
 

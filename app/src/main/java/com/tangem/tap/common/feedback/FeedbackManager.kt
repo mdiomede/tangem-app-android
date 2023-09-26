@@ -2,6 +2,7 @@ package com.tangem.tap.common.feedback
 
 import android.content.Context
 import com.tangem.datasource.config.models.ChatConfig
+import com.tangem.datasource.utils.BlockchainSdkLogCollector
 import com.tangem.domain.common.TapWorkarounds
 import com.tangem.tap.common.chat.ChatManager
 import com.tangem.tap.common.extensions.sendEmail
@@ -19,11 +20,13 @@ import java.io.StringWriter
 class FeedbackManager(
     val infoHolder: AdditionalFeedbackInfo,
     private val logCollector: TangemLogCollector,
+    private val blockchainSdkLogCollector: BlockchainSdkLogCollector,
     private val chatManager: ChatManager,
 ) {
 
     private var sessionFeedbackFile: File? = null
     private var sessionLogsFile: File? = null
+    private var sessionBlockchainSdkLogsFile: File? = null
 
     fun sendEmail(feedbackData: FeedbackData, onFail: ((Exception) -> Unit)? = null) {
         feedbackData.prepare(infoHolder)
@@ -32,7 +35,7 @@ class FeedbackManager(
                 email = getSupportEmail(),
                 subject = activity.getString(feedbackData.subjectResId),
                 message = feedbackData.joinTogether(activity, infoHolder),
-                file = getLogFile(activity),
+                files = getLogFiles(activity),
                 onFail = onFail,
             )
         }
@@ -41,7 +44,7 @@ class FeedbackManager(
     fun openChat(config: ChatConfig, feedbackData: FeedbackData) {
         chatManager.open(
             config = config,
-            createLogsFile = ::getLogFile,
+            createLogsFile = ::getScanLogFile,
             createFeedbackFile = { context -> getFeedbackFile(context, feedbackData) },
         )
     }
@@ -75,24 +78,71 @@ class FeedbackManager(
         }
     }
 
-    private fun getLogFile(context: Context): File? {
+    private fun getLogFiles(context: Context): List<File?> {
+        val logFile = if (sessionLogsFile != null) {
+            sessionLogsFile
+        } else {
+            sessionLogsFile = getLogFile(
+                context = context,
+                fileName = LOGS_FILE,
+                logs = logCollector::getLogs,
+                clearLogs = logCollector::clearLogs,
+            )
+            sessionLogsFile
+        }
+
+        val blockchainLogFile = if (sessionBlockchainSdkLogsFile != null) {
+            sessionBlockchainSdkLogsFile
+        } else {
+            sessionBlockchainSdkLogsFile = getLogFile(
+                context = context,
+                fileName = BLOCKCHAIN_LOGS_FILE,
+                logs = blockchainSdkLogCollector::getLogs,
+                clearLogs = blockchainSdkLogCollector::clearLogs,
+            )
+            sessionBlockchainSdkLogsFile
+        }
+
+        return listOf(
+            logFile,
+            blockchainLogFile,
+        )
+    }
+
+    // TODO: Implement sending of multiple logs files in chat https://tangem.atlassian.net/browse/AND-4718
+    private fun getScanLogFile(context: Context): File? {
+        return if (sessionLogsFile != null) {
+            sessionLogsFile
+        } else {
+            sessionLogsFile = getLogFile(
+                context = context,
+                fileName = LOGS_FILE,
+                logs = logCollector::getLogs,
+                clearLogs = logCollector::clearLogs,
+            )
+            sessionLogsFile
+        }
+    }
+
+    private fun getLogFile(
+        context: Context,
+        fileName: String,
+        logs: () -> List<String>,
+        clearLogs: () -> Unit,
+    ): File? {
         return try {
-            if (sessionLogsFile != null) {
-                return sessionLogsFile
-            }
-            val file = File(context.filesDir, LOGS_FILE)
+            val file = File(context.filesDir, fileName)
             file.delete()
             file.createNewFile()
 
             val stringWriter = StringWriter()
-            logCollector.getLogs().forEach { stringWriter.append(it) }
+            logs().forEach { stringWriter.append(it) }
             val fileWriter = FileWriter(file)
             fileWriter.write(stringWriter.toString())
             fileWriter.close()
-            logCollector.clearLogs()
+            clearLogs()
             if (file.exists()) {
-                sessionLogsFile = file
-                sessionLogsFile
+                file
             } else {
                 null
             }
@@ -115,5 +165,6 @@ class FeedbackManager(
         const val S2C_SUPPORT_EMAIL = "cardsupport@start2coin.com"
         const val FEEDBACK_FILE = "feedback.txt"
         const val LOGS_FILE = "logs.txt"
+        const val BLOCKCHAIN_LOGS_FILE = "blockchain_logs.txt"
     }
 }

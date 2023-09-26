@@ -23,6 +23,7 @@ import com.tangem.datasource.config.FeaturesLocalLoader
 import com.tangem.datasource.config.models.Config
 import com.tangem.datasource.connection.NetworkConnectionManager
 import com.tangem.datasource.local.token.UserTokensStore
+import com.tangem.datasource.utils.BlockchainSdkLogCollector
 import com.tangem.domain.appcurrency.repository.AppCurrencyRepository
 import com.tangem.domain.apptheme.repository.AppThemeModeRepository
 import com.tangem.domain.balancehiding.repositories.BalanceHidingRepository
@@ -253,12 +254,6 @@ internal class TapApplication : Application(), ImageLoaderFactory {
 
         loadNativeLibraries()
 
-        if (LogConfig.network.blockchainSdkNetwork) {
-            BlockchainSdkRetrofitBuilder.interceptors = listOf(
-                createNetworkLoggingInterceptor(),
-            )
-        }
-
         val userTokensStorageService = UserTokensStorageService.init(context = this)
         userTokensRepository = UserTokensRepository.init(
             tangemTechService = store.state.domainNetworks.tangemTechService,
@@ -372,14 +367,25 @@ internal class TapApplication : Application(), ImageLoaderFactory {
             return TangemLogCollector(logLevels, LogFormat.StairsFormatter())
         }
 
+        fun setupBlockchainSdkLogs(blockchainSdkLogCollector: BlockchainSdkLogCollector) {
+            if (LogConfig.network.blockchainSdkNetwork) {
+                BlockchainSdkRetrofitBuilder.interceptors = listOf(
+                    createNetworkLoggingInterceptor(blockchainSdkLogCollector),
+                )
+            }
+        }
+
         val additionalFeedbackInfo = initAdditionalFeedbackInfo(context)
         val tangemLogCollector = initTangemLogCollector()
         Log.addLogger(tangemLogCollector)
+        val blockchainSdkLogCollector = BlockchainSdkLogCollector()
+        setupBlockchainSdkLogs(blockchainSdkLogCollector)
 
         val feedbackManager = FeedbackManager(
             infoHolder = additionalFeedbackInfo,
             logCollector = tangemLogCollector,
             chatManager = ChatManager(preferencesStorage, foregroundActivityObserver, store),
+            blockchainSdkLogCollector = blockchainSdkLogCollector,
         )
         store.dispatch(GlobalAction.SetFeedbackManager(feedbackManager))
     }
