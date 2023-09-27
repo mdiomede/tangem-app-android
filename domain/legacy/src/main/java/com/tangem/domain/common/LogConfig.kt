@@ -16,7 +16,7 @@ object NetworkLogConfig {
     const val utorgService: Boolean = false
     val tangemTechService: Boolean = BuildConfig.DEBUG
     val paymentologyApiService: Boolean = BuildConfig.DEBUG
-    val blockchainSdkNetwork: Boolean = BuildConfig.DEBUG
+    val blockchainSdkNetwork: Boolean = true
 }
 
 object AnalyticsHandlersLogConfig {

@@ -21,20 +21,27 @@ fun Activity.sendEmail(
     email: String,
     subject: String,
     message: String,
-    file: File? = null,
+    files: List<File?> = emptyList(),
     onFail: ((Exception) -> Unit)? = null,
 ) {
-    fun createEmailShareIntent(recipient: String, subject: String, text: String, file: File? = null): Intent {
+    fun createEmailShareIntent(
+        recipient: String,
+        subject: String,
+        text: String,
+        files: List<File?> = emptyList(),
+    ): Intent {
         val builder = ShareCompat.IntentBuilder.from(this)
             .setType("message/rfc822")
             .setEmailTo(arrayOf(recipient))
             .setSubject(subject)
             .setText(text)
-        file?.let { builder.setStream(FileProvider.getUriForFile(this, "$packageName.provider", it)) }
+        files.forEach { file ->
+            file?.let { builder.addStream(FileProvider.getUriForFile(this, "$packageName.provider", file)) }
+        }
         return builder.intent
     }
 
-    val originalIntent = createEmailShareIntent(email, subject, message, file)
+    val originalIntent = createEmailShareIntent(email, subject, message, files)
     val emailFilterIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
 
     val originalIntentResults = packageManager.queryIntentActivities(originalIntent, 0)
@@ -47,7 +54,7 @@ fun Activity.sendEmail(
             }
         }
         .map {
-            createEmailShareIntent(email, subject, message, file).apply {
+            createEmailShareIntent(email, subject, message, files).apply {
                 setPackage(it.activityInfo.packageName)
             }
         }

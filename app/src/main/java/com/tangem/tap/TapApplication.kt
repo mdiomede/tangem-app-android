@@ -22,6 +22,7 @@ import com.tangem.datasource.config.ConfigManager
 import com.tangem.datasource.config.FeaturesLocalLoader
 import com.tangem.datasource.config.models.Config
 import com.tangem.datasource.connection.NetworkConnectionManager
+import com.tangem.datasource.utils.BlockchainSdkLogCollector
 import com.tangem.domain.DomainLayer
 import com.tangem.domain.appcurrency.repository.AppCurrencyRepository
 import com.tangem.domain.card.ScanCardProcessor
@@ -49,6 +50,7 @@ import com.tangem.tap.common.redux.global.GlobalAction
 import com.tangem.tap.common.shop.TangemShopService
 import com.tangem.tap.domain.configurable.warningMessage.WarningMessagesManager
 import com.tangem.tap.domain.tokens.UserTokensRepository
+import com.tangem.tap.domain.tokens.UserTokensStorageService
 import com.tangem.tap.domain.totalBalance.TotalFiatBalanceCalculator
 import com.tangem.tap.domain.totalBalance.di.provideDefaultImplementation
 import com.tangem.tap.domain.walletCurrencies.WalletCurrenciesManager
@@ -218,11 +220,11 @@ class TapApplication : Application(), ImageLoaderFactory {
 
         loadNativeLibraries()
 
-        if (LogConfig.network.blockchainSdkNetwork) {
-            BlockchainSdkRetrofitBuilder.interceptors = listOf(
-                createNetworkLoggingInterceptor(),
-            )
-        }
+        // if (LogConfig.network.blockchainSdkNetwork) {
+        //     BlockchainSdkRetrofitBuilder.interceptors = listOf(
+        //         createNetworkLoggingInterceptor(),
+        //     )
+        // }
 
         userTokensRepository = UserTokensRepository.init(
             context = this,
@@ -329,14 +331,25 @@ class TapApplication : Application(), ImageLoaderFactory {
             return TangemLogCollector(logLevels, LogFormat.StairsFormatter())
         }
 
+        fun setupBlockchainSdkLogs(blockchainSdkLogCollector: BlockchainSdkLogCollector) {
+            if (LogConfig.network.blockchainSdkNetwork) {
+                BlockchainSdkRetrofitBuilder.interceptors = listOf(
+                    createNetworkLoggingInterceptor(blockchainSdkLogCollector),
+                )
+            }
+        }
+
         val additionalFeedbackInfo = initAdditionalFeedbackInfo(context)
         val tangemLogCollector = initTangemLogCollector()
         Log.addLogger(tangemLogCollector)
+        val blockchainSdkLogCollector = BlockchainSdkLogCollector()
+        setupBlockchainSdkLogs(blockchainSdkLogCollector)
 
         val feedbackManager = FeedbackManager(
             infoHolder = additionalFeedbackInfo,
             logCollector = tangemLogCollector,
             chatManager = ChatManager(preferencesStorage, foregroundActivityObserver, store),
+            blockchainSdkLogCollector = blockchainSdkLogCollector,
         )
         store.dispatch(GlobalAction.SetFeedbackManager(feedbackManager))
     }
