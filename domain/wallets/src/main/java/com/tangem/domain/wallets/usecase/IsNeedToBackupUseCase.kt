@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
  */
 class IsNeedToBackupUseCase(private val walletsStateHolder: WalletsStateHolder) {
 
+    // TODO: Обернуть в Either
     operator fun invoke(id: UserWalletId): Flow<Boolean> {
         val userWalletsListManager = requireNotNull(walletsStateHolder.userWalletsListManager)
 
