@@ -37,13 +37,14 @@ internal class TokenDetailsTxHistoryItemFlowConverter(
     }
 
     override fun convert(value: Flow<PagingData<TxHistoryItem>>): TxHistoryState {
-        val txHistoryContent = currentStateProvider().txHistoryState as TxHistoryState.Content
+        val state = currentStateProvider().txHistoryState
+        val txHistoryContent = state as? TxHistoryState.Content
 
         // FIXME: TxHistoryRepository should send loading transactions
         // https://tangem.atlassian.net/browse/AND-4334
         value
             .onEach { txHistoryStatePagingData ->
-                txHistoryContent.contentItems.update {
+                txHistoryContent?.contentItems?.update {
                     txHistoryStatePagingData
                         .map<TxHistoryItem, TxHistoryItemState> { item ->
                             // [createTransactionState] returns timestamp without formatting
@@ -59,7 +60,7 @@ internal class TokenDetailsTxHistoryItemFlowConverter(
             }
             .launchIn(CoroutineScope(Dispatchers.IO))
 
-        return txHistoryContent
+        return state
     }
 
     private fun createTransactionState(item: TxHistoryItem): TransactionState {

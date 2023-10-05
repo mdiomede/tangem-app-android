@@ -71,6 +71,7 @@ internal class TokenDetailsViewModel @Inject constructor(
 
     private val marketPriceJobHolder = JobHolder()
     private val refreshStateJobHolder = JobHolder()
+    private val historyTxStateJobHolder = JobHolder()
     private var cryptoCurrencyStatus: CryptoCurrencyStatus? = null
     private var wallet by Delegates.notNull<UserWallet>()
 
@@ -163,13 +164,17 @@ internal class TokenDetailsViewModel @Inject constructor(
     }
 
     private fun updateTxHistory(refresh: Boolean = false) {
+        if (!refresh) {
+            uiState = stateFactory.getLoadingTxHistoryState()
+        }
+
         viewModelScope.launch(dispatchers.io) {
             val txHistoryItemsCountEither = txHistoryItemsCountUseCase(
                 network = cryptoCurrency.network,
             )
 
             if (!refresh) {
-                uiState = stateFactory.getLoadingTxHistoryState(itemsCountEither = txHistoryItemsCountEither)
+                uiState = stateFactory.getLoadedTxHistoryCountState(itemsCountEither = txHistoryItemsCountEither)
             }
 
             txHistoryItemsCountEither.onRight {
@@ -177,7 +182,7 @@ internal class TokenDetailsViewModel @Inject constructor(
                     .map { it.cachedIn(viewModelScope) }
                 uiState = stateFactory.getLoadedTxHistoryState(txHistoryEither = either)
             }
-        }
+        }.saveIn(historyTxStateJobHolder)
     }
 
     private fun createSelectedAppCurrencyFlow(): StateFlow<AppCurrency> {

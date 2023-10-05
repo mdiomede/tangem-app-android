@@ -34,9 +34,9 @@ internal class TokenDetailsLoadingTxHistoryConverter(
 
     private fun convert(value: Int): TokenDetailsState {
         val state = currentStateProvider()
-        val txHistoryContent = state.txHistoryState as TxHistoryState.Content
+        val txHistoryContent = state.txHistoryState as? TxHistoryState.Content
 
-        txHistoryContent.contentItems.update {
+        txHistoryContent?.contentItems?.update {
             PagingData.from(
                 data = listOf(TxHistoryState.TxHistoryItemState.Title(onExploreClick = clickIntents::onExploreClick)) +
                     MutableList(
