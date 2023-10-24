@@ -360,7 +360,7 @@ internal class TokenDetailsViewModel @Inject constructor(
                 router.openUrl(
                     url = getExploreUrlUseCase(
                         userWalletId = userWalletId,
-                        network = cryptoCurrency.network,
+                        currency = cryptoCurrency,
                         addressType = AddressType.Default,
                     ),
                 )
@@ -375,7 +375,7 @@ internal class TokenDetailsViewModel @Inject constructor(
             router.openUrl(
                 url = getExploreUrlUseCase(
                     userWalletId = userWalletId,
-                    network = cryptoCurrency.network,
+                    currency = cryptoCurrency,
                     addressType = AddressType.valueOf(addressModel.type.name),
                 ),
             )

@@ -785,7 +785,7 @@ internal class WalletViewModel @Inject constructor(
                 router.openUrl(
                     url = getExploreUrlUseCase(
                         userWalletId = wallet.walletId,
-                        network = currencyStatus.currency.network,
+                        currency = currencyStatus.currency,
                     ),
                 )
             }
