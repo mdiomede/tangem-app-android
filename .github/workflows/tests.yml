@@ -20,7 +20,7 @@ concurrency:
 jobs:
   test:
     name: Test
-    runs-on: [self-hosted, old]
+    runs-on: self-hosted
     if: github.event.pull_request.draft == false
     steps:
 
