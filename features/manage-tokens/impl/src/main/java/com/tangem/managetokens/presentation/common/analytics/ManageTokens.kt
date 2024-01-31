@@ -33,7 +33,7 @@ sealed class ManageTokens(
         params = mapOf("Token" to token)
     )
 
-    class ButtonChooseWallet : ManageTokens(event = "Button - Choose Wallet")
+    object ButtonChooseWallet : ManageTokens(event = "Button - Choose Wallet")
 
     class WalletSelected(source: Source) : ManageTokens(
         event = "Wallet Selected",

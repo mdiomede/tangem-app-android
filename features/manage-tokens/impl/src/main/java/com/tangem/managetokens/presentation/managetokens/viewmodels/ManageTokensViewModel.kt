@@ -13,6 +13,7 @@ import androidx.paging.map
 import arrow.core.getOrElse
 import com.tangem.core.analytics.Analytics
 import com.tangem.core.analytics.api.AnalyticsEventHandler
+import com.tangem.core.analytics.models.AnalyticsParam
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.card.DerivePublicKeysUseCase
@@ -63,7 +64,7 @@ internal class ManageTokensViewModel @Inject constructor(
     private val getSelectedAppCurrencyUseCase: GetSelectedAppCurrencyUseCase,
     private val checkCurrencyCompatibilityUseCase: CheckCurrencyCompatibilityUseCase,
     private val isCryptoCurrencyCoinCouldHide: IsCryptoCurrencyCoinCouldHideUseCase,
-    private val analyticsEventHandler: AnalyticsEventHandler
+    private val analyticsEventHandler: AnalyticsEventHandler,
 ) : ViewModel(), ManageTokensClickIntents, DefaultLifecycleObserver {
 
     private val debouncer = Debouncer()
@@ -209,6 +210,13 @@ internal class ManageTokensViewModel @Inject constructor(
     override fun onTokenItemButtonClick(token: TokenItemState.Loaded) {
         when (token.availableAction.value) {
             TokenButtonType.ADD, TokenButtonType.EDIT -> {
+                if (token.availableAction.value == TokenButtonType.ADD) {
+                    analyticsEventHandler.send(ManageTokens.ButtonAdd(token.currencySymbol))
+                }
+                if (token.availableAction.value == TokenButtonType.EDIT) {
+                    analyticsEventHandler.send(ManageTokens.ButtonEdit(token.currencySymbol))
+                }
+
                 uiState = uiState.copy(selectedToken = token)
                 val addedCurrenciesOnWallet = addedCurrenciesByWallet[selectedWallet] ?: listOf()
                 stateFactory.updateTokenNetworksOnTokenSelection(token, addedCurrenciesOnWallet)
@@ -251,12 +259,19 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onNetworkToggleClick(token: TokenItemState.Loaded, network: NetworkItemState.Toggleable) {
+        Log.e("here", "ss")
         val selectedWallet = selectedWallet ?: return
         if (!selectedWallet.isMultiCurrency || selectedWallet.isLocked) return
 
         if (network.isAdded.value) {
+            analyticsEventHandler.send(
+                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.Off)
+            )
             toggleToken(token, network, selectedWallet)
         } else {
+            analyticsEventHandler.send(
+                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.On)
+            )
             viewModelScope.launch(dispatchers.io) {
                 checkCompatibilityAndToggleToken(token, network, selectedWallet)
             }
@@ -370,6 +385,7 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onChooseWalletClick() {
+        analyticsEventHandler.send(ManageTokens.ButtonChooseWallet)
         uiState = uiState.copy(
             showChooseWalletScreen = true,
         )
