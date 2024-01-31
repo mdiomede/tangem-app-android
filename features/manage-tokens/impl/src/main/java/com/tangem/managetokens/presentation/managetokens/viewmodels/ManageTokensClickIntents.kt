@@ -20,8 +20,6 @@ internal interface ManageTokensClickIntents {
     fun onNetworkToggleClick(token: TokenItemState.Loaded, network: NetworkItemState.Toggleable)
     fun onNonNativeNetworkHintClick()
 
-    fun onSelectWalletsClick()
-
     fun onChooseWalletClick()
 
     fun onCloseChoosingWalletClick()

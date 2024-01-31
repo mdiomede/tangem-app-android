@@ -378,12 +378,6 @@ internal class ManageTokensViewModel @Inject constructor(
         )
     }
 
-    override fun onSelectWalletsClick() {
-        uiState = uiState.copy(
-            showChooseWalletScreen = true,
-        )
-    }
-
     override fun onChooseWalletClick() {
         analyticsEventHandler.send(ManageTokens.ButtonChooseWallet)
         uiState = uiState.copy(
