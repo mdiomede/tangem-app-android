@@ -1,5 +1,6 @@
 package com.tangem.managetokens.presentation.managetokens.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,8 +8,11 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.map
 import arrow.core.getOrElse
+import com.tangem.core.analytics.Analytics
+import com.tangem.core.analytics.api.AnalyticsEventHandler
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.domain.card.DerivePublicKeysUseCase
@@ -20,6 +24,7 @@ import com.tangem.domain.wallets.models.UserWalletId
 import com.tangem.domain.wallets.usecase.GetSelectedWalletSyncUseCase
 import com.tangem.domain.wallets.usecase.GetWalletsUseCase
 import com.tangem.domain.wallets.usecase.SelectWalletUseCase
+import com.tangem.managetokens.presentation.common.analytics.ManageTokens
 import com.tangem.managetokens.presentation.common.state.AlertState
 import com.tangem.managetokens.presentation.common.state.Event
 import com.tangem.managetokens.presentation.common.state.NetworkItemState
@@ -58,6 +63,7 @@ internal class ManageTokensViewModel @Inject constructor(
     private val getSelectedAppCurrencyUseCase: GetSelectedAppCurrencyUseCase,
     private val checkCurrencyCompatibilityUseCase: CheckCurrencyCompatibilityUseCase,
     private val isCryptoCurrencyCoinCouldHide: IsCryptoCurrencyCoinCouldHideUseCase,
+    private val analyticsEventHandler: AnalyticsEventHandler
 ) : ViewModel(), ManageTokensClickIntents, DefaultLifecycleObserver {
 
     private val debouncer = Debouncer()
@@ -107,6 +113,8 @@ internal class ManageTokensViewModel @Inject constructor(
     )
 
     init {
+        analyticsEventHandler.send(ManageTokens.ScreenOpened())
+
         viewModelScope.launch(dispatchers.io) {
             getWalletsUseCase()
                 .distinctUntilChanged()

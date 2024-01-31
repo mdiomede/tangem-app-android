@@ -10,7 +10,7 @@ sealed class ManageTokens(
 
     class ScreenOpened : ManageTokens("Manage Tokens Screen Opened")
 
-    class TokenSearched : ManageTokens("Token Searched")
+    class TokenIsNotFound(userInput: String) : ManageTokens("Token Is Not Found")
 
     class TokenSwitcherChanged(
         token: String,

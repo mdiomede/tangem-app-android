@@ -14,9 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.tangem.core.analytics.Analytics
 import com.tangem.core.ui.components.bottomsheets.TangemBottomSheetConfig
 import com.tangem.core.ui.res.TangemTheme
+import com.tangem.managetokens.presentation.common.analytics.ManageTokens
 import com.tangem.managetokens.presentation.common.state.AlertState
 import com.tangem.managetokens.presentation.common.state.ChooseWalletState
 import com.tangem.managetokens.presentation.common.ui.ChooseWalletBottomSheet
@@ -77,6 +81,10 @@ private fun Content(state: ManageTokensState) {
                 )
             }
             val tokens = state.tokens.collectAsLazyPagingItems()
+            val query = state.searchBarState.query
+
+            TrackPossibleEmptySearchResult(tokens = tokens, query = query)
+
             TokensList(tokens = tokens, addCustomTokenButton = state.addCustomTokenButton)
         }
         state.derivationNotification?.let {
@@ -89,6 +97,21 @@ private fun Content(state: ManageTokensState) {
         state.selectedToken?.let { selectedToken ->
             ManageTokensBottomSheet(selectedToken = selectedToken, state = state)
         }
+    }
+}
+
+@Composable
+private fun TrackPossibleEmptySearchResult(tokens: LazyPagingItems<TokenItemState>, query: String) {
+    val wasLoading = remember { mutableStateOf(false) }
+
+    LaunchedEffect(tokens.loadState) {
+        val isLoading = tokens.loadState.refresh == LoadState.Loading
+
+        if (wasLoading.value && !isLoading && query.isNotEmpty() && tokens.itemSnapshotList.isEmpty()) {
+            Analytics.send(ManageTokens.TokenIsNotFound(query))
+        }
+
+        wasLoading.value = isLoading
     }
 }
 
