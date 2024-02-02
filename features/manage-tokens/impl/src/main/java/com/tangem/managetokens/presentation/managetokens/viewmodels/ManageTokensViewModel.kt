@@ -371,6 +371,7 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onNonNativeNetworkHintClick() {
+        analyticsEventHandler.send(ManageTokens.NoticeNonNativeNetworkClicked)
         uiState = stateFactory.getStateAndTriggerEvent(
             state = uiState,
             event = Event.ShowAlert(AlertState.NonNative),

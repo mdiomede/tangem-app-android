@@ -51,6 +51,8 @@ sealed class ManageTokens(
         params = mapOf("Token" to token)
     )
 
+    object NoticeNonNativeNetworkClicked : ManageTokens(event = "Notice - Non Native Network Clicked")
+
     class ButtonGenerateAddresses(cardCount: Int) : ManageTokens(
         "Button - Generate Addresses",
         params = mapOf("CardCount" to cardCount.toString())
