@@ -60,18 +60,7 @@ sealed class ManageTokens(
 
     object ButtonCustomToken : ManageTokens("Button - Custom Token")
 
-    class TokenWasAddedBlockchain(
-        val derivationPath: String,
-        val token: String,
-    ) : ManageTokens(
-        event = "Custom Token Was Added",
-        params = mapOf(
-            "Token" to token,
-            "Derivation Path" to derivationPath,
-        )
-    )
-
-    class TokenWasAddedToken(
+    class TokenWasAdded(
         val derivationPath: String,
         val token: String,
         val networkId: String,
