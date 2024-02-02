@@ -13,6 +13,7 @@ import androidx.paging.map
 import arrow.core.getOrElse
 import com.tangem.core.analytics.Analytics
 import com.tangem.core.analytics.api.AnalyticsEventHandler
+import com.tangem.core.analytics.models.AnalyticsEvent
 import com.tangem.core.analytics.models.AnalyticsParam
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
@@ -191,6 +192,7 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onAddCustomTokensButtonClick() {
+        analyticsEventHandler.send(ManageTokens.ButtonCustomToken)
         router.openCustomTokensScreen()
     }
 

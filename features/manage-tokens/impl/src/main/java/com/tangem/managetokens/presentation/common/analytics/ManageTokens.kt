@@ -60,8 +60,6 @@ sealed class ManageTokens(
 
     object ButtonCustomToken : ManageTokens("Button - Custom Token")
 
-    object CustomTokenScreenOpened : ManageTokens(event = "Custom Token Screen Opened")
-
     class TokenWasAddedBlockchain(
         val derivationPath: String,
         val token: String,
