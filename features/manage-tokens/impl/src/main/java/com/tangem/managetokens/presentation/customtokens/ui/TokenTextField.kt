@@ -24,7 +24,6 @@ internal fun TokenTextField(
     state: TextFieldState.Editable,
     placeholder: String,
     keyboardType: KeyboardType = KeyboardType.Text,
-    onFocusExit: () -> Unit,
 ) {
     val isInitiallyComposed = remember { mutableStateOf(false) }
     LaunchedEffect(key1 = true) {
@@ -46,7 +45,7 @@ internal fun TokenTextField(
             .fillMaxWidth()
             .onFocusChanged {
                 if (!it.isFocused && isInitiallyComposed.value) {
-                    onFocusExit()
+                    state.onFocusExit()
                 }
             },
         decorationBox = { innerTextField ->
