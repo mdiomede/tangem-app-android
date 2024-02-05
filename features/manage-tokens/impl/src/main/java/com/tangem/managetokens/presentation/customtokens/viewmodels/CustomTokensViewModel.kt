@@ -17,6 +17,7 @@ import com.tangem.domain.wallets.models.UserWalletId
 import com.tangem.domain.wallets.usecase.GetSelectedWalletSyncUseCase
 import com.tangem.domain.wallets.usecase.GetWalletsUseCase
 import com.tangem.domain.wallets.usecase.SelectWalletUseCase
+import com.tangem.managetokens.presentation.common.analytics.ManageTokens
 import com.tangem.managetokens.presentation.common.state.AlertState
 import com.tangem.managetokens.presentation.common.state.Event
 import com.tangem.managetokens.presentation.common.state.NetworkItemState
@@ -112,6 +113,7 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onNetworkSelected(networkItemState: NetworkItemState) {
+        analyticsEventHandler.send(ManageTokens.CustomTokenNetworkSelected(networkItemState.name))
         selectNetwork(networkItemState)
         router.popBackStack()
     }
@@ -280,8 +282,12 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onDerivationSelected(derivation: Derivation) {
-        uiState =
-            uiState.copy(chooseDerivationState = uiState.chooseDerivationState?.copy(selectedDerivation = derivation))
+        derivation.standardType?.let {
+            analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(it))
+        }
+        uiState = uiState.copy(
+            chooseDerivationState = uiState.chooseDerivationState?.copy(selectedDerivation = derivation)
+        )
         router.popBackStack()
     }
 
@@ -294,6 +300,7 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onCustomDerivationChange(input: String) {
+        analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(input)) // TODO?
         uiState = uiState.copy(
             chooseDerivationState = uiState.chooseDerivationState?.copy(
                 enterCustomDerivationState = uiState.chooseDerivationState?.enterCustomDerivationState?.copy(
