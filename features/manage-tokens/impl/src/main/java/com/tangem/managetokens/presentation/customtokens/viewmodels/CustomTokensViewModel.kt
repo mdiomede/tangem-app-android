@@ -170,6 +170,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     value = input,
                     isEnabled = true,
                     onValueChange = this::onContractAddressChange,
+                    onFocusExit = this::onContractAddressFocusExit,
                 ),
             ),
         )
@@ -245,6 +246,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     value = input,
                     isEnabled = true,
                     onValueChange = this::onTokenNameChange,
+                    onFocusExit = this::onTokenNameFocusExit,
                 ),
             ),
         )
@@ -257,6 +259,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     value = input,
                     isEnabled = true,
                     onValueChange = this::onSymbolChange,
+                    onFocusExit = this::onSymbolFocusExit
                 ),
             ),
         )
@@ -276,10 +279,29 @@ internal class CustomTokensViewModel @Inject constructor(
                     isEnabled = true,
                     onValueChange = this::onDecimalsChange,
                     error = error,
+                    onFocusExit = this::onDecimalsFocusExit
                 ),
             ),
         )
     }
+
+    override fun onContractAddressFocusExit() {
+        analyticsEventHandler.send(ManageTokens.CustomTokenAddress(true))
+    }
+
+    override fun onTokenNameFocusExit() {
+        analyticsEventHandler.send(ManageTokens.CustomTokenName)
+    }
+
+    override fun onSymbolFocusExit() {
+        analyticsEventHandler.send(ManageTokens.CustomTokenSymbol)
+    }
+
+    override fun onDecimalsFocusExit() {
+        analyticsEventHandler.send(ManageTokens.CustomTokenDecimals)
+    }
+
+
 
     override fun onDerivationSelected(derivation: Derivation) {
         derivation.standardType?.let {

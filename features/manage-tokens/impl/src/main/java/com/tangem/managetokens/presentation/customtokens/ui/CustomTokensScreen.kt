@@ -1,5 +1,6 @@
 package com.tangem.managetokens.presentation.customtokens.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -159,21 +160,33 @@ private fun TokenFields(state: CustomTokenData, modifier: Modifier = Modifier) {
             textFieldState = state.contractAddressTextField,
             placeholder = "0x0000000000000000000000000000000",
             title = R.string.custom_token_contract_address_input_title,
+            onFocusExit = {
+                (state.contractAddressTextField as? TextFieldState.Editable)?.onFocusExit?.invoke()
+            },
         )
         TokenField(
             textFieldState = state.nameTextField,
             placeholder = stringResource(id = R.string.custom_token_name_input_placeholder),
             title = R.string.custom_token_name_input_title,
+            onFocusExit = {
+                (state.nameTextField as? TextFieldState.Editable)?.onFocusExit?.invoke()
+            },
         )
         TokenField(
             textFieldState = state.symbolTextField,
             placeholder = stringResource(id = R.string.custom_token_token_symbol_input_placeholder),
             title = R.string.custom_token_token_symbol_input_title,
+            onFocusExit = {
+                (state.symbolTextField as? TextFieldState.Editable)?.onFocusExit?.invoke()
+            },
         )
         TokenField(
             textFieldState = state.decimalsTextField,
             placeholder = "0",
             title = R.string.custom_token_decimals_input_title,
+            onFocusExit = {
+                (state.decimalsTextField as? TextFieldState.Editable)?.onFocusExit?.invoke()
+            },
         )
     }
 }
@@ -183,6 +196,7 @@ private fun TokenField(
     textFieldState: TextFieldState,
     placeholder: String,
     title: Int,
+    onFocusExit: () -> Unit,
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     Column(
@@ -199,6 +213,7 @@ private fun TokenField(
                 state = textFieldState,
                 placeholder = placeholder,
                 keyboardType = keyboardType,
+                onFocusExit = onFocusExit
             )
             is TextFieldState.Loading -> TokenShimmer()
         }

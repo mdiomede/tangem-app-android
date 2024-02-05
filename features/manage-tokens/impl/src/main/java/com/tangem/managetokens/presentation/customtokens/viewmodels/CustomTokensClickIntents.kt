@@ -25,6 +25,14 @@ internal interface CustomTokensClickIntents {
 
     fun onDecimalsChange(input: String)
 
+    fun onContractAddressFocusExit()
+
+    fun onTokenNameFocusExit()
+
+    fun onSymbolFocusExit()
+
+    fun onDecimalsFocusExit()
+
     fun onDerivationSelected(derivation: Derivation)
 
     fun onChooseDerivationClick()

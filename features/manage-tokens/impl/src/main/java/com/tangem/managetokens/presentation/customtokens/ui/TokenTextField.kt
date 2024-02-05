@@ -1,12 +1,17 @@
 package com.tangem.managetokens.presentation.customtokens.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -19,7 +24,13 @@ internal fun TokenTextField(
     state: TextFieldState.Editable,
     placeholder: String,
     keyboardType: KeyboardType = KeyboardType.Text,
+    onFocusExit: () -> Unit,
 ) {
+    val isInitiallyComposed = remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = true) {
+        isInitiallyComposed.value = true
+    }
+
     BasicTextField(
         value = state.value,
         onValueChange = state.onValueChange,
@@ -32,7 +43,12 @@ internal fun TokenTextField(
         ),
         cursorBrush = SolidColor(TangemTheme.colors.icon.primary1),
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .onFocusChanged {
+                if (!it.isFocused && isInitiallyComposed.value) {
+                    onFocusExit()
+                }
+            },
         decorationBox = { innerTextField ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 if (state.value.isEmpty()) {
