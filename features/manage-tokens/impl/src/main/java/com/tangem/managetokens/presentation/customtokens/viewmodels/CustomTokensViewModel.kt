@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tangem.core.analytics.api.AnalyticsEventHandler
 import com.tangem.crypto.hdWallet.DerivationPath
 import com.tangem.crypto.hdWallet.HDWalletError
 import com.tangem.domain.common.util.derivationStyleProvider
@@ -52,6 +53,7 @@ internal class CustomTokensViewModel @Inject constructor(
     private val validateContractAddressUseCase: ValidateContractAddressUseCase,
     private val getNetworksSupportedByWallet: GetNetworksSupportedByWallet,
     private val areTokensSupportedByNetworkUseCase: AreTokensSupportedByNetworkUseCase,
+    private val analyticsEventHandler: AnalyticsEventHandler,
 ) : ViewModel(), CustomTokensClickIntents, DefaultLifecycleObserver {
 
     private val debouncer = Debouncer()
@@ -202,9 +204,14 @@ internal class CustomTokensViewModel @Inject constructor(
                     ifLeft = {
                         val tokenData = ContractAddressToCustomTokenDataConverter(this@CustomTokensViewModel)
                             .convert(contractAddress)
+
+                        val isButtonEnabled = tokenData.isRequiredInformationProvided()
                         uiState = uiState.copy(
                             tokenData = tokenData,
                             warnings = (uiState.warnings + AddCustomTokenWarning.PotentialScamToken).toPersistentSet(),
+                            addTokenButton = uiState.addTokenButton.copy(
+                                isEnabled = isButtonEnabled,
+                            ),
                         )
                     },
                     ifRight = { token ->
@@ -215,7 +222,14 @@ internal class CustomTokensViewModel @Inject constructor(
                                 contractAddress,
                             )
                         }
-                        uiState = uiState.copy(tokenData = tokenData)
+
+                        val isButtonEnabled = tokenData.isRequiredInformationProvided()
+                        uiState = uiState.copy(
+                            tokenData = tokenData,
+                            addTokenButton = uiState.addTokenButton.copy(
+                                isEnabled = isButtonEnabled,
+                            ),
+                        )
                     },
                 )
             }
