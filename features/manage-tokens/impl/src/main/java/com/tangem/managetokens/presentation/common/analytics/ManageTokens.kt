@@ -54,7 +54,7 @@ sealed class ManageTokens(
     class ButtonGenerateAddresses(cardCount: Int) : ManageTokens(
         event = "Button - Get Addresses",
         params = mapOf("CardCount" to cardCount.toString()),
-    )
+    ) // TODO AND-5979
 
     object ButtonCustomToken : ManageTokens("Button - Custom Token")
 
@@ -72,7 +72,7 @@ sealed class ManageTokens(
             token?.let { put("Token", it) }
             contractAddress?.let { put("Contract Address", it) }
         },
-    )
+    ) // TODO wait for the discussion to end
 
     class CustomTokenNetworkSelected(blockchain: String) : ManageTokens(
         event = "Custom Token Network Selected",
