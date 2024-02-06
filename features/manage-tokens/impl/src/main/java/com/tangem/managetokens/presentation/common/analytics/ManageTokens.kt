@@ -10,13 +10,16 @@ sealed class ManageTokens(
 
     class ScreenOpened : ManageTokens("Manage Tokens Screen Opened")
 
-    class TokenIsNotFound(userInput: String) : ManageTokens("Token Is Not Found")
+    class TokenIsNotFound(userInput: String) : ManageTokens(
+        event = "Token Is Not Found",
+        params = mapOf("Input" to userInput)
+    )
 
     class TokenSwitcherChanged(
         token: String,
         state: AnalyticsParam.OnOffState,
     ) : ManageTokens(
-        "Token Switcher Changed",
+        event = "Token Switcher Changed",
         params = mapOf(
             "Token" to token,
             "State" to state.value,
@@ -24,12 +27,12 @@ sealed class ManageTokens(
     )
 
     class ButtonAdd(token: String) : ManageTokens(
-        "Button - Add",
+        event = "Button - Add",
         params = mapOf("Token" to token)
     )
 
     class ButtonEdit(token: String) : ManageTokens(
-        "Button - Edit",
+        event = "Button - Edit",
         params = mapOf("Token" to token)
     )
 
@@ -46,15 +49,10 @@ sealed class ManageTokens(
         }
     }
 
-    class TokensAdded(token: String) : ManageTokens(
-        "Tokens Added",
-        params = mapOf("Token" to token)
-    )
-
     object NoticeNonNativeNetworkClicked : ManageTokens(event = "Notice - Non Native Network Clicked")
 
     class ButtonGenerateAddresses(cardCount: Int) : ManageTokens(
-        "Button - Generate Addresses",
+        event = "Button - Generate Addresses",
         params = mapOf("CardCount" to cardCount.toString())
     )
 
@@ -77,12 +75,12 @@ sealed class ManageTokens(
     )
 
     class CustomTokenNetworkSelected(blockchain: String) : ManageTokens(
-        "Custom Token Network Selected",
+        event = "Custom Token Network Selected",
         params = mapOf("blockchain" to blockchain)
     )
 
     class CustomTokenDerivationSelected(derivation: String) : ManageTokens(
-        "Custom Token Derivation Selected",
+        event = "Custom Token Derivation Selected",
         params = mapOf("Derivation" to derivation)
     )
 
@@ -96,5 +94,4 @@ sealed class ManageTokens(
     object CustomTokenSymbol : ManageTokens("Custom Token Symbol")
 
     object CustomTokenDecimals : ManageTokens("Custom Token Decimals")
-
 }

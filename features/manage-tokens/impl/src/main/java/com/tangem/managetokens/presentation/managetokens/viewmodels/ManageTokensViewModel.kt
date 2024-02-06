@@ -395,6 +395,7 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onWalletSelected(walletId: String) {
+        analyticsEventHandler.send(ManageTokens.WalletSelected(ManageTokens.WalletSelected.Source.MainToken))
         viewModelScope.launch(dispatchers.io) {
             selectWalletUseCase(UserWalletId(walletId))
         }

@@ -140,6 +140,7 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onWalletSelected(walletId: String) {
+        analyticsEventHandler.send(ManageTokens.WalletSelected(ManageTokens.WalletSelected.Source.CustomToken))
         viewModelScope.launch(dispatchers.io) {
             val userWalletId = UserWalletId(walletId)
             selectWalletUseCase(userWalletId)
