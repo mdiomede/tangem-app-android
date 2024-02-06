@@ -52,7 +52,7 @@ sealed class ManageTokens(
     object NoticeNonNativeNetworkClicked : ManageTokens(event = "Notice - Non Native Network Clicked")
 
     class ButtonGenerateAddresses(cardCount: Int) : ManageTokens(
-        event = "Button - Generate Addresses",
+        event = "Button - Get Addresses",
         params = mapOf("CardCount" to cardCount.toString())
     )
 
