@@ -6,11 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.getOrElse
 import com.tangem.core.analytics.api.AnalyticsEventHandler
 import com.tangem.crypto.hdWallet.DerivationPath
 import com.tangem.crypto.hdWallet.HDWalletError
 import com.tangem.domain.common.util.derivationStyleProvider
 import com.tangem.domain.tokens.*
+import com.tangem.domain.tokens.model.CryptoCurrency
 import com.tangem.domain.tokens.model.Network
 import com.tangem.domain.wallets.models.UserWallet
 import com.tangem.domain.wallets.models.UserWalletId
@@ -250,6 +252,9 @@ internal class CustomTokensViewModel @Inject constructor(
                     onFocusExit = this::onTokenNameFocusExit,
                 ),
             ),
+            addTokenButton = uiState.addTokenButton.copy(
+                isEnabled = uiState.tokenData?.isRequiredInformationProvided() == true,
+            ),
         )
     }
 
@@ -262,6 +267,9 @@ internal class CustomTokensViewModel @Inject constructor(
                     onValueChange = this::onSymbolChange,
                     onFocusExit = this::onSymbolFocusExit,
                 ),
+            ),
+            addTokenButton = uiState.addTokenButton.copy(
+                isEnabled = uiState.tokenData?.isRequiredInformationProvided() == true,
             ),
         )
     }
@@ -282,6 +290,9 @@ internal class CustomTokensViewModel @Inject constructor(
                     error = error,
                     onFocusExit = this::onDecimalsFocusExit,
                 ),
+            ),
+            addTokenButton = uiState.addTokenButton.copy(
+                isEnabled = uiState.tokenData?.isRequiredInformationProvided() == true,
             ),
         )
     }
@@ -374,9 +385,8 @@ internal class CustomTokensViewModel @Inject constructor(
             val cryptoCurrency = AddCustomTokenStateToCryptoCurrencyConverter(
                 selectedWallet.scanResponse.derivationStyleProvider,
             ).convert(uiState)
-            val alreadyAdded =
-                getCurrenciesUseCase(selectedWallet.walletId).getOrNull()?.any { it == cryptoCurrency }
-            if (alreadyAdded == true) {
+            val alreadyAdded = isCryptoCurrencyAlreadyAdded(selectedWallet, cryptoCurrency)
+            if (alreadyAdded) {
                 uiState = stateFactory.getStateAndTriggerEvent(
                     state = uiState,
                     event = Event.ShowAlert(AlertState.TokenAlreadyAdded),
@@ -385,6 +395,33 @@ internal class CustomTokensViewModel @Inject constructor(
             } else {
                 addCryptoCurrenciesUseCase(selectedWallet.walletId, currency = cryptoCurrency)
                 withContext(dispatchers.main) { router.popBackStack() }
+            }
+        }
+    }
+
+    private suspend fun isCryptoCurrencyAlreadyAdded(
+        selectedWallet: UserWallet,
+        cryptoCurrency: CryptoCurrency,
+    ): Boolean {
+        val currenciesList = getCurrenciesUseCase(selectedWallet.walletId).getOrElse { emptyList() }
+        return when (cryptoCurrency) {
+            is CryptoCurrency.Coin -> {
+                currenciesList.any {
+                    it is CryptoCurrency.Coin &&
+                        it.id == cryptoCurrency.id &&
+                        it.network.derivationPath == cryptoCurrency.network.derivationPath
+                }
+            }
+            is CryptoCurrency.Token -> {
+                currenciesList.any {
+                    (it as? CryptoCurrency.Token)?.let {
+                        it.id == cryptoCurrency.id &&
+                            it.contractAddress == cryptoCurrency.contractAddress &&
+                            it.network.id == cryptoCurrency.network.id &&
+                            it.network.derivationPath == cryptoCurrency.network.derivationPath
+
+                    } ?: false
+                }
             }
         }
     }
