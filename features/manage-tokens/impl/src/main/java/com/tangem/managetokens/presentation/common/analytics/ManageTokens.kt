@@ -58,21 +58,21 @@ sealed class ManageTokens(
 
     object ButtonCustomToken : ManageTokens("Button - Custom Token")
 
-    class TokenWasAdded(
-        val derivationPath: String,
+    class CustomTokenWasAdded(
+        val derivation: String,
         val networkId: String,
-        val token: String?,
-        val contractAddress: String?,
+        val token: String? = null,
+        val contractAddress: String? = null,
     ) : ManageTokens(
         event = "Custom Token Was Added",
         params = mutableMapOf(
-            "Derivation Path" to derivationPath,
+            "Derivation" to derivation,
             "Network Id" to networkId,
         ).apply {
             token?.let { put("Token", it) }
             contractAddress?.let { put("Contract Address", it) }
         },
-    ) // TODO wait for the discussion to end
+    )
 
     class CustomTokenNetworkSelected(blockchain: String) : ManageTokens(
         event = "Custom Token Network Selected",

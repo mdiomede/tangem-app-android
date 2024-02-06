@@ -1,5 +1,6 @@
 package com.tangem.managetokens.presentation.customtokens.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -395,6 +396,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     setUiState = { uiState = it },
                 )
             } else {
+                sendTokenAddedEvent(cryptoCurrency)
                 addCryptoCurrenciesUseCase(selectedWallet.walletId, currency = cryptoCurrency)
                 withContext(dispatchers.main) { router.popBackStack() }
             }
@@ -424,6 +426,36 @@ internal class CustomTokensViewModel @Inject constructor(
 
                     } ?: false
                 }
+            }
+        }
+    }
+
+    private fun sendTokenAddedEvent(cryptoCurrency: CryptoCurrency) {
+        val selectedDerivation = uiState.chooseDerivationState?.selectedDerivation
+
+        val derivation = when {
+            selectedDerivation == null -> "Default"
+            selectedDerivation.networkName.isNotEmpty() -> selectedDerivation.networkName
+            else -> "Custom"
+        }
+        when (cryptoCurrency) {
+            is CryptoCurrency.Token -> {
+                analyticsEventHandler.send(
+                    ManageTokens.CustomTokenWasAdded(
+                        derivation = derivation,
+                        networkId = cryptoCurrency.network.name,
+                        contractAddress = cryptoCurrency.contractAddress,
+                        token = cryptoCurrency.symbol,
+                    ),
+                )
+            }
+            is CryptoCurrency.Coin -> {
+                analyticsEventHandler.send(
+                    ManageTokens.CustomTokenWasAdded(
+                        derivation = derivation,
+                        networkId = cryptoCurrency.network.name,
+                    ),
+                )
             }
         }
     }
