@@ -298,7 +298,9 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onContractAddressFocusExit() {
-        analyticsEventHandler.send(ManageTokens.CustomTokenAddress(true))
+        val error = (uiState.tokenData?.contractAddressTextField as? TextFieldState.Editable)?.error
+        val validated = error is AddCustomTokenWarning.InvalidContractAddress
+        analyticsEventHandler.send(ManageTokens.CustomTokenAddress(validated = validated))
     }
 
     override fun onTokenNameFocusExit() {
