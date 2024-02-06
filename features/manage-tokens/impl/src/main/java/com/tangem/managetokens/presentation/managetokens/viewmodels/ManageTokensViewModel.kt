@@ -8,12 +8,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.map
 import arrow.core.getOrElse
-import com.tangem.core.analytics.Analytics
 import com.tangem.core.analytics.api.AnalyticsEventHandler
-import com.tangem.core.analytics.models.AnalyticsEvent
 import com.tangem.core.analytics.models.AnalyticsParam
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
 import com.tangem.domain.appcurrency.model.AppCurrency
@@ -267,12 +264,12 @@ internal class ManageTokensViewModel @Inject constructor(
 
         if (network.isAdded.value) {
             analyticsEventHandler.send(
-                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.Off)
+                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.Off),
             )
             toggleToken(token, network, selectedWallet)
         } else {
             analyticsEventHandler.send(
-                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.On)
+                ManageTokens.TokenSwitcherChanged(token = token.currencySymbol, AnalyticsParam.OnOffState.On),
             )
             viewModelScope.launch(dispatchers.io) {
                 checkCompatibilityAndToggleToken(token, network, selectedWallet)

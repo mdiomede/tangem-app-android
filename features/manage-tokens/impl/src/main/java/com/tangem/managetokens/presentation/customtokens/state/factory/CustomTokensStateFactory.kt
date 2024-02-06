@@ -201,25 +201,25 @@ internal class CustomTokensStateFactory(
                         value = "",
                         isEnabled = true,
                         onValueChange = clickIntents::onContractAddressChange,
-                        onFocusExit = clickIntents::onContractAddressFocusExit
+                        onFocusExit = clickIntents::onContractAddressFocusExit,
                     ),
                     nameTextField = TextFieldState.Editable(
                         value = "",
                         isEnabled = false,
                         onValueChange = clickIntents::onTokenNameChange,
-                        onFocusExit = clickIntents::onTokenNameFocusExit
+                        onFocusExit = clickIntents::onTokenNameFocusExit,
                     ),
                     symbolTextField = TextFieldState.Editable(
                         value = "",
                         isEnabled = false,
                         onValueChange = clickIntents::onSymbolChange,
-                        onFocusExit = clickIntents::onSymbolFocusExit
+                        onFocusExit = clickIntents::onSymbolFocusExit,
                     ),
                     decimalsTextField = TextFieldState.Editable(
                         value = "",
                         isEnabled = false,
                         onValueChange = clickIntents::onDecimalsChange,
-                        onFocusExit = clickIntents::onDecimalsFocusExit
+                        onFocusExit = clickIntents::onDecimalsFocusExit,
                     ),
                 )
         } else {
@@ -272,7 +272,7 @@ internal class CustomTokensStateFactory(
                     value = contractAddress,
                     isEnabled = true,
                     onValueChange = clickIntents::onContractAddressChange,
-                    onFocusExit = clickIntents::onContractAddressFocusExit
+                    onFocusExit = clickIntents::onContractAddressFocusExit,
 
                 ),
                 nameTextField = TextFieldState.Loading,

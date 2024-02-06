@@ -105,13 +105,13 @@ private fun TrackPossibleEmptySearchResult(tokens: LazyPagingItems<TokenItemStat
     val wasLoading = remember { mutableStateOf(false) }
 
     LaunchedEffect(tokens.loadState) {
-        val isLoading = tokens.loadState.refresh == LoadState.Loading
+        val finishedLoading = tokens.loadState.refresh != LoadState.Loading && wasLoading.value
 
-        if (wasLoading.value && !isLoading && query.isNotEmpty() && tokens.itemSnapshotList.isEmpty()) {
+        if (finishedLoading && query.isNotEmpty() && tokens.itemSnapshotList.isEmpty()) {
             Analytics.send(ManageTokens.TokenIsNotFound(query))
         }
 
-        wasLoading.value = isLoading
+        wasLoading.value = finishedLoading
     }
 }
 

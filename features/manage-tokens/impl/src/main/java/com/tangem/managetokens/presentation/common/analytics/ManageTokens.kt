@@ -12,7 +12,7 @@ sealed class ManageTokens(
 
     class TokenIsNotFound(userInput: String) : ManageTokens(
         event = "Token Is Not Found",
-        params = mapOf("Input" to userInput)
+        params = mapOf("Input" to userInput),
     )
 
     class TokenSwitcherChanged(
@@ -28,19 +28,19 @@ sealed class ManageTokens(
 
     class ButtonAdd(token: String) : ManageTokens(
         event = "Button - Add",
-        params = mapOf("Token" to token)
+        params = mapOf("Token" to token),
     )
 
     class ButtonEdit(token: String) : ManageTokens(
         event = "Button - Edit",
-        params = mapOf("Token" to token)
+        params = mapOf("Token" to token),
     )
 
     object ButtonChooseWallet : ManageTokens(event = "Button - Choose Wallet")
 
     class WalletSelected(source: Source) : ManageTokens(
         event = "Wallet Selected",
-        params = mapOf("Source" to source.name)
+        params = mapOf("Source" to source.name),
     ) {
 
         enum class Source(name: String) {
@@ -53,7 +53,7 @@ sealed class ManageTokens(
 
     class ButtonGenerateAddresses(cardCount: Int) : ManageTokens(
         event = "Button - Get Addresses",
-        params = mapOf("CardCount" to cardCount.toString())
+        params = mapOf("CardCount" to cardCount.toString()),
     )
 
     object ButtonCustomToken : ManageTokens("Button - Custom Token")
@@ -71,22 +71,22 @@ sealed class ManageTokens(
         ).apply {
             token?.let { put("Token", it) }
             contractAddress?.let { put("Contract Address", it) }
-        }
+        },
     )
 
     class CustomTokenNetworkSelected(blockchain: String) : ManageTokens(
         event = "Custom Token Network Selected",
-        params = mapOf("blockchain" to blockchain)
+        params = mapOf("blockchain" to blockchain),
     )
 
     class CustomTokenDerivationSelected(derivation: String) : ManageTokens(
         event = "Custom Token Derivation Selected",
-        params = mapOf("Derivation" to derivation)
+        params = mapOf("Derivation" to derivation),
     )
 
     class CustomTokenAddress(validated: Boolean) : ManageTokens(
         "Custom Token Address",
-        params = mapOf("Validation" to if (validated) "Ok" else "Error")
+        params = mapOf("Validation" to if (validated) "Ok" else "Error"),
     )
 
     object CustomTokenName : ManageTokens("Custom Token Name")

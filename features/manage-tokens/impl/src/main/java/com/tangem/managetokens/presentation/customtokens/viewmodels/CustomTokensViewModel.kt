@@ -41,7 +41,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.properties.Delegates
 
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "TooManyFunctions", "LargeClass")
 @HiltViewModel
 internal class CustomTokensViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatcherProvider,
@@ -260,7 +260,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     value = input,
                     isEnabled = true,
                     onValueChange = this::onSymbolChange,
-                    onFocusExit = this::onSymbolFocusExit
+                    onFocusExit = this::onSymbolFocusExit,
                 ),
             ),
         )
@@ -280,7 +280,7 @@ internal class CustomTokensViewModel @Inject constructor(
                     isEnabled = true,
                     onValueChange = this::onDecimalsChange,
                     error = error,
-                    onFocusExit = this::onDecimalsFocusExit
+                    onFocusExit = this::onDecimalsFocusExit,
                 ),
             ),
         )
@@ -302,14 +302,12 @@ internal class CustomTokensViewModel @Inject constructor(
         analyticsEventHandler.send(ManageTokens.CustomTokenDecimals)
     }
 
-
-
     override fun onDerivationSelected(derivation: Derivation) {
         derivation.standardType?.let {
             analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(it))
         }
         uiState = uiState.copy(
-            chooseDerivationState = uiState.chooseDerivationState?.copy(selectedDerivation = derivation)
+            chooseDerivationState = uiState.chooseDerivationState?.copy(selectedDerivation = derivation),
         )
         router.popBackStack()
     }
