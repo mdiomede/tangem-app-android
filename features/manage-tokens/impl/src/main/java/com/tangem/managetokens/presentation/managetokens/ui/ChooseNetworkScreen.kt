@@ -84,22 +84,14 @@ internal fun ChooseNetworkScreen(
             SpacerH(height = TangemTheme.dimens.spacing16)
         }
 
-        item {
-            if (networkState.nativeNetworks.isNotEmpty()) {
+        if (networkState.nativeNetworks.isNotEmpty()) {
+            item {
                 NativeNetworks(networkState = networkState, tokenState = state)
             }
         }
 
         if (networkState.nonNativeNetworks.isNotEmpty()) {
-            item {
-                NonNativeNetworksHeader(networkState.onNonNativeNetworkHintClick)
-            }
-            item {
-                SpacerH(height = TangemTheme.dimens.spacing8)
-            }
-            item {
-                this@LazyColumn.NonNativeNetworks(networkState = networkState, tokenState = state)
-            }
+            this@LazyColumn.nonNativeNetworks(networkState = networkState, tokenState = state)
         }
     }
 }
@@ -136,11 +128,18 @@ private fun NativeNetworks(networkState: ChooseNetworkState, tokenState: TokenIt
     }
 }
 
-@Composable
-private fun LazyListScope.NonNativeNetworks(networkState: ChooseNetworkState, tokenState: TokenItemState.Loaded) {
+private fun LazyListScope.nonNativeNetworks(networkState: ChooseNetworkState, tokenState: TokenItemState.Loaded) {
+    item {
+        NonNativeNetworksHeader(networkState.onNonNativeNetworkHintClick)
+    }
+
+    item {
+        SpacerH(height = TangemTheme.dimens.spacing8)
+    }
+
     items(
         count = networkState.nonNativeNetworks.count(),
-        key = { index -> networkState.nonNativeNetworks[index].id },
+        key = { index -> networkState.nonNativeNetworks[index].id + (1000) },
     ) { index ->
         NetworkItem(
             state = networkState.nonNativeNetworks[index],
@@ -153,6 +152,7 @@ private fun LazyListScope.NonNativeNetworks(networkState: ChooseNetworkState, to
                 ),
         )
     }
+
     item {
         SpacerH(height = TangemTheme.dimens.spacing16)
     }
