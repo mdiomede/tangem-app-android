@@ -99,6 +99,7 @@ internal object TokensDomainModule {
         networksRepository: NetworksRepository,
         marketCryptoCurrencyRepository: MarketCryptoCurrencyRepository,
         swapRepository: SwapRepository,
+        currencyChecksRepository: CurrencyChecksRepository,
         showSwapPromoTokenUseCase: ShouldShowSwapPromoTokenUseCase,
         dispatchers: CoroutineDispatcherProvider,
     ): GetCurrencyWarningsUseCase {
@@ -108,6 +109,7 @@ internal object TokensDomainModule {
             quotesRepository = quotesRepository,
             networksRepository = networksRepository,
             marketCryptoCurrencyRepository = marketCryptoCurrencyRepository,
+            currencyChecksRepository = currencyChecksRepository,
             swapRepository = swapRepository,
             showSwapPromoTokenUseCase = showSwapPromoTokenUseCase,
             dispatchers = dispatchers,
@@ -309,5 +311,23 @@ internal object TokensDomainModule {
         repository: NetworksCompatibilityRepository,
     ): GetNetworksSupportedByWallet {
         return GetNetworksSupportedByWallet(repository = repository)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideGetBalanceNotEnoughForFeeWarningUseCase(
+        currenciesRepository: CurrenciesRepository,
+        dispatchers: CoroutineDispatcherProvider,
+    ): GetBalanceNotEnoughForFeeWarningUseCase {
+        return GetBalanceNotEnoughForFeeWarningUseCase(currenciesRepository, dispatchers)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideIsAmountSubtractAvailableUseCase(
+        currenciesRepository: CurrenciesRepository,
+        dispatchers: CoroutineDispatcherProvider,
+    ): IsAmountSubtractAvailableUseCase {
+        return IsAmountSubtractAvailableUseCase(currenciesRepository, dispatchers)
     }
 }

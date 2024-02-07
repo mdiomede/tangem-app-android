@@ -10,6 +10,7 @@ import com.tangem.core.ui.components.bottomsheets.tokenreceive.mapToAddressModel
 import com.tangem.core.ui.extensions.WrappedList
 import com.tangem.core.ui.extensions.resourceReference
 import com.tangem.domain.appcurrency.GetSelectedAppCurrencyUseCase
+import com.tangem.domain.appcurrency.extenstions.unwrap
 import com.tangem.domain.common.util.cardTypesResolver
 import com.tangem.domain.demo.IsDemoCardUseCase
 import com.tangem.domain.redux.ReduxStateHolder
@@ -110,7 +111,7 @@ internal class WalletCurrencyActionsClickIntentsImplementor @Inject constructor(
         feeCurrencyStatus: CryptoCurrencyStatus?,
     ) {
         reduxStateHolder.dispatch(
-            action = TradeCryptoAction.New.SendCoin(
+            action = TradeCryptoAction.SendCoin(
                 userWallet = userWallet,
                 coinStatus = cryptoCurrencyStatus,
                 feeCurrencyStatus = feeCurrencyStatus,
@@ -135,7 +136,7 @@ internal class WalletCurrencyActionsClickIntentsImplementor @Inject constructor(
                 .collectLatest {
                     it.onRight { coinStatus ->
                         reduxStateHolder.dispatch(
-                            action = TradeCryptoAction.New.SendToken(
+                            action = TradeCryptoAction.SendToken(
                                 userWallet = userWallet,
                                 tokenCurrency = cryptoCurrency,
                                 tokenFiatRate = cryptoCurrencyStatus.fiatRate,
@@ -281,7 +282,7 @@ internal class WalletCurrencyActionsClickIntentsImplementor @Inject constructor(
         showErrorIfDemoModeOrElse {
             viewModelScope.launch(dispatchers.main) {
                 reduxStateHolder.dispatch(
-                    action = TradeCryptoAction.New.Sell(
+                    action = TradeCryptoAction.Sell(
                         cryptoCurrencyStatus = cryptoCurrencyStatus,
                         appCurrencyCode = getSelectedAppCurrencyUseCase.unwrap().code,
                     ),
@@ -300,7 +301,7 @@ internal class WalletCurrencyActionsClickIntentsImplementor @Inject constructor(
         showErrorIfDemoModeOrElse {
             viewModelScope.launch(dispatchers.main) {
                 reduxStateHolder.dispatch(
-                    TradeCryptoAction.New.Buy(
+                    TradeCryptoAction.Buy(
                         userWallet = userWallet,
                         cryptoCurrencyStatus = cryptoCurrencyStatus,
                         appCurrencyCode = getSelectedAppCurrencyUseCase.unwrap().code,
@@ -315,7 +316,7 @@ internal class WalletCurrencyActionsClickIntentsImplementor @Inject constructor(
             event = TokenScreenAnalyticsEvent.ButtonExchange(cryptoCurrencyStatus.currency.symbol),
         )
 
-        reduxStateHolder.dispatch(TradeCryptoAction.New.Swap(cryptoCurrencyStatus.currency))
+        reduxStateHolder.dispatch(TradeCryptoAction.Swap(cryptoCurrencyStatus.currency))
     }
 
     override fun onExploreClick() {

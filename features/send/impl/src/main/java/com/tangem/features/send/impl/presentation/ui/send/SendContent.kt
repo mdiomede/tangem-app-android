@@ -1,5 +1,6 @@
 package com.tangem.features.send.impl.presentation.ui.send
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import com.tangem.common.Strings
 import com.tangem.core.ui.components.inputrow.InputRowDefault
 import com.tangem.core.ui.components.inputrow.InputRowImage
 import com.tangem.core.ui.components.inputrow.InputRowRecipientDefault
@@ -24,9 +26,11 @@ import com.tangem.core.ui.components.notifications.Notification
 import com.tangem.core.ui.components.transactions.TransactionDoneTitle
 import com.tangem.core.ui.extensions.TextReference
 import com.tangem.core.ui.extensions.resolveReference
+import com.tangem.core.ui.extensions.resourceReference
+import com.tangem.core.ui.extensions.wrappedList
 import com.tangem.core.ui.res.TangemTheme
-import com.tangem.core.ui.utils.BigDecimalFormatter
 import com.tangem.core.ui.utils.BigDecimalFormatter.formatCryptoAmount
+import com.tangem.core.ui.utils.BigDecimalFormatter.formatFiatAmount
 import com.tangem.domain.tokens.model.AmountType
 import com.tangem.features.send.impl.R
 import com.tangem.features.send.impl.presentation.state.SendNotification
@@ -63,17 +67,20 @@ internal fun SendContent(uiState: SendUiState) {
                     FromWallet(
                         walletName = amountState.walletName,
                         walletBalance = amountState.walletBalance.resolveReference(),
+                        isBalanceHidden = uiState.isBalanceHidden,
                     )
                 }
-                AmountBlock(
-                    amountState = amountState,
-                    isSuccess = isSuccess,
-                    onClick = uiState.clickIntents::showAmount,
-                )
                 RecipientBlock(
                     recipientState = recipientState,
                     isSuccess = isSuccess,
+                    isEditingDisabled = uiState.isEditingDisabled,
                     onClick = uiState.clickIntents::showRecipient,
+                )
+                AmountBlock(
+                    amountState = amountState,
+                    isSuccess = isSuccess,
+                    isEditingDisabled = uiState.isEditingDisabled,
+                    onClick = uiState.clickIntents::showAmount,
                 )
                 FeeBlock(
                     feeState = feeState,
@@ -87,7 +94,7 @@ internal fun SendContent(uiState: SendUiState) {
 }
 
 @Composable
-private fun FromWallet(walletName: String, walletBalance: String) {
+private fun FromWallet(walletName: String, walletBalance: String, isBalanceHidden: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -106,20 +113,31 @@ private fun FromWallet(walletName: String, walletBalance: String) {
             style = TangemTheme.typography.caption2,
             color = TangemTheme.colors.text.secondary,
         )
-        Text(
-            text = walletBalance,
-            style = TangemTheme.typography.body2,
-            color = TangemTheme.colors.text.primary1,
-            modifier = Modifier
-                .padding(
-                    top = TangemTheme.dimens.spacing8,
-                ),
-        )
+        val balance = if (isBalanceHidden) Strings.STARS else walletBalance
+        AnimatedContent(
+            targetState = balance,
+            label = "Hide Balance Animation",
+        ) {
+            Text(
+                text = it,
+                style = TangemTheme.typography.body2,
+                color = TangemTheme.colors.text.primary1,
+                modifier = Modifier
+                    .padding(
+                        top = TangemTheme.dimens.spacing8,
+                    ),
+            )
+        }
     }
 }
 
 @Composable
-private fun AmountBlock(amountState: SendStates.AmountState, isSuccess: Boolean, onClick: () -> Unit) {
+private fun AmountBlock(
+    amountState: SendStates.AmountState,
+    isSuccess: Boolean,
+    isEditingDisabled: Boolean,
+    onClick: () -> Unit,
+) {
     val amount = amountState.amountTextField
 
     val cryptoAmount = formatCryptoAmount(
@@ -127,11 +145,16 @@ private fun AmountBlock(amountState: SendStates.AmountState, isSuccess: Boolean,
         cryptoCurrency = amount.cryptoAmount.currencySymbol,
         decimals = amount.cryptoAmount.decimals,
     )
-    val fiatAmount = BigDecimalFormatter.formatFiatAmount(
+    val fiatAmount = formatFiatAmount(
         fiatAmount = amount.fiatAmount.value,
         fiatCurrencyCode = (amount.fiatAmount.type as AmountType.FiatType).code,
         fiatCurrencySymbol = amount.fiatAmount.currencySymbol,
     )
+    val backgroundColor = if (isEditingDisabled) {
+        TangemTheme.colors.button.disabled
+    } else {
+        TangemTheme.colors.background.action
+    }
     InputRowImage(
         title = TextReference.Res(R.string.send_amount_label),
         subtitle = TextReference.Str(cryptoAmount),
@@ -140,21 +163,31 @@ private fun AmountBlock(amountState: SendStates.AmountState, isSuccess: Boolean,
         showNetworkIcon = true,
         modifier = Modifier
             .clip(TangemTheme.shapes.roundedCornersXMedium)
-            .background(TangemTheme.colors.background.action)
-            .clickable(enabled = !isSuccess) { onClick() },
+            .background(backgroundColor)
+            .clickable(enabled = !isSuccess && !isEditingDisabled) { onClick() },
     )
 }
 
 @Composable
-private fun RecipientBlock(recipientState: SendStates.RecipientState, isSuccess: Boolean, onClick: () -> Unit) {
+private fun RecipientBlock(
+    recipientState: SendStates.RecipientState,
+    isSuccess: Boolean,
+    isEditingDisabled: Boolean,
+    onClick: () -> Unit,
+) {
     val address = recipientState.addressTextField
     val memo = recipientState.memoTextField
+    val backgroundColor = if (isEditingDisabled) {
+        TangemTheme.colors.button.disabled
+    } else {
+        TangemTheme.colors.background.action
+    }
 
     Column(
         modifier = Modifier
             .clip(TangemTheme.shapes.roundedCornersXMedium)
-            .background(TangemTheme.colors.background.action)
-            .clickable(enabled = !isSuccess) { onClick() },
+            .background(backgroundColor)
+            .clickable(enabled = !isSuccess && !isEditingDisabled) { onClick() },
     ) {
         val showMemo = memo != null && memo.value.isNotBlank()
         InputRowRecipientDefault(
@@ -174,14 +207,22 @@ private fun RecipientBlock(recipientState: SendStates.RecipientState, isSuccess:
 @Composable
 private fun FeeBlock(feeState: SendStates.FeeState, isSuccess: Boolean, onClick: () -> Unit) {
     val fee = feeState.fee ?: return
-    val feeValue = formatCryptoAmount(
+    val feeCryptoValue = formatCryptoAmount(
         cryptoAmount = fee.amount.value,
         cryptoCurrency = fee.amount.currencySymbol,
         decimals = fee.amount.decimals,
     )
+    val feeFiatValue = formatFiatAmount(
+        fiatAmount = feeState.rate?.let { fee.amount.value?.multiply(it) },
+        fiatCurrencyCode = feeState.appCurrency.code,
+        fiatCurrencySymbol = feeState.appCurrency.symbol,
+    )
     InputRowDefault(
-        title = TextReference.Res(R.string.common_network_fee_title),
-        text = TextReference.Str(feeValue),
+        title = resourceReference(R.string.common_network_fee_title),
+        text = resourceReference(
+            id = R.string.send_wallet_balance_format,
+            wrappedList(feeCryptoValue, feeFiatValue),
+        ),
         modifier = Modifier
             .clip(TangemTheme.shapes.roundedCornersXMedium)
             .background(TangemTheme.colors.background.action)

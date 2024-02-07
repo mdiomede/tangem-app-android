@@ -20,6 +20,9 @@ configurations.all {
 
             substitute(module("com.facebook.react:hermes-engine"))
                 .using(module("com.facebook.react:hermes-android:0.72.4"))
+
+            substitute(module("org.bouncycastle:bcprov-jdk15on"))
+                .using(module("org.bouncycastle:bcprov-jdk18on:1.73"))
         }
 
         force(
@@ -52,6 +55,7 @@ dependencies {
     implementation(projects.domain.balanceHiding.models)
     implementation(projects.domain.transaction)
     implementation(projects.domain.analytics)
+    implementation(projects.domain.visa)
 
     implementation(projects.common)
     implementation(projects.core.analytics)
@@ -78,6 +82,7 @@ dependencies {
     implementation(projects.data.wallets)
     implementation(projects.data.analytics)
     implementation(projects.data.transaction)
+    implementation(projects.data.visa)
 
     /** Features */
     implementation(projects.features.onboarding)

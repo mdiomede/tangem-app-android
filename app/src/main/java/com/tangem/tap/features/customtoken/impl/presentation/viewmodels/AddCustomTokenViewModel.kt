@@ -142,7 +142,11 @@ internal class AddCustomTokenViewModel @Inject constructor(
     }
 
     private fun createFloatingButton(): AddCustomTokenFloatingButton {
-        return AddCustomTokenFloatingButton(isEnabled = false, onClick = actionsHandler::onAddCustomTokenClick)
+        return AddCustomTokenFloatingButton(
+            isEnabled = true,
+            showProgress = false,
+            onClick = actionsHandler::onAddCustomTokenClick,
+        )
     }
 
     private inner class FormStateBuilder {
@@ -827,11 +831,13 @@ internal class AddCustomTokenViewModel @Inject constructor(
 
             val currency = when (getCustomTokenType()) {
                 CustomTokenType.TOKEN -> {
+                    val contractAddress = foundToken?.network?.contractAddress
+                        ?: uiState.form.contractAddressInputField.value
                     CustomCurrency.CustomToken(
                         token = Token(
                             name = uiState.form.tokenNameInputField.value,
                             symbol = uiState.form.tokenSymbolInputField.value,
-                            contractAddress = uiState.form.contractAddressInputField.value,
+                            contractAddress = contractAddress,
                             decimals = requireNotNull(uiState.form.decimalsInputField.value.toIntOrNull()),
                             id = foundToken?.id,
                         ),
@@ -850,9 +856,14 @@ internal class AddCustomTokenViewModel @Inject constructor(
             analyticsSender.sendWhenAddTokenButtonClicked(currency)
 
             viewModelScope.launch(dispatchers.io) {
+                val oldButtonState = uiState.floatingButton
+                uiState = uiState.copySealed(
+                    floatingButton = uiState.floatingButton.copy(isEnabled = false, showProgress = true),
+                )
                 runCatching { featureInteractor.saveToken(currency) }
                     .onSuccess { featureRouter.openWalletScreen() }
                     .onFailure {
+                        uiState = uiState.copySealed(floatingButton = oldButtonState)
                         Timber.e(it)
                     }
             }
