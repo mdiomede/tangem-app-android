@@ -85,9 +85,7 @@ internal fun ChooseNetworkScreen(
         }
 
         if (networkState.nativeNetworks.isNotEmpty()) {
-            item {
-                NativeNetworks(networkState = networkState, tokenState = state)
-            }
+            this@LazyColumn.nativeNetworks(networkState = networkState, tokenState = state)
         }
 
         if (networkState.nonNativeNetworks.isNotEmpty()) {
@@ -96,34 +94,48 @@ internal fun ChooseNetworkScreen(
     }
 }
 
-@Composable
-private fun NativeNetworks(networkState: ChooseNetworkState, tokenState: TokenItemState.Loaded) {
-    Column {
+private fun LazyListScope.nativeNetworks(networkState: ChooseNetworkState, tokenState: TokenItemState.Loaded) {
+    item {
         Text(
             text = stringResource(id = R.string.manage_tokens_network_selector_native_title),
             color = TangemTheme.colors.text.tertiary,
             style = TangemTheme.typography.caption1,
         )
-        SpacerH(height = TangemTheme.dimens.spacing2)
+    }
+
+        item {
+            SpacerH(height = TangemTheme.dimens.spacing2)
+        }
+
+    item {
         Text(
             text = stringResource(id = R.string.manage_tokens_network_selector_native_subtitle),
             color = TangemTheme.colors.text.tertiary,
             style = TangemTheme.typography.caption2,
         )
-        SpacerH(height = TangemTheme.dimens.spacing8)
+    }
 
-        networkState.nativeNetworks.forEachIndexed { index, network ->
-            NetworkItem(
-                state = network,
-                tokenState = tokenState,
-                modifier = Modifier
-                    .roundedShapeItemDecoration(
-                        currentIndex = index,
-                        lastIndex = networkState.nativeNetworks.lastIndex,
-                        addDefaultPadding = false,
-                    ),
-            )
-        }
+    item {
+        SpacerH(height = TangemTheme.dimens.spacing8)
+    }
+
+    items(
+        count = networkState.nativeNetworks.count(),
+        key = { index -> networkState.nativeNetworks[index].id },
+    ) { index ->
+        NetworkItem(
+            state = networkState.nativeNetworks[index],
+            tokenState = tokenState,
+            modifier = Modifier
+                .roundedShapeItemDecoration(
+                    currentIndex = index,
+                    lastIndex = networkState.nativeNetworks.lastIndex,
+                    addDefaultPadding = false,
+                ),
+        )
+    }
+
+    item {
         SpacerH(height = TangemTheme.dimens.spacing16)
     }
 }
