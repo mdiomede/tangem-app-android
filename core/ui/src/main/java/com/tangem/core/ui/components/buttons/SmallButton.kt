@@ -66,10 +66,14 @@ private fun SmallButton(config: SmallButtonConfig, isPrimary: Boolean, modifier:
         contentAlignment = Alignment.Center,
     ) {
         Text(
+            modifier = Modifier.padding(
+                start = TangemTheme.dimens.spacing10,
+                end = TangemTheme.dimens.spacing10,
+            ),
             text = config.text.resolveReference(),
             color = if (isPrimary) TangemTheme.colors.text.primary2 else TangemTheme.colors.text.primary1,
             maxLines = 1,
-            style = TangemTheme.typography.button,
+            style = TangemTheme.typography.button
         )
     }
 }
@@ -97,7 +101,7 @@ private fun ButtonsSample() {
         verticalArrangement = Arrangement.spacedBy(TangemTheme.dimens.spacing8),
     ) {
         val config = SmallButtonConfig(
-            text = TextReference.Str(value = "Add"),
+            text = TextReference.Str(value = "Adddddddd"),
             onClick = {},
         )
         PrimarySmallButton(config = config)
