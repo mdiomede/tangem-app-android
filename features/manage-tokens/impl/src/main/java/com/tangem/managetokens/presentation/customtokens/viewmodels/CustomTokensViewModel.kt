@@ -1,6 +1,5 @@
 package com.tangem.managetokens.presentation.customtokens.viewmodels
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -318,7 +317,7 @@ internal class CustomTokensViewModel @Inject constructor(
 
     override fun onDerivationSelected(derivation: Derivation) {
         derivation.standardType?.let {
-            analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(it))
+            analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(derivation.networkName))
         }
         uiState = uiState.copy(
             chooseDerivationState = uiState.chooseDerivationState?.copy(selectedDerivation = derivation),
@@ -335,7 +334,7 @@ internal class CustomTokensViewModel @Inject constructor(
     }
 
     override fun onCustomDerivationChange(input: String) {
-        analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(input)) // TODO?
+        analyticsEventHandler.send(ManageTokens.CustomTokenDerivationSelected(ManageTokens.Derivation.CUSTOM.value))
         uiState = uiState.copy(
             chooseDerivationState = uiState.chooseDerivationState?.copy(
                 enterCustomDerivationState = uiState.chooseDerivationState?.enterCustomDerivationState?.copy(
@@ -423,7 +422,6 @@ internal class CustomTokensViewModel @Inject constructor(
                             it.contractAddress == cryptoCurrency.contractAddress &&
                             it.network.id == cryptoCurrency.network.id &&
                             it.network.derivationPath == cryptoCurrency.network.derivationPath
-
                     } ?: false
                 }
             }
@@ -434,9 +432,9 @@ internal class CustomTokensViewModel @Inject constructor(
         val selectedDerivation = uiState.chooseDerivationState?.selectedDerivation
 
         val derivation = when {
-            selectedDerivation == null -> "Default"
+            selectedDerivation == null -> ManageTokens.Derivation.DEFAULT.value
             selectedDerivation.networkName.isNotEmpty() -> selectedDerivation.networkName
-            else -> "Custom"
+            else -> ManageTokens.Derivation.CUSTOM.value
         }
         when (cryptoCurrency) {
             is CryptoCurrency.Token -> {
