@@ -2,10 +2,7 @@ package com.tangem.managetokens.presentation.managetokens.ui
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
@@ -54,6 +51,7 @@ private fun Content(state: ManageTokensState) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
             .background(color = TangemTheme.colors.background.primary)
             .padding(top = TangemTheme.dimens.spacing32),
     ) {
