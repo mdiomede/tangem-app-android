@@ -151,7 +151,7 @@ private fun LazyListScope.nonNativeNetworks(networkState: ChooseNetworkState, to
 
     items(
         count = networkState.nonNativeNetworks.count(),
-        key = { index -> networkState.nonNativeNetworks[index].id + (1000) },
+        key = { index -> networkState.nonNativeNetworks[index].id },
     ) { index ->
         NetworkItem(
             state = networkState.nonNativeNetworks[index],
