@@ -101,21 +101,12 @@ private fun LazyListScope.nativeNetworks(networkState: ChooseNetworkState, token
             color = TangemTheme.colors.text.tertiary,
             style = TangemTheme.typography.caption1,
         )
-    }
-
-        item {
-            SpacerH(height = TangemTheme.dimens.spacing2)
-        }
-
-    item {
+        SpacerH(height = TangemTheme.dimens.spacing2)
         Text(
             text = stringResource(id = R.string.manage_tokens_network_selector_native_subtitle),
             color = TangemTheme.colors.text.tertiary,
             style = TangemTheme.typography.caption2,
         )
-    }
-
-    item {
         SpacerH(height = TangemTheme.dimens.spacing8)
     }
 
@@ -143,9 +134,6 @@ private fun LazyListScope.nativeNetworks(networkState: ChooseNetworkState, token
 private fun LazyListScope.nonNativeNetworks(networkState: ChooseNetworkState, tokenState: TokenItemState.Loaded) {
     item {
         NonNativeNetworksHeader(networkState.onNonNativeNetworkHintClick)
-    }
-
-    item {
         SpacerH(height = TangemTheme.dimens.spacing8)
     }
 
