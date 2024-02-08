@@ -52,6 +52,7 @@ private fun Content(state: ManageTokensState) {
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
+            .imePadding()
             .background(color = TangemTheme.colors.background.primary)
             .padding(top = TangemTheme.dimens.spacing32),
     ) {
