@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tangem.core.ui.R
 import com.tangem.core.ui.components.*
+import com.tangem.core.ui.extensions.rememberHapticFeedback
 import com.tangem.core.ui.extensions.shareText
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.features.send.impl.presentation.state.SendUiState
@@ -49,9 +50,10 @@ internal fun SendNavigationButtons(uiState: SendUiState) {
 @Composable
 private fun SendSecondaryNavigationButton(uiState: SendUiState) {
     val currentState = uiState.currentState.collectAsState()
+    val isEditingDisabled = uiState.isEditingDisabled
+    val isCorrectScreen = currentState.value == SendUiStateType.Amount || currentState.value == SendUiStateType.Fee
     AnimatedVisibility(
-        visible = currentState.value == SendUiStateType.Amount ||
-            currentState.value == SendUiStateType.Fee,
+        visible = !isEditingDisabled && isCorrectScreen,
     ) {
         Icon(
             modifier = Modifier
@@ -94,11 +96,12 @@ private fun SendPrimaryNavigationButton(uiState: SendUiState, modifier: Modifier
     ) { textId ->
         when {
             currentState.value == SendUiStateType.Send && !isSuccess -> {
+                val hapticFeedback = rememberHapticFeedback(state = currentState, onAction = buttonClick)
                 PrimaryButtonIconEnd(
                     text = stringResource(textId),
                     iconResId = R.drawable.ic_tangem_24,
                     enabled = isButtonEnabled,
-                    onClick = buttonClick,
+                    onClick = hapticFeedback,
                     showProgress = isSending,
                 )
             }
@@ -170,6 +173,7 @@ private fun getButtonData(
     isSuccess: Boolean,
 ): Pair<Int, () -> Unit> {
     return when (currentState.value) {
+        SendUiStateType.None,
         SendUiStateType.Amount,
         SendUiStateType.Recipient,
         SendUiStateType.Fee,

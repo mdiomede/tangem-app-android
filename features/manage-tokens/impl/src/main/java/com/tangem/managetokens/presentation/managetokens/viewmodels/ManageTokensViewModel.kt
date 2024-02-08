@@ -262,7 +262,6 @@ internal class ManageTokensViewModel @Inject constructor(
     }
 
     override fun onNetworkToggleClick(token: TokenItemState.Loaded, network: NetworkItemState.Toggleable) {
-        Log.e("here", "ss")
         val selectedWallet = selectedWallet ?: return
         if (!selectedWallet.isMultiCurrency || selectedWallet.isLocked) return
 

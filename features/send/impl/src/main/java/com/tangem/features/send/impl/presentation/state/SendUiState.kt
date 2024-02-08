@@ -7,6 +7,7 @@ import com.tangem.blockchain.common.transaction.Fee
 import com.tangem.core.ui.components.currency.tokenicon.TokenIconState
 import com.tangem.core.ui.event.StateEvent
 import com.tangem.core.ui.extensions.TextReference
+import com.tangem.domain.appcurrency.model.AppCurrency
 import com.tangem.features.send.impl.presentation.domain.SendRecipientListContent
 import com.tangem.features.send.impl.presentation.state.amount.SendAmountSegmentedButtonsConfig
 import com.tangem.features.send.impl.presentation.state.fee.FeeSelectorState
@@ -17,6 +18,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 
 /**
@@ -25,12 +27,14 @@ import java.math.BigDecimal
 @Immutable
 internal data class SendUiState(
     val clickIntents: SendClickIntents,
+    val isEditingDisabled: Boolean,
     val amountState: SendStates.AmountState? = null,
     val recipientState: SendStates.RecipientState? = null,
     val feeState: SendStates.FeeState? = null,
     val sendState: SendStates.SendState = SendStates.SendState(),
     val recipientList: MutableStateFlow<PagingData<SendRecipientListContent>> = MutableStateFlow(PagingData.empty()),
-    val currentState: MutableStateFlow<SendUiStateType>,
+    val currentState: StateFlow<SendUiStateType>,
+    val isBalanceHidden: Boolean,
     val event: StateEvent<SendEvent>,
 )
 
@@ -42,6 +46,7 @@ internal sealed class SendStates {
     abstract val isPrimaryButtonEnabled: Boolean
 
     /** Amount state */
+    @Stable
     data class AmountState(
         override val type: SendUiStateType = SendUiStateType.Amount,
         override val isPrimaryButtonEnabled: Boolean,
@@ -53,6 +58,7 @@ internal sealed class SendStates {
     ) : SendStates()
 
     /** Recipient state */
+    @Stable
     data class RecipientState(
         override val type: SendUiStateType = SendUiStateType.Recipient,
         override val isPrimaryButtonEnabled: Boolean,
@@ -64,19 +70,25 @@ internal sealed class SendStates {
     ) : SendStates()
 
     /** Fee and speed state */
+    @Stable
     data class FeeState(
         override val type: SendUiStateType = SendUiStateType.Fee,
         override val isPrimaryButtonEnabled: Boolean = false,
         val feeSelectorState: FeeSelectorState,
+        val isSubtractAvailable: Boolean,
         val isSubtract: Boolean,
         val isUserSubtracted: Boolean,
         val fee: Fee?,
         val receivedAmountValue: BigDecimal,
         val receivedAmount: String,
+        val rate: BigDecimal?,
+        val appCurrency: AppCurrency,
+        val isFeeApproximate: Boolean,
         val notifications: ImmutableList<SendFeeNotification>,
     ) : SendStates()
 
     /** Send state */
+    @Stable
     data class SendState(
         override val type: SendUiStateType = SendUiStateType.Send,
         override val isPrimaryButtonEnabled: Boolean = true,
@@ -90,6 +102,7 @@ internal sealed class SendStates {
 }
 
 enum class SendUiStateType {
+    None,
     Amount,
     Recipient,
     Fee,

@@ -7,10 +7,7 @@ import com.tangem.domain.tokens.model.FeePaidCurrency
 import com.tangem.domain.tokens.model.Network
 import com.tangem.domain.tokens.model.warnings.CryptoCurrencyWarning
 import com.tangem.domain.tokens.operations.CurrenciesStatusesOperations
-import com.tangem.domain.tokens.repository.CurrenciesRepository
-import com.tangem.domain.tokens.repository.MarketCryptoCurrencyRepository
-import com.tangem.domain.tokens.repository.NetworksRepository
-import com.tangem.domain.tokens.repository.QuotesRepository
+import com.tangem.domain.tokens.repository.*
 import com.tangem.domain.walletmanager.WalletManagersFacade
 import com.tangem.domain.wallets.models.UserWalletId
 import com.tangem.feature.swap.domain.api.SwapRepository
@@ -31,6 +28,7 @@ class GetCurrencyWarningsUseCase(
     private val marketCryptoCurrencyRepository: MarketCryptoCurrencyRepository,
     private val showSwapPromoTokenUseCase: ShouldShowSwapPromoTokenUseCase,
     private val dispatchers: CoroutineDispatcherProvider,
+    private val currencyChecksRepository: CurrencyChecksRepository,
 ) {
 
     suspend operator fun invoke(
@@ -56,7 +54,7 @@ class GetCurrencyWarningsUseCase(
                 isSingleWalletWithTokens = isSingleWalletWithTokens,
             ),
             flowOf(walletManagersFacade.getRentInfo(userWalletId, currency.network)),
-            flowOf(walletManagersFacade.getExistentialDeposit(userWalletId, currency.network)),
+            flowOf(currencyChecksRepository.getExistentialDeposit(userWalletId, currency.network)),
             getSwapPromoNotificationWarning(
                 operations = operations,
                 userWalletId = userWalletId,
@@ -200,7 +198,8 @@ class GetCurrencyWarningsUseCase(
             }
             feePaidCurrency is FeePaidCurrency.Token -> {
                 val feePaidTokenBalance = feePaidCurrency.balance
-                if (!tokenStatus.value.amount.isZero() && feePaidTokenBalance.isZero()) {
+                val amount = tokenStatus.value.amount ?: return null
+                if (!amount.isZero() && feePaidTokenBalance.isZero()) {
                     constructTokenBalanceNotEnoughWarning(
                         userWalletId = userWalletId,
                         tokenStatus = tokenStatus,
@@ -222,7 +221,9 @@ class GetCurrencyWarningsUseCase(
         val token = currenciesRepository
             .getMultiCurrencyWalletCurrenciesSync(userWalletId)
             .find {
-                it is CryptoCurrency.Token && it.contractAddress.equals(feePaidToken.contractAddress, ignoreCase = true)
+                it is CryptoCurrency.Token &&
+                    it.contractAddress.equals(feePaidToken.contractAddress, ignoreCase = true) &&
+                    it.network.derivationPath == tokenStatus.currency.network.derivationPath
             }
         return if (token != null) {
             CryptoCurrencyWarning.CustomTokenNotEnoughForFee(

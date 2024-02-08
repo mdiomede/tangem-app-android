@@ -71,11 +71,13 @@ include(":core:res")
 include(":core:ui")
 include(":core:utils")
 include(":core:deep-links")
+include(":core:deep-links:global")
 // endregion Core modules
 
 // region Libs modules
 include(":libs:crypto")
 include(":libs:auth")
+include(":libs:visa")
 // endregion Libs modules
 
 // region Feature modules
@@ -134,6 +136,7 @@ include(":domain:balance-hiding")
 include(":domain:balance-hiding:models")
 include(":domain:transaction")
 include(":domain:analytics")
+include(":domain:visa")
 // endregion Domain modules
 
 // region Data modules
@@ -149,4 +152,5 @@ include(":data:txhistory")
 include(":data:wallets")
 include(":data:analytics")
 include(":data:transaction")
+include(":data:visa")
 // endregion Data modules
