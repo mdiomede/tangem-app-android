@@ -84,7 +84,7 @@ private fun SmallButton(config: SmallButtonConfig, isPrimary: Boolean, modifier:
             text = config.text.resolveReference(),
             color = textColor,
             maxLines = 1,
-            style = TangemTheme.typography.button
+            style = TangemTheme.typography.button,
         )
     }
 }

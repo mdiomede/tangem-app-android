@@ -91,7 +91,6 @@ private fun Content(state: AddCustomTokenState, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-
     }
 
     if (state.chooseWalletState is ChooseWalletState.Choose && state.chooseWalletState.show) {
