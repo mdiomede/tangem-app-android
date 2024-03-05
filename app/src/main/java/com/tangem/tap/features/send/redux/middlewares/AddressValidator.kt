@@ -51,11 +51,11 @@ internal class AddressValidator {
 
     private fun validateAddress(wallet: Wallet, address: String): AddressVerifyAction.Error? {
         return if (wallet.blockchain.validateAddress(address)) {
-            if (wallet.addresses.all { it.value != address }) {
+            // if (wallet.addresses.all { it.value != address }) {
                 null
-            } else {
-                AddressVerifyAction.Error.ADDRESS_SAME_AS_WALLET
-            }
+            // } else {
+            //     AddressVerifyAction.Error.ADDRESS_SAME_AS_WALLET
+            // }
         } else {
             AddressVerifyAction.Error.ADDRESS_INVALID_OR_UNSUPPORTED_BY_BLOCKCHAIN
         }
