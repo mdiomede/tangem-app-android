@@ -275,7 +275,7 @@ fun Blockchain.toCoinId(): String {
         Blockchain.Moonbeam, Blockchain.MoonbeamTestnet -> "moonbeam"
         Blockchain.Manta, Blockchain.MantaTestnet -> "manta-network-ethereum"
         Blockchain.PolygonZkEVM, Blockchain.PolygonZkEVMTestnet -> "polygon-zkevm-ethereum"
-        Blockchain.Nexa, Blockchain.NexaTestnet -> "nexa" // FIXME
+        Blockchain.Nexa, Blockchain.NexaTestnet -> "nexacoin" // FIXME
         Blockchain.Radiant -> "radiant"
     }
 }
@@ -304,7 +304,7 @@ private const val NODL_AMOUNT_TO_CREATE_ACCOUNT = 1.5
 private val excludedBlockchains = listOf(
     Blockchain.Unknown,
     Blockchain.Playa3ull,
-    Blockchain.Nexa,
-    Blockchain.NexaTestnet,
+    // Blockchain.Nexa,
+    // Blockchain.NexaTestnet,
     Blockchain.Radiant,
 )

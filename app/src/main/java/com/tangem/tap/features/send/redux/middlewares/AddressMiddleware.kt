@@ -114,7 +114,7 @@ internal class AddressMiddleware {
         dispatch: (Action) -> Unit,
     ) {
         val addressSchemeSplit = when (wallet.blockchain) {
-            Blockchain.BitcoinCash, Blockchain.Kaspa -> listOf(address)
+            Blockchain.BitcoinCash, Blockchain.Kaspa, Blockchain.Nexa -> listOf(address)
             else -> address.split(":")
         }
 

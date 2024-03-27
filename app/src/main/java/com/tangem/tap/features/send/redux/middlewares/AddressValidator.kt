@@ -1,5 +1,6 @@
 package com.tangem.tap.features.send.redux.middlewares
 
+import android.util.Log
 import com.tangem.blockchain.blockchains.near.NearWalletManager
 import com.tangem.blockchain.blockchains.near.network.NearAccount
 import com.tangem.blockchain.common.Blockchain
@@ -50,6 +51,9 @@ internal class AddressValidator {
     }
 
     private fun validateAddress(wallet: Wallet, address: String): AddressVerifyAction.Error? {
+        Log.d("ASDASD", "address: $address")
+        Log.d("ASDASD", wallet.blockchain.fullName)
+        Log.d("ASDASD", wallet.blockchain.validateAddress(address).toString())
         return if (wallet.blockchain.validateAddress(address)) {
             if (wallet.addresses.all { it.value != address }) {
                 null

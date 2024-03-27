@@ -30,6 +30,9 @@ object Wallet2CardConfig : CardConfig {
             blockchain.getSupportedCurves().contains(EllipticCurve.Bls12381G2Aug) -> {
                 EllipticCurve.Bls12381G2Aug
             }
+            blockchain.getSupportedCurves().contains(EllipticCurve.Bip0340) -> {
+                EllipticCurve.Bip0340
+            }
             // only for support cardano on Wallet2
             blockchain.getSupportedCurves().contains(EllipticCurve.Ed25519) -> {
                 EllipticCurve.Ed25519
