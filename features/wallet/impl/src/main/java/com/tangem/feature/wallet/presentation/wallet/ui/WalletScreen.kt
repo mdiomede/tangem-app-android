@@ -40,6 +40,7 @@ import com.tangem.core.ui.components.bottomsheets.tokenreceive.TokenReceiveBotto
 import com.tangem.core.ui.components.keyboardAsState
 import com.tangem.core.ui.components.transactions.state.TxHistoryState
 import com.tangem.core.ui.res.TangemTheme
+import com.tangem.core.ui.test.TestTags
 import com.tangem.feature.wallet.impl.R
 import com.tangem.feature.wallet.presentation.wallet.state.model.*
 import com.tangem.feature.wallet.presentation.wallet.state.model.holder.TxHistoryStateHolder
@@ -134,7 +135,7 @@ private fun WalletContent(
             .padding(horizontal = horizontalPadding)
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().testTag("WALLET_SCREEN"),
+            modifier = Modifier.fillMaxSize().testTag(TestTags.WALLET_SCREEN),
             contentPadding = PaddingValues(
                 top = TangemTheme.dimens.spacing8,
                 bottom = TangemTheme.dimens.spacing92,

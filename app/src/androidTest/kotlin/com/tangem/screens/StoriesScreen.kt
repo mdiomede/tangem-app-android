@@ -1,7 +1,7 @@
 package com.tangem.screens
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
-import com.tangem.tap.common.compose.resources.TestTags
+import com.tangem.core.ui.test.TestTags
 import com.tangem.wallet.R
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
