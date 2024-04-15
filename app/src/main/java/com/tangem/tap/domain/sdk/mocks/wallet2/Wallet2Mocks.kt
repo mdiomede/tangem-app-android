@@ -7,5 +7,4 @@ object Wallet2Mocks : Mocks() {
 
     override val scanResponse: ScanResponse
         get() = TODO("Not yet implemented")
-
 }

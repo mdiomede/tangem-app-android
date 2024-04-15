@@ -2,8 +2,7 @@ package com.tangem.tap.domain.sdk.mocks
 
 import com.tangem.domain.models.scan.ScanResponse
 
-abstract class Mocks {
+interface Mocks {
 
-    abstract val scanResponse: ScanResponse
-
+    val scanResponse: ScanResponse
 }

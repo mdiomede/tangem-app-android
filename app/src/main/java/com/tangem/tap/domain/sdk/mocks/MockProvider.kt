@@ -11,7 +11,7 @@ object MockProvider {
     fun getScanResponse() = getMocks(productType).scanResponse
 
     private fun getMocks(productType: ProductType): Mocks {
-        return when(productType) {
+        return when (productType) {
             ProductType.Wallet -> WalletMocks
             ProductType.Wallet2 -> Wallet2Mocks
             else -> TODO()
