@@ -8,7 +8,7 @@ import io.github.kakaocup.kakao.text.KButton
 object DisclaimerScreen : KScreen<DisclaimerScreen>(){
 
     override val layoutId = R.layout.fragment_disclaimer
-    override val viewClass: Class<*> = DisclaimerFragment::class.java
+    override val viewClass = DisclaimerFragment::class.java
 
     val acceptButton: KButton = KButton {
         withId(R.id.btn_accept)

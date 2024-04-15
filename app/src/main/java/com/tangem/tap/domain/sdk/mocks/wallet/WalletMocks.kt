@@ -11,7 +11,7 @@ import com.tangem.operations.attestation.Attestation
 import com.tangem.tap.domain.sdk.mocks.Mocks
 import java.util.Date
 
-object WalletMocks : Mocks {
+object WalletMocks : Mocks() {
 
     private val cardDto = CardDTO(
         cardId = "AC05000000086747",
