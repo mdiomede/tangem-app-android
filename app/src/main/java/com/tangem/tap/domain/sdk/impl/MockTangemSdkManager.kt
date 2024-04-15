@@ -6,18 +6,31 @@ import androidx.annotation.StringRes
 import com.tangem.Message
 import com.tangem.common.*
 import com.tangem.common.authentication.keystore.KeystoreManager
+import com.tangem.common.card.CardWallet
+import com.tangem.common.card.EllipticCurve
+import com.tangem.common.card.EncryptionMode
+import com.tangem.common.card.FirmwareVersion
 import com.tangem.common.core.*
 import com.tangem.common.extensions.ByteArrayKey
 import com.tangem.common.services.secure.SecureStorage
+import com.tangem.crypto.Ed25519
+import com.tangem.crypto.Secp256k1
+import com.tangem.crypto.Secp256r1
 import com.tangem.crypto.hdWallet.DerivationPath
 import com.tangem.domain.models.scan.CardDTO
 import com.tangem.domain.models.scan.ScanResponse
 import com.tangem.operations.derivation.DerivationTaskResponse
 import com.tangem.crypto.hdWallet.bip32.ExtendedPublicKey
+import com.tangem.domain.models.scan.ProductType
+import com.tangem.operations.attestation.Attestation
 import com.tangem.tap.domain.sdk.TangemSdkManager
+import com.tangem.tap.domain.sdk.mocks.MockProvider
 import com.tangem.tap.domain.tasks.product.CreateProductWalletTaskResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Date
 
 @Suppress("TooManyFunctions")
 class MockTangemSdkManager(
@@ -25,7 +38,7 @@ class MockTangemSdkManager(
 ) : TangemSdkManager {
 
     override val canUseBiometry: Boolean
-        get() = TODO()
+        get() = false
 
     override val needEnrollBiometrics: Boolean
         get() = TODO()
@@ -44,7 +57,7 @@ class MockTangemSdkManager(
         messageRes: Int?,
         allowsRequestAccessCodeFromRepository: Boolean,
     ): CompletionResult<ScanResponse> {
-        TODO()
+        return CompletionResult.Success(MockProvider.getScanResponse())
     }
 
     override suspend fun createProductWallet(
@@ -135,7 +148,6 @@ class MockTangemSdkManager(
 
     @Suppress("MagicNumber")
     override fun changeDisplayedCardIdNumbersCount(scanResponse: ScanResponse?) {
-        TODO()
     }
 
     @Deprecated("TangemSdkManager shouldn't returns a string from resources")
@@ -146,4 +158,5 @@ class MockTangemSdkManager(
     override fun setUserCodeRequestPolicy(policy: UserCodeRequestPolicy) {
         TODO()
     }
+
 }
