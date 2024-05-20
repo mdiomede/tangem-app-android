@@ -27,6 +27,7 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.tangem.core.analytics.api.AnalyticsEventHandler
+import com.tangem.core.decompose.context.AppComponentContext
 import com.tangem.core.deeplink.DeepLinksRegistry
 import com.tangem.core.navigation.AppScreen
 import com.tangem.core.navigation.NavigationAction
@@ -57,6 +58,7 @@ import com.tangem.tap.common.OnActivityResultCallback
 import com.tangem.tap.common.SnackbarHandler
 import com.tangem.tap.common.apptheme.MutableAppThemeModeHolder
 import com.tangem.tap.common.redux.NotificationsHandler
+import com.tangem.tap.di.RootAppComponentContext
 import com.tangem.tap.domain.sdk.TangemSdkManager
 import com.tangem.tap.domain.walletconnect2.domain.WalletConnectInteractor
 import com.tangem.tap.features.intentHandler.IntentProcessor
@@ -155,6 +157,10 @@ class MainActivity : AppCompatActivity(), SnackbarHandler, ActivityResultCallbac
     @Inject
     lateinit var emailSender: EmailSender
 
+    @Inject
+    @RootAppComponentContext
+    lateinit var rootComponentContext: AppComponentContext
+
     internal val viewModel: MainViewModel by viewModels()
 
     private lateinit var appThemeModeFlow: SharedFlow<AppThemeMode?>
@@ -239,6 +245,7 @@ class MainActivity : AppCompatActivity(), SnackbarHandler, ActivityResultCallbac
                 sendRouter = sendRouter,
                 qrScanningRouter = qrScanningRouter,
                 emailSender = emailSender,
+                rootComponentContext = rootComponentContext,
             ),
         )
     }
