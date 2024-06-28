@@ -58,6 +58,7 @@ interface SwapRepository {
         fromContractAddress: String,
         fromNetwork: String,
         toContractAddress: String,
+        fromAddress: String,
         toNetwork: String,
         fromAmount: String,
         fromDecimals: Int,
@@ -68,6 +69,17 @@ interface SwapRepository {
         refundAddress: String? = null, // for cex only
         refundExtraId: String? = null, // for cex only
     ): Either<DataError, SwapDataModel>
+
+    // TODO: Add target error handling, remove either (https://tangem.atlassian.net/browse/AND-7323)
+    @Suppress("LongParameterList")
+    suspend fun exchangeSent(
+        txId: String,
+        fromNetwork: String,
+        fromAddress: String,
+        payInAddress: String,
+        txHash: String,
+        payInExtraId: String?,
+    ): Either<DataError, Unit>
 
     fun getNativeTokenForNetwork(networkId: String): CryptoCurrency
 }
