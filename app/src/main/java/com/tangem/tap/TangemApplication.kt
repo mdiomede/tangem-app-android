@@ -24,7 +24,7 @@ import com.tangem.datasource.config.ConfigManager
 import com.tangem.datasource.config.FeaturesLocalLoader
 import com.tangem.datasource.config.models.Config
 import com.tangem.datasource.connection.NetworkConnectionManager
-import com.tangem.datasource.local.token.UserTokensStore
+import com.tangem.datasource.local.preferences.AppPreferencesStore
 import com.tangem.domain.appcurrency.repository.AppCurrencyRepository
 import com.tangem.domain.apptheme.GetAppThemeModeUseCase
 import com.tangem.domain.apptheme.repository.AppThemeModeRepository
@@ -131,8 +131,8 @@ abstract class TangemApplication : Application(), ImageLoaderFactory {
     private val balanceHidingRepository: BalanceHidingRepository
         get() = entryPoint.getBalanceHidingRepository()
 
-    private val userTokensStore: UserTokensStore
-        get() = entryPoint.getUserTokensStore()
+    private val appPreferencesStore: AppPreferencesStore
+        get() = entryPoint.getAppPreferencesStore()
 
     val getAppThemeModeUseCase: GetAppThemeModeUseCase
         get() = entryPoint.getGetAppThemeModeUseCase()
@@ -244,7 +244,7 @@ abstract class TangemApplication : Application(), ImageLoaderFactory {
         }
 
         derivationsFinder = DerivationsFinder(
-            newTokensStore = userTokensStore,
+            appPreferencesStore = appPreferencesStore,
             dispatchers = AppCoroutineDispatcherProvider(),
         )
         appStateHolder.mainStore = store
