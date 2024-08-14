@@ -11,6 +11,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import com.tangem.core.ui.extensions.resolveReference
 import com.tangem.core.ui.res.TangemColorPalette
 import com.tangem.core.ui.res.TangemThemePreview
 import com.tangem.core.ui.res.TangemTheme
+import com.tangem.core.ui.test.TestTags
 import com.tangem.tap.features.details.ui.common.ScreenTitle
 import com.tangem.tap.features.details.ui.common.SettingsScreensScaffold
 import com.tangem.wallet.R
@@ -54,7 +56,8 @@ private fun Content(state: DetailsScreenState, modifier: Modifier = Modifier) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag(TestTags.DETAILS_SCREEN),
         ) {
             ScreenTitle(titleRes = R.string.details_title)
             SpacerH(height = TangemTheme.dimens.spacing36)
@@ -94,7 +97,8 @@ private fun LargeDetailsItem(item: SettingsItem) {
             .clickable(onClick = item.onClick)
             .padding(horizontal = TangemTheme.dimens.spacing20)
             .heightIn(min = TangemTheme.dimens.size84)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .testTag(TestTags.DETAILS_SCREEN_ITEM),
         horizontalArrangement = Arrangement.spacedBy(TangemTheme.dimens.spacing20),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -143,7 +147,8 @@ private fun DetailsItem(item: SettingsItem) {
             .clickable(enabled = !item.showProgress, onClick = item.onClick)
             .padding(horizontal = TangemTheme.dimens.spacing20)
             .heightIn(min = TangemTheme.dimens.size56)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .testTag(TestTags.DETAILS_SCREEN_ITEM),
         horizontalArrangement = Arrangement.spacedBy(TangemTheme.dimens.spacing20),
         verticalAlignment = Alignment.CenterVertically,
     ) {

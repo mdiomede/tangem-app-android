@@ -29,7 +29,7 @@ abstract class BaseTestCase : TestCase(
 
     @get:Rule
     val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.POST_NOTIFICATIONS,
+        //Manifest.permission.POST_NOTIFICATIONS,
         Manifest.permission.CAMERA
     )
 

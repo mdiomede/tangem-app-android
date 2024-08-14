@@ -3,7 +3,7 @@ package com.tangem.tests
 import com.tangem.common.BaseTestCase
 import com.tangem.screens.DisclaimerScreen
 import com.tangem.screens.StoriesScreen
-import com.tangem.screens.WalletScreen
+import com.tangem.screens.MainScreen
 import com.tangem.tap.domain.sdk.mocks.MockProvider
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -39,7 +39,7 @@ class ScanErrorTest : BaseTestCase() {
                     }
                 }
             }
-            ComposeScreen.onComposeScreen<WalletScreen>(composeTestRule) {
+            ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
                 step("Make sure wallet screen is visible") {
                     assertIsDisplayed()
                 }

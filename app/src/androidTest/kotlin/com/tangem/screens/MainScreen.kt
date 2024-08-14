@@ -3,9 +3,10 @@ package com.tangem.screens
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import com.tangem.core.ui.test.TestTags
 import io.github.kakaocup.compose.node.element.ComposeScreen
+import io.github.kakaocup.compose.node.element.KNode
 
-class WalletScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
-    ComposeScreen<WalletScreen>(
+class MainScreen(semanticsProvider: SemanticsNodeInteractionsProvider) :
+    ComposeScreen<MainScreen>(
         semanticsProvider = semanticsProvider,
-        viewBuilderAction = { hasTestTag(TestTags.WALLET_SCREEN) }
+        viewBuilderAction = { hasTestTag(TestTags.MAIN_SCREEN) }
     )
