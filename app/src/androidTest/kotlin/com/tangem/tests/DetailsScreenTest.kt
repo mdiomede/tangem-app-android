@@ -24,10 +24,7 @@ class DetailsScreenTest : BaseTestCase() {
             }
             DisclaimerScreen {
                 step("Click on \"Accept\" button") {
-                    acceptButton {
-                        isVisible()
-                        click()
-                    }
+                    flakySafely { acceptButton.click() }
                 }
             }
             ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
@@ -90,10 +87,7 @@ class DetailsScreenTest : BaseTestCase() {
             }
             DisclaimerScreen {
                 step("Click on \"Accept\" button") {
-                    acceptButton {
-                        isVisible()
-                        click()
-                    }
+                    flakySafely { acceptButton.click() }
                 }
             }
             ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
@@ -157,10 +151,7 @@ class DetailsScreenTest : BaseTestCase() {
             }
             DisclaimerScreen {
                 step("Click on \"Accept\" button") {
-                    acceptButton {
-                        isVisible()
-                        click()
-                    }
+                    flakySafely { acceptButton.click() }
                 }
             }
             ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
