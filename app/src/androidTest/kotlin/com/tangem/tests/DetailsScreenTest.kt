@@ -141,4 +141,73 @@ class DetailsScreenTest : BaseTestCase() {
                 }
             }
         }
+
+
+    @Test
+    fun noteDetailsTest() =
+        setupHooks().run {
+            ComposeScreen.onComposeScreen<StoriesScreen>(composeTestRule) {
+                step("Click on \"Scan\" button") {
+                    MockProvider.setMocks(ProductType.Note)
+                    scanButton {
+                        assertIsDisplayed()
+                        performClick()
+                    }
+                }
+            }
+            DisclaimerScreen {
+                step("Click on \"Accept\" button") {
+                    acceptButton {
+                        isVisible()
+                        click()
+                    }
+                }
+            }
+            ComposeScreen.onComposeScreen<MainScreen>(composeTestRule) {
+                step("Make sure wallet screen is visible") {
+                    assertIsDisplayed()
+                }
+            }
+            ComposeScreen.onComposeScreen<TopBar>(composeTestRule) {
+                step("Open wallet details") {
+                    moreButton {
+                        assertIsDisplayed()
+                        performClick()
+                    }
+                    device.uiDevice.pressBack() //TODO: why details screen is visible only from second time
+                    moreButton {
+                        assertIsDisplayed()
+                        performClick()
+                    }
+                }
+            }
+            ComposeScreen.onComposeScreen<DetailsScreen>(composeTestRule) {
+                step("Assert wallet connect button is visible") {
+                    walletConnectButton.assertIsNotDisplayed()
+                }
+                step("Assert link more cards button is not visible") {
+                    linkMoreCardsButton.assertIsNotDisplayed()
+                }
+                step("Assert scan card button is visible") {
+                    scanCardButton.assertIsDisplayed()
+                }
+                step("Assert card settings button is visible") {
+                    cardSettingsButton.assertIsDisplayed()
+                }
+                step("Assert app settings button is visible") {
+                    appSettingsButton.assertIsDisplayed()
+                }
+                step("Assert contact support button is visible") {
+                    contactSupportButton.assertIsDisplayed()
+                }
+                step("Assert referral program button is visible") {
+                    referralProgramButton.assertIsNotDisplayed()
+                }
+                step("Assert terms or service button is visible") {
+                    toSButton.assertIsDisplayed()
+                }
+            }
+        }
+
+
 }
