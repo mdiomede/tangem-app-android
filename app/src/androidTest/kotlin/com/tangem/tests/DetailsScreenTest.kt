@@ -182,7 +182,7 @@ class DetailsScreenTest : BaseTestCase() {
                 }
             }
             ComposeScreen.onComposeScreen<DetailsScreen>(composeTestRule) {
-                step("Assert wallet connect button is visible") {
+                step("Assert wallet connect button is not visible") {
                     walletConnectButton.assertIsNotDisplayed()
                 }
                 step("Assert link more cards button is not visible") {
@@ -200,7 +200,7 @@ class DetailsScreenTest : BaseTestCase() {
                 step("Assert contact support button is visible") {
                     contactSupportButton.assertIsDisplayed()
                 }
-                step("Assert referral program button is visible") {
+                step("Assert referral program button is not visible") {
                     referralProgramButton.assertIsNotDisplayed()
                 }
                 step("Assert terms or service button is visible") {
