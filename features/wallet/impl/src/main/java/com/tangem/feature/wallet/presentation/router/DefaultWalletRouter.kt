@@ -140,7 +140,7 @@ internal class DefaultWalletRouter(
     }
 
     override fun openManageTokensScreen() {
-        router.push(AppRoute.ManageTokens(readOnlyContent = false))
+        router.push(AppRoute.ManageTokens(readOnlyContent = false, showToolbar = true))
     }
 
     override fun openScanFailedDialog(onTryAgain: () -> Unit) {

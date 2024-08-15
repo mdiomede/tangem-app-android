@@ -128,10 +128,11 @@ internal class ChildFactory @Inject constructor(
                         contextProvider = contextProvider(route, contextFactory),
                         params = ManageTokensComponent.Params(
                             mode = if (route.readOnlyContent) {
-                                ManageTokensComponent.Mode.READ_ONLY
+                                ManageTokensComponent.Mode.ReadOnly(showToolbar = route.showToolbar)
                             } else {
-                                ManageTokensComponent.Mode.MANAGE
+                                ManageTokensComponent.Mode.Manage(showToolbar = route.showToolbar)
                             },
+                            applyInnerContentPadding = true,
                         ),
                         componentFactory = manageTokensComponentFactory,
                     )

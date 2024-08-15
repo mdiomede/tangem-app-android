@@ -10,23 +10,26 @@ internal sealed class ManageTokensUM {
     abstract val popBack: () -> Unit
     abstract val isLoading: Boolean
     abstract val items: ImmutableList<CurrencyItemUM>
-    abstract val topBar: ManageTokensTopBarUM
+    abstract val topBar: ManageTokensTopBarUM?
     abstract val search: SearchBarUM
+    abstract val applyContentInnerPadding: Boolean
 
     data class ReadContent(
         override val popBack: () -> Unit,
         override val isLoading: Boolean,
         override val items: ImmutableList<CurrencyItemUM>,
-        override val topBar: ManageTokensTopBarUM,
+        override val topBar: ManageTokensTopBarUM?,
         override val search: SearchBarUM,
+        override val applyContentInnerPadding: Boolean,
     ) : ManageTokensUM()
 
     data class ManageContent(
         override val popBack: () -> Unit,
         override val isLoading: Boolean,
         override val items: ImmutableList<CurrencyItemUM>,
-        override val topBar: ManageTokensTopBarUM,
+        override val topBar: ManageTokensTopBarUM?,
         override val search: SearchBarUM,
+        override val applyContentInnerPadding: Boolean,
         val onSaveClick: () -> Unit,
         val hasChanges: Boolean,
     ) : ManageTokensUM()

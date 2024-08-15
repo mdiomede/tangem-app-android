@@ -13,7 +13,10 @@ import com.tangem.core.ui.components.rows.model.ChainRowUM
 import com.tangem.core.ui.extensions.resourceReference
 import com.tangem.domain.tokens.model.Network
 import com.tangem.features.managetokens.component.ManageTokensComponent
-import com.tangem.features.managetokens.entity.*
+import com.tangem.features.managetokens.entity.CurrencyItemUM
+import com.tangem.features.managetokens.entity.CurrencyNetworkUM
+import com.tangem.features.managetokens.entity.ManageTokensTopBarUM
+import com.tangem.features.managetokens.entity.ManageTokensUM
 import com.tangem.features.managetokens.impl.R
 import com.tangem.utils.coroutines.CoroutineDispatcherProvider
 import kotlinx.collections.immutable.mutate
@@ -38,20 +41,24 @@ internal class ManageTokensModel @Inject constructor(
 
     private fun getInitialState(mode: ManageTokensComponent.Mode): ManageTokensUM {
         return when (mode) {
-            ManageTokensComponent.Mode.READ_ONLY -> createReadContentModel()
-            ManageTokensComponent.Mode.MANAGE -> createManageContentModel()
+            is ManageTokensComponent.Mode.ReadOnly -> createReadContentModel(mode)
+            is ManageTokensComponent.Mode.Manage -> createManageContentModel(mode)
         }
     }
 
-    private fun createReadContentModel(): ManageTokensUM.ReadContent {
+    private fun createReadContentModel(mode: ManageTokensComponent.Mode.ReadOnly): ManageTokensUM.ReadContent {
         return ManageTokensUM.ReadContent(
             popBack = router::pop,
             isLoading = false,
             items = initItems(),
-            topBar = ManageTokensTopBarUM.ReadContent(
-                title = resourceReference(R.string.common_search_tokens),
-                onBackButtonClick = router::pop,
-            ),
+            topBar = if (mode.showToolbar) {
+                ManageTokensTopBarUM.ReadContent(
+                    title = resourceReference(R.string.common_search_tokens),
+                    onBackButtonClick = router::pop,
+                )
+            } else {
+                null
+            },
             search = SearchBarUM(
                 placeholderText = resourceReference(R.string.manage_tokens_search_placeholder),
                 query = "",
@@ -59,22 +66,27 @@ internal class ManageTokensModel @Inject constructor(
                 isActive = false,
                 onActiveChange = ::toggleSearchBar,
             ),
+            applyContentInnerPadding = params.applyInnerContentPadding,
         )
     }
 
-    private fun createManageContentModel(): ManageTokensUM.ManageContent {
+    private fun createManageContentModel(mode: ManageTokensComponent.Mode.Manage): ManageTokensUM.ManageContent {
         return ManageTokensUM.ManageContent(
             popBack = router::pop,
             isLoading = false,
             items = initItems(),
-            topBar = ManageTokensTopBarUM.ManageContent(
-                title = resourceReference(id = R.string.main_manage_tokens),
-                onBackButtonClick = router::pop,
-                endButton = TopAppBarButtonUM(
-                    iconRes = R.drawable.ic_plus_24,
-                    onIconClicked = ::onAddCustomToken,
-                ),
-            ),
+            topBar = if (mode.showToolbar) {
+                ManageTokensTopBarUM.ManageContent(
+                    title = resourceReference(id = R.string.main_manage_tokens),
+                    onBackButtonClick = router::pop,
+                    endButton = TopAppBarButtonUM(
+                        iconRes = R.drawable.ic_plus_24,
+                        onIconClicked = ::onAddCustomToken,
+                    ),
+                )
+            } else {
+                null
+            },
             search = SearchBarUM(
                 placeholderText = resourceReference(R.string.manage_tokens_search_placeholder),
                 query = "",
@@ -82,7 +94,8 @@ internal class ManageTokensModel @Inject constructor(
                 isActive = false,
                 onActiveChange = ::toggleSearchBar,
             ),
-            onSaveClick = ::onSaveClick,
+            applyContentInnerPadding = params.applyInnerContentPadding,
+            onSaveClick = { onSaveClick(mode.onSaved) },
             hasChanges = false,
         )
     }
@@ -91,8 +104,9 @@ internal class ManageTokensModel @Inject constructor(
         // TODO: https://tangem.atlassian.net/browse/AND-7256
     }
 
-    private fun onSaveClick() {
+    private fun onSaveClick(onSaved: () -> Unit) {
         // TODO: https://tangem.atlassian.net/browse/AND-7551
+        onSaved()
     }
 
     @Suppress("UnusedPrivateMember")

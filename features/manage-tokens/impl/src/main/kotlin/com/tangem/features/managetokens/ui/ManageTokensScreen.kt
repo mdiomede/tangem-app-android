@@ -1,6 +1,7 @@
 package com.tangem.features.managetokens.ui
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,6 +24,8 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.util.fastForEachIndexed
 import com.tangem.core.ui.components.BottomFade
 import com.tangem.core.ui.components.PrimaryButtonIconEnd
@@ -41,6 +44,7 @@ import com.tangem.core.ui.extensions.resolveReference
 import com.tangem.core.ui.extensions.resourceReference
 import com.tangem.core.ui.res.TangemTheme
 import com.tangem.core.ui.res.TangemThemePreview
+import com.tangem.features.managetokens.component.ManageTokensComponent
 import com.tangem.features.managetokens.component.preview.PreviewManageTokensComponent
 import com.tangem.features.managetokens.entity.CurrencyItemUM
 import com.tangem.features.managetokens.entity.CurrencyItemUM.Basic.NetworksUM
@@ -60,16 +64,24 @@ internal fun ManageTokensScreen(state: ManageTokensUM, modifier: Modifier = Modi
         modifier = modifier,
         containerColor = TangemTheme.colors.background.primary,
         topBar = {
-            ManageTokensTopBar(
-                modifier = Modifier.statusBarsPadding(),
-                topBar = state.topBar,
-            )
+            val topBar = state.topBar
+            if (topBar != null) {
+                ManageTokensTopBar(
+                    modifier = Modifier.statusBarsPadding(),
+                    topBar = topBar,
+                )
+            }
         },
         content = { innerPadding ->
-            Content(
-                modifier = Modifier
+            val contentModifier = if (state.applyContentInnerPadding) {
+                Modifier
                     .padding(innerPadding)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+            } else {
+                Modifier.fillMaxSize()
+            }
+            Content(
+                modifier = contentModifier,
                 search = state.search,
                 items = state.items,
                 isLoading = state.isLoading,
@@ -313,9 +325,19 @@ private fun NetworksList(networks: NetworksUM, currencyId: String, modifier: Mod
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Preview(showBackground = true, widthDp = 360, heightDp = 800, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun Preview_ManageTokens() {
+private fun Preview_ManageTokens(
+    @PreviewParameter(ManageTokensComponentParamsProvider::class) params: ManageTokensComponent.Params,
+) {
     TangemThemePreview {
-        PreviewManageTokensComponent().Content(Modifier.fillMaxWidth())
+        PreviewManageTokensComponent(params).Content(Modifier.fillMaxWidth())
     }
 }
+
+private class ManageTokensComponentParamsProvider : CollectionPreviewParameterProvider<ManageTokensComponent.Params>(
+    collection = listOf(
+        ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.Manage(showToolbar = true)),
+        ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.Manage(showToolbar = false)),
+        ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.ReadOnly(showToolbar = true))
+    )
+)
 // endregion Preview
