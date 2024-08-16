@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -87,6 +89,7 @@ internal fun StakingInitialInfoContent(state: StakingStates.InitialInfoState, cl
                         rewardCrypto = state.yieldBalance.rewardsCrypto,
                         rewardFiat = state.yieldBalance.rewardsFiat,
                         isRewardsToClaim = state.yieldBalance.isRewardsToClaim,
+                        isRewardsClaimable = state.yieldBalance.isRewardsClaimable,
                         onRewardsClick = clickIntents::openRewardsValidators,
                     )
                     SpacerH12()
@@ -109,6 +112,7 @@ internal fun StakingInitialInfoContent(state: StakingStates.InitialInfoState, cl
 private fun BannerBlock(onClick: () -> Unit) {
     Box(
         modifier = Modifier
+            .clip(RoundedCornerShape(size = TangemTheme.dimens.radius14))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
@@ -140,6 +144,7 @@ private fun StakingRewardBlock(
     rewardCrypto: String,
     rewardFiat: String,
     isRewardsToClaim: Boolean,
+    isRewardsClaimable: Boolean,
     onRewardsClick: () -> Unit,
 ) {
     val (text, textColor) = if (isRewardsToClaim) {
@@ -158,7 +163,7 @@ private fun StakingRewardBlock(
     InputRowDefault(
         title = resourceReference(R.string.staking_rewards),
         text = text,
-        iconRes = R.drawable.ic_chevron_right_24.takeIf { isRewardsToClaim },
+        iconRes = R.drawable.ic_chevron_right_24.takeIf { isRewardsToClaim && isRewardsClaimable },
         textColor = textColor,
         modifier = Modifier
             .clip(TangemTheme.shapes.roundedCornersXMedium)
@@ -166,7 +171,7 @@ private fun StakingRewardBlock(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                enabled = isRewardsToClaim,
+                enabled = isRewardsToClaim && isRewardsClaimable,
                 onClick = onRewardsClick,
             ),
     )
@@ -189,42 +194,26 @@ private fun ActiveStakingBlock(groups: ImmutableList<BalanceGroupedState>, onCli
                             .clip(TangemTheme.shapes.roundedCornersXMedium)
                             .background(TangemTheme.colors.background.action),
                     ) {
-                        group.items.forEachIndexed { index, balance ->
+                        Text(
+                            text = group.title.resolveReference(),
+                            style = TangemTheme.typography.subtitle2,
+                            color = TangemTheme.colors.text.tertiary,
+                            modifier = Modifier.padding(
+                                top = TangemTheme.dimens.spacing12,
+                                start = TangemTheme.dimens.spacing12,
+                                end = TangemTheme.dimens.spacing12,
+                            ),
+                        )
+                        group.items.forEach { balance ->
                             key(balance.validator.address) {
-                                val caption = if (group.type == BalanceType.UNSTAKING) {
-                                    combinedReference(
-                                        resourceReference(R.string.staking_details_unbonding_period),
-                                        annotatedReference {
-                                            appendSpace()
-                                            appendColored(
-                                                text = balance.unbondingPeriod.resolveReference(),
-                                                color = TangemTheme.colors.text.accent,
-                                            )
-                                        },
-                                    )
-                                } else {
-                                    combinedReference(
-                                        resourceReference(R.string.app_name),
-                                        annotatedReference {
-                                            appendSpace()
-                                            appendColored(
-                                                text = BigDecimalFormatter.formatPercent(
-                                                    percent = balance.validator.apr.orZero(),
-                                                    useAbsoluteValue = true,
-                                                ),
-                                                color = TangemTheme.colors.text.accent,
-                                            )
-                                        },
-                                    )
-                                }
                                 InputRowImageInfo(
-                                    title = group.title.takeIf { index == 0 },
                                     subtitle = stringReference(balance.validator.name),
-                                    caption = caption,
+                                    caption = getCaption(group.type, balance),
                                     isGrayscaleImage = group.type == BalanceType.UNSTAKING,
                                     infoTitle = balance.fiatAmount,
                                     infoSubtitle = balance.cryptoAmount,
                                     imageUrl = balance.validator.image.orEmpty(),
+                                    iconEndRes = R.drawable.ic_chevron_right_24.takeIf { group.isClickable },
                                     modifier = Modifier.clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = rememberRipple(),
@@ -238,6 +227,36 @@ private fun ActiveStakingBlock(groups: ImmutableList<BalanceGroupedState>, onCli
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun getCaption(balanceType: BalanceType, balance: BalanceState): TextReference {
+    return if (balanceType == BalanceType.UNSTAKING) {
+        combinedReference(
+            resourceReference(R.string.staking_details_unbonding_period),
+            annotatedReference {
+                appendSpace()
+                appendColored(
+                    text = balance.unbondingPeriod.resolveReference(),
+                    color = TangemTheme.colors.text.accent,
+                )
+            },
+        )
+    } else {
+        combinedReference(
+            resourceReference(R.string.app_name),
+            annotatedReference {
+                appendSpace()
+                appendColored(
+                    text = BigDecimalFormatter.formatPercent(
+                        percent = balance.validator.apr.orZero(),
+                        useAbsoluteValue = true,
+                    ),
+                    color = TangemTheme.colors.text.accent,
+                )
+            },
+        )
     }
 }
 

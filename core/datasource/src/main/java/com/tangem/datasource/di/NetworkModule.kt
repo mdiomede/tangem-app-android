@@ -14,6 +14,7 @@ import com.tangem.datasource.api.markets.TangemTechMarketsApi
 import com.tangem.datasource.api.stakekit.StakeKitApi
 import com.tangem.datasource.api.tangemTech.TangemTechApi
 import com.tangem.datasource.api.tangemTech.TangemTechApiV2
+import com.tangem.datasource.local.logs.AppLogsStore
 import com.tangem.datasource.local.preferences.AppPreferencesStore
 import com.tangem.datasource.utils.*
 import com.tangem.datasource.utils.RequestHeader.AppVersionPlatformHeaders
@@ -32,7 +33,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+internal object NetworkModule {
+
+    private const val DEV_V1_TANGEM_TECH_BASE_URL = "https://devapi.tangem-tech.com/v1/"
+    private const val PROD_V2_TANGEM_TECH_BASE_URL = "https://api.tangem-tech.com/v2/"
+    private const val TANGEM_TECH_MARKETS_SERVICE_TIMEOUT_SECONDS = 60L
 
     @Provides
     @Singleton
@@ -54,21 +59,19 @@ class NetworkModule {
         @NetworkMoshi moshi: Moshi,
         @ApplicationContext context: Context,
         apiConfigsManager: ApiConfigsManager,
+        appLogsStore: AppLogsStore,
     ): TangemExpressApi {
-        val environmentConfig = apiConfigsManager.getEnvironmentConfig(id = ApiConfig.ID.Express)
-
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
-            .baseUrl(environmentConfig.baseUrl)
-            .client(
-                OkHttpClient.Builder()
-                    .applyApiConfig(ApiConfig.ID.Express, apiConfigsManager)
-                    .addLoggers(context)
-                    .build(),
-            )
-            .build()
-            .create(TangemExpressApi::class.java)
+        return createApi(
+            id = ApiConfig.ID.Express,
+            moshi = moshi,
+            context = context,
+            apiConfigsManager = apiConfigsManager,
+            clientBuilder = {
+                addInterceptor(
+                    NetworkLogsSaveInterceptor(appLogsStore),
+                )
+            },
+        )
     }
 
     @Provides
@@ -77,21 +80,19 @@ class NetworkModule {
         @NetworkMoshi moshi: Moshi,
         @ApplicationContext context: Context,
         apiConfigsManager: ApiConfigsManager,
+        appLogsStore: AppLogsStore,
     ): StakeKitApi {
-        val environmentConfig = apiConfigsManager.getEnvironmentConfig(id = ApiConfig.ID.StakeKit)
-
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
-            .baseUrl(environmentConfig.baseUrl)
-            .client(
-                OkHttpClient.Builder()
-                    .applyApiConfig(id = ApiConfig.ID.StakeKit, apiConfigsManager = apiConfigsManager)
-                    .addLoggers(context)
-                    .build(),
-            )
-            .build()
-            .create(StakeKitApi::class.java)
+        return createApi(
+            id = ApiConfig.ID.StakeKit,
+            moshi = moshi,
+            context = context,
+            apiConfigsManager = apiConfigsManager,
+            clientBuilder = {
+                addInterceptor(
+                    NetworkLogsSaveInterceptor(appLogsStore),
+                )
+            },
+        )
     }
 
     @Provides
@@ -101,36 +102,27 @@ class NetworkModule {
         @ApplicationContext context: Context,
         apiConfigsManager: ApiConfigsManager,
     ): TangemTechApi {
-        val environmentConfig = apiConfigsManager.getEnvironmentConfig(id = ApiConfig.ID.TangemTech)
-
-        return Retrofit.Builder()
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
-            .baseUrl(environmentConfig.baseUrl)
-            .client(
-                OkHttpClient.Builder()
-                    .applyApiConfig(id = ApiConfig.ID.TangemTech, apiConfigsManager = apiConfigsManager)
-                    .applyTimeoutAnnotations()
-                    .addLoggers(context)
-                    .build(),
-            )
-            .build()
-            .create(TangemTechApi::class.java)
+        return createApi(
+            id = ApiConfig.ID.TangemTech,
+            moshi = moshi,
+            context = context,
+            apiConfigsManager = apiConfigsManager,
+            clientBuilder = { applyTimeoutAnnotations() },
+        )
     }
 
+    // TODO: It will be deleted in the future or refactored using ApiConfig
     @Provides
     @Singleton
     fun provideTangemTechApiV2(
         @NetworkMoshi moshi: Moshi,
         @ApplicationContext context: Context,
         appVersionProvider: AppVersionProvider,
-        apiConfigsManager: ApiConfigsManager,
     ): TangemTechApiV2 {
         return provideTangemTechApiInternal(
             moshi = moshi,
             context = context,
             appVersionProvider = appVersionProvider,
-            apiConfigsManager = apiConfigsManager,
             baseUrl = PROD_V2_TANGEM_TECH_BASE_URL,
         )
     }
@@ -142,17 +134,16 @@ class NetworkModule {
         @NetworkMoshi moshi: Moshi,
         @ApplicationContext context: Context,
         appVersionProvider: AppVersionProvider,
-        apiConfigsManager: ApiConfigsManager,
     ): TangemTechApi {
         return provideTangemTechApiInternal(
             moshi = moshi,
             context = context,
             appVersionProvider = appVersionProvider,
-            apiConfigsManager = apiConfigsManager,
             baseUrl = DEV_V1_TANGEM_TECH_BASE_URL,
         )
     }
 
+    // TODO: https://tangem.atlassian.net/browse/AND-7937
     @Provides
     @DevTangemApi
     @Singleton
@@ -160,13 +151,11 @@ class NetworkModule {
         @NetworkMoshi moshi: Moshi,
         @ApplicationContext context: Context,
         appVersionProvider: AppVersionProvider,
-        apiConfigsManager: ApiConfigsManager,
     ): TangemTechMarketsApi {
         return provideTangemTechApiInternal(
             moshi = moshi,
             context = context,
             appVersionProvider = appVersionProvider,
-            apiConfigsManager = apiConfigsManager,
             baseUrl = DEV_V1_TANGEM_TECH_BASE_URL,
             timeouts = Timeouts(
                 callTimeoutSeconds = TANGEM_TECH_MARKETS_SERVICE_TIMEOUT_SECONDS,
@@ -181,13 +170,11 @@ class NetworkModule {
         moshi: Moshi,
         context: Context,
         appVersionProvider: AppVersionProvider,
-        apiConfigsManager: ApiConfigsManager,
         baseUrl: String,
         timeouts: Timeouts = Timeouts(),
         requestHeaders: List<RequestHeader> = listOf(AppVersionPlatformHeaders(appVersionProvider)),
     ): T {
         val client = OkHttpClient.Builder()
-            .applyApiConfig(id = ApiConfig.ID.TangemTech, apiConfigsManager = apiConfigsManager)
             .applyTimeoutAnnotations()
             .let { builder ->
                 var b = builder
@@ -222,18 +209,34 @@ class NetworkModule {
             .create(T::class.java)
     }
 
+    private inline fun <reified T> createApi(
+        id: ApiConfig.ID,
+        moshi: Moshi,
+        context: Context,
+        apiConfigsManager: ApiConfigsManager,
+        clientBuilder: OkHttpClient.Builder.() -> OkHttpClient.Builder = { this },
+    ): T {
+        val environmentConfig = apiConfigsManager.getEnvironmentConfig(id)
+
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
+            .baseUrl(environmentConfig.baseUrl)
+            .client(
+                OkHttpClient.Builder()
+                    .applyApiConfig(id, apiConfigsManager)
+                    .addLoggers(context)
+                    .clientBuilder()
+                    .build(),
+            )
+            .build()
+            .create(T::class.java)
+    }
+
     private data class Timeouts(
         val callTimeoutSeconds: Long? = null,
         val connectTimeoutSeconds: Long? = null,
         val readTimeoutSeconds: Long? = null,
         val writeTimeoutSeconds: Long? = null,
     )
-
-    private companion object {
-        const val DEV_V1_TANGEM_TECH_BASE_URL = "https://devapi.tangem-tech.com/v1/"
-
-        const val PROD_V2_TANGEM_TECH_BASE_URL = "https://api.tangem-tech.com/v2/"
-
-        const val TANGEM_TECH_MARKETS_SERVICE_TIMEOUT_SECONDS = 60L
-    }
 }
