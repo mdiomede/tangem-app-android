@@ -65,6 +65,7 @@ data class SignatureVerification(
 enum class TronResource {
     @Json(name = "ENERGY")
     ENERGY,
+
     @Json(name = "BANDWIDTH")
     BANDWIDTH,
 }

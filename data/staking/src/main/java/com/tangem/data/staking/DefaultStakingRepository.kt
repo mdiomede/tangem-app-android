@@ -4,7 +4,6 @@ import android.util.Base64
 import arrow.core.raise.catch
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import com.tangem.blockchain.common.Blockchain
 import com.tangem.blockchain.common.TransactionData
 import com.tangem.blockchain.common.TransactionStatus
@@ -517,8 +516,7 @@ internal class DefaultStakingRepository(
                 validatorAddress = params.validatorAddress,
                 validatorAddresses = listOf(params.validatorAddress), // check on other networks
                 tronResource = getTronResource(network),
-
-                ),
+            ),
         )
     }
 
