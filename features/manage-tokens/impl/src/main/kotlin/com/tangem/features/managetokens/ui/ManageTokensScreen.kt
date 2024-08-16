@@ -1,7 +1,6 @@
 package com.tangem.features.managetokens.ui
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
@@ -337,7 +336,7 @@ private class ManageTokensComponentParamsProvider : CollectionPreviewParameterPr
     collection = listOf(
         ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.Manage(showToolbar = true)),
         ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.Manage(showToolbar = false)),
-        ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.ReadOnly(showToolbar = true))
-    )
+        ManageTokensComponent.Params(mode = ManageTokensComponent.Mode.ReadOnly(showToolbar = true)),
+    ),
 )
 // endregion Preview
