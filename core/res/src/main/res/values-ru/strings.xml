@@ -807,6 +807,8 @@
   <string name="wallet_settings_title">Настройки кошелька</string>
   <string name="wallet_title">Tangem</string>
   <string name="warning_access_denied_message">Используйте %s или отсканируйте карту, чтобы разблокировать доступ к вашему кошельку</string>
+  <string name="warning_approval_in_progress_message">Процесс выдачи разрешения уже в работе и скоро будет завершен</string>
+  <string name="warning_approval_in_progress_title">Выдача разрешения</string>
   <string name="warning_backup_errors_message">Похоже, что процесс активации карт не был завершен корректно. Это могло быть вызвано проблемой взаимодействия с модулем NFC либо некорректным прикладыванием карты к телефону. Пожалуйста, обратитесь в нашу службу поддержки для уточнения деталей.</string>
   <string name="warning_backup_errors_title">Ошибка активации</string>
   <string name="warning_beacon_chain_retirement_content">По решению разработчиков сети BNB стандарт BEP-2 перестанет поддерживаться в июне 2024 года. Чтобы не потерять активы, их необходимо преобразовать в стандарт BEP-20. Используйте функцию обмена в приложении или сторонние сервисы, чтобы перевести средства в cеть BNB Smart Chain.</string>
@@ -824,14 +826,14 @@
   <string name="warning_existential_deposit_title">Для работы с сетью необходим депозит</string>
   <string name="warning_express_active_transaction_message">Обмен будет доступен после завершения %s транзакции</string>
   <string name="warning_express_active_transaction_title">У вас есть активная транзакция</string>
-  <string name="warning_express_approval_in_progress_message">Разрешение обмена в процессе и будет скоро завершено</string>
-  <string name="warning_express_approval_in_progress_title">Разрешение в процессе</string>
   <string name="warning_express_dust_message">Минимальная сумма обмена - %1$s. Пожалуйста, убедитесь, что остаток после обмена также не будет меньше %2$s.</string>
   <string name="warning_express_no_exchangeable_coins_description">У вас в списке нет монет доступных для обмена с %s</string>
   <string name="warning_express_no_exchangeable_coins_title">Нет доступных для обмена токенов</string>
   <string name="warning_express_not_enough_fee_for_token_tx_description">Чтобы совершить транзакцию, вам необходимо внести немного %1$s %2$s</string>
   <string name="warning_express_not_enough_fee_for_token_tx_title">Невозможно покрыть комиссию %s</string>
   <string name="warning_express_notification_invalid_reserve_amount_title">Сумма получения не может быть менее %s</string>
+  <string name="warning_express_pair_unavailable_message">Это может произойти из-за того, что провайдер временно не предоставляет обмен выбранной вами пары. Пожалуйста, подождите некоторое время и попробуйте снова. (Код %@)</string>
+  <string name="warning_express_pair_unavailable_title">Выбранная пара временно недоступна</string>
   <string name="warning_express_refresh_required_title">Cервис временно недоступен</string>
   <string name="warning_express_too_maximum_amount_title">Сумма для обмена должна быть не более %s</string>
   <string name="warning_express_too_minimal_amount_title">Сумма для обмена должна быть не менее %s</string>

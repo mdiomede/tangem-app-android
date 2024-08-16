@@ -1,7 +1,6 @@
 package com.tangem.features.staking.impl.presentation.state.transformers.approval
 
-import com.tangem.core.ui.extensions.resourceReference
-import com.tangem.features.staking.impl.R
+import com.tangem.core.ui.extensions.stringReference
 import com.tangem.features.staking.impl.presentation.state.StakingNotification
 import com.tangem.features.staking.impl.presentation.state.StakingStates
 import com.tangem.features.staking.impl.presentation.state.StakingUiState
@@ -16,8 +15,8 @@ internal object SetApprovalInProgressTransformer : Transformer<StakingUiState> {
         // todo staking AND-7962 replace with correct text
         notifications.add(
             StakingNotification.Warning.TransactionInProgress(
-                title = resourceReference(R.string.warning_express_approval_in_progress_title),
-                description = resourceReference(R.string.warning_express_approval_in_progress_message),
+                title = stringReference("//TODO"),
+                description = stringReference("//TODO"),
             ),
         )
 
